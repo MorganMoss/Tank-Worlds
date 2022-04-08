@@ -1,27 +1,38 @@
-package za.co.wethinkcode.robotworlds.server;
+package src.main.java.za.co.wethinkcode.robotworlds.server;
 
 import java.util.List;
 
+import src.main.java.za.co.wethinkcode.robotworlds.server.map.Map;
+
 public class World {
-    private final List<Obstacle> obstacleList;
     private final Position mapSize;
     private final int repairTime;
     private List<Robot> robots;
     private List<Integer>[][] grid;
 
-    public World(List<Obstacle> obstacleList, Position mapSize, int repairTime) {
-        this.obstacleList = obstacleList;
-        this.mapSize = mapSize;
+
+    public World(Map map, int repairTime) {
         this.repairTime = repairTime;
+        this.mapSize = map.getMapSize();
+        List<Obstacle> obstacleList = map.getObstacles();
+        // TODO : take obstacles and turn them into a grid of integers
+        grid = null;
     }
 
-    public void add(Robot robot) {}
 
-    public void remove(Robot robot) {}
+    public void add(Robot robot) {
+        robots.add(robot);
+    }
+
+    public void remove(Robot robot) {
+        robots.remove(robot);
+    }
+
 
     public void updatePosition(Robot robot, int steps) {}
 
     public void updateDirection(Robot robot, int degrees) {}
+
 
     public void fire(Robot robot) {}
 

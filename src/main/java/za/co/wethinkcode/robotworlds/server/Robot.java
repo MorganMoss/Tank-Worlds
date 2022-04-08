@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.server;
+package src.main.java.za.co.wethinkcode.robotworlds.server;
 
 abstract class Robot {
     private final String name;

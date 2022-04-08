@@ -1,6 +1,6 @@
-package za.co.wethinkcode.robotworlds.server;
+package src.main.java.za.co.wethinkcode.robotworlds.server;
 
-abstract class Obstacle {
+public abstract class Obstacle {
     private final String shape;
     private final int size;
     private final Position centrePosition;
