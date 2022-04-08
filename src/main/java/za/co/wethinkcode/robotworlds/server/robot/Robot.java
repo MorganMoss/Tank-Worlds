@@ -1,6 +1,9 @@
-package src.main.java.za.co.wethinkcode.robotworlds.server;
+package src.main.java.za.co.wethinkcode.robotworlds.server.robot;
 
-abstract class Robot {
+import src.main.java.za.co.wethinkcode.robotworlds.server.Direction;
+import src.main.java.za.co.wethinkcode.robotworlds.server.Position;
+
+public abstract class Robot {
     private final String name;
     private final String visibilityPattern;
     private final int maxShield;
@@ -25,7 +28,7 @@ abstract class Robot {
 
     public Position getPosition() {return this.position;}
 
-    public void setDirection(int Angle) {}
+    public void setDirection(int angle) {}
 
     public Direction getDirection() {return this.direction;}
 
@@ -35,12 +38,12 @@ abstract class Robot {
 
     public void decreaseAmmo() {this.currentAmmo--;}
 
-    public abstract void resetAmmo();
+    public void resetAmmo() {this.currentAmmo = this.maxAmmo;}
 
     public int getShield() {return this.currentShield;}
 
     public void decreaseShield() {this.currentShield--;}
 
-    public abstract void resetShield();
+    public void resetShield() {this.currentShield = this.maxShield;}
 
 }

@@ -3,6 +3,7 @@ package src.main.java.za.co.wethinkcode.robotworlds.server;
 import java.util.List;
 
 import src.main.java.za.co.wethinkcode.robotworlds.server.map.Map;
+import src.main.java.za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 public class World {
     private final Position mapSize;
