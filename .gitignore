@@ -19,6 +19,9 @@
 *.tar.gz
 *.rar
 
+# Intellij
+.idea/*
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
