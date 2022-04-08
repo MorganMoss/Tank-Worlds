@@ -1,10 +1,8 @@
 package za.co.wethinkcode.robotworlds.server;
 
-import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 
-public class MultiServers {
+public class Server {
     public final World world;
     public final ServerSocket socket;
     public List<Request> currentRequests;

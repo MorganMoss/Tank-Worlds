@@ -1,13 +1,19 @@
-package za.co.wethinkcode.robotworlds;
+package za.co.wethinkcode.robotworlds.server;
 
 import java.util.List;
 
 public class World {
     private final List<Obstacle> obstacleList;
-    private final Bounds;
-    private final RepairTime;
+    private final Position mapSize;
+    private final int repairTime;
     private List<Robot> robots;
     private List<Integer>[][] grid;
+
+    public World(List<Obstacle> obstacleList, Position mapSize, int repairTime) {
+        this.obstacleList = obstacleList;
+        this.mapSize = mapSize;
+        this.repairTime = repairTime;
+    }
 
     public void add(Robot robot) {}
 

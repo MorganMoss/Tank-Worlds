@@ -1,16 +1,20 @@
-package za.co.wethinkcode.robotworlds;
+package za.co.wethinkcode.robotworlds.server;
 
 import java.util.List;
 
 abstract class Map {
-    private final int mapSize;
-    List<Obstacle> obstacles;
+    private final Position mapSize;
+    private List<Obstacle> obstacles;
+
+    public Map(Position mapSize) {
+        this.mapSize = mapSize;
+    }
 
     public List<Obstacle> getObstacles() {
         return this.obstacles;
     }
 
-    public int getMapSize() {
+    public Position getMapSize() {
         return this.mapSize;
     }
 }
