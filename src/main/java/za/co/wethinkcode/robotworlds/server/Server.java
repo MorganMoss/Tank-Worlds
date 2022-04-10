@@ -4,8 +4,8 @@ import za.co.wethinkcode.robotworlds.protocol.*;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.net.*;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -15,7 +15,7 @@ public class Server {
     /**
      * The world the server interacts with when handling requests and responses
      */
-    private final World world;
+//    private final World world;
 
 
     /**
@@ -37,14 +37,14 @@ public class Server {
     /**
      * Opens a server socket and initializes world from config.
      */
-    public Server() {
-        try {
-            socket = new ServerSocket();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        world = new World(getMap(), getRepairTime());
-    }
+//    public Server() {
+//        try {
+//            socket = new ServerSocket();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        world = new World(getMap(), getRepairTime());
+//    }
 
 
     /**
@@ -89,11 +89,29 @@ public class Server {
      * should execute requests and send reponses to clients when run
      * @param args : no args are handled
      */
-    public static void main(String[] args) {
-        Server server = new Server();
-        do {
-            server.executeRequests();
-            server.sendResponses();
-        } while (true);
+//    public static void main(String[] args) {
+//        Server server = new Server();
+//        do {
+//            server.executeRequests();
+//            server.sendResponses();
+//        } while (true);
+//    }
+
+    public static void main(String[] args) throws ClassNotFoundException, IOException {
+
+        ServerSocket s = new ServerSocket(SimpleServer.PORT);
+        System.out.println("Server running & waiting for client connections.");
+        while(true) {
+            try {
+                Socket socket = s.accept();
+                System.out.println("Connection: " + socket);
+
+                Runnable r = new SimpleServer(socket);
+                Thread task = new Thread(r);
+                task.start();
+            } catch(IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }
