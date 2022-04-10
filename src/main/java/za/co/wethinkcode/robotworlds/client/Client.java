@@ -1,9 +1,9 @@
-package src.main.java.za.co.wethinkcode.robotworlds.client;
+package za.co.wethinkcode.robotworlds.client;
 
 import java.net.Socket;
 
-import src.main.java.za.co.wethinkcode.robotworlds.protocol.Request;
-import src.main.java.za.co.wethinkcode.robotworlds.protocol.Response;
+import za.co.wethinkcode.robotworlds.protocol.Request;
+import za.co.wethinkcode.robotworlds.protocol.Response;
 
 public class Client {
     public final String robotName;
@@ -11,9 +11,14 @@ public class Client {
     public Request currentRequest;
     public Response currentResponse;
 
-    giveRequest(String input) {}
+    public Client(String robotName, Socket socket) {
+        this.robotName = robotName;
+        this.socket = socket;
+    }
 
-    getResponse() {}
+    void giveRequest(String input) {}
+
+    void getResponse() {}
 
     public static void main(String[] args) {
         

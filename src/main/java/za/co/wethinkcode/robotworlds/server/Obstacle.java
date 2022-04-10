@@ -1,4 +1,4 @@
-package src.main.java.za.co.wethinkcode.robotworlds.server;
+package za.co.wethinkcode.robotworlds.server;
 
 public abstract class Obstacle {
     private final String shape;

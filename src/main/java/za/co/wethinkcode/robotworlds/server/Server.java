@@ -1,8 +1,8 @@
-package src.main.java.za.co.wethinkcode.robotworlds.server;
+package za.co.wethinkcode.robotworlds.server;
 
-import src.main.java.za.co.wethinkcode.robotworlds.protocol.*;
-import src.main.java.za.co.wethinkcode.robotworlds.server.map.BasicMap;
-import src.main.java.za.co.wethinkcode.robotworlds.server.map.Map;
+import za.co.wethinkcode.robotworlds.protocol.*;
+import za.co.wethinkcode.robotworlds.server.map.BasicMap;
+import za.co.wethinkcode.robotworlds.server.map.Map;
 
 import java.io.IOException;
 import java.net.ServerSocket;

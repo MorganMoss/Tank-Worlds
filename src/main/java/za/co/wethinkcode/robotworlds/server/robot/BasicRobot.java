@@ -1,4 +1,4 @@
-package src.main.java.za.co.wethinkcode.robotworlds.server.robot;
+package za.co.wethinkcode.robotworlds.server.robot;
 
 public class BasicRobot extends Robot {
 
