@@ -30,7 +30,7 @@ class TankWar extends JComponent {
 
     private TankWar() {
         System.out.println("Enter Socket Name: ");
-        Socket.name=scanner.nextLine();
+        ClientSocket.name=scanner.nextLine();
 
         this.addKeyListener(new KeyAdapter() {
             // GET PLAYER COMMAND
@@ -45,25 +45,29 @@ class TankWar extends JComponent {
                             enemy1.takeHit(7);
                             }
                         request = "fire";
-                        Socket.run();
+                        ClientSocket.run();
+                        System.out.println(ClientSocket.response);
                         break;
                     case KeyEvent.VK_M:
 //                        client.HelperMethods.playAudio(Tools.nextBoolean() ? "supershoot.wav" : "supershoot.aiff");
                         repair();
                         request = "repair";
-                        Socket.run();
+                        ClientSocket.run();
+                        System.out.println(ClientSocket.response);
                         break;
 
                     case KeyEvent.VK_R:
 //                        client.HelperMethods.playAudio(Tools.nextBoolean() ? "supershoot.wav" : "supershoot.aiff");
                         request = "reload";
-                        Socket.run();
+                        ClientSocket.run();
+                        System.out.println(ClientSocket.response);
                         reload();
                         break;
                     case KeyEvent.VK_LEFT:
                         System.out.println(x);
                         request = "left";
-                        Socket.run();
+                        ClientSocket.run();
+                        System.out.println(ClientSocket.response);
                         if(tankDirection == Direction.Up){
                             tankDirection = Direction.Left;
                         }else if (tankDirection == Direction.Right){
@@ -76,7 +80,8 @@ class TankWar extends JComponent {
                         break;
                     case KeyEvent.VK_UP:
                         request = "forward";
-                        Socket.run();
+                        ClientSocket.run();
+                        System.out.println(ClientSocket.response);
                         System.out.println(y);
                         if(tankDirection == Direction.Up){
                             y -= 5;
@@ -90,7 +95,8 @@ class TankWar extends JComponent {
                         break;
                     case KeyEvent.VK_DOWN:
                         request = "back";
-                        Socket.run();
+                        ClientSocket.run();
+                        System.out.println(ClientSocket.response);
                         if(tankDirection == Direction.Up){
                             y += 5;
                         }else if (tankDirection == Direction.Right){
@@ -103,7 +109,8 @@ class TankWar extends JComponent {
                         break;
                     case KeyEvent.VK_RIGHT:
                         request = "right";
-                        Socket.run();
+                        ClientSocket.run();
+                        System.out.println(ClientSocket.response);
                         if(tankDirection == Direction.Up){
                             tankDirection = Direction.Right;
                         }else if (tankDirection == Direction.Right){

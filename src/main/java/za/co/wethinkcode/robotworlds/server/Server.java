@@ -69,36 +69,51 @@ public class Server {
         }
     }
 
-    public static void main(String[] args) throws ClassNotFoundException, IOException {
+    public static void main(String[] args) {
+        ServerSocket server = null;
+
+        try {
 
 //        We use the PORT as defined in SimpleServer. This is the port that client
 //        applications must connect to. ServerSocket is used on the server side to
 //        manage client connections.
-        ServerSocket serverSocket = new ServerSocket(SimpleServer.PORT);
-        System.out.println("Server running & waiting for client connections.");
+            server = new ServerSocket(SimpleServer.PORT);
+            server.setReuseAddress(true);
 
-        while(true) {
-            try {
-//        The accept() method blocks execution (i.e. it waits) until a client has
-//        connected, then it returns an instance of Socket that represents the
-//        connection with that specific client.
-                Socket socket = serverSocket.accept();
-                System.out.println("Connection: " + socket.getInetAddress().getHostAddress());
+            // running infinite loop for getting
+            // client request
+            while (true) {
 
-//        We create an instance of SimpleServer that will handle the
-//        communications with the specific client that has connected.
-//        We then create a Thread that will let our SimpleServer instance
-//        run in the background, i.e. not affecting the code in this main
-//        method, or other client connections
+                // socket object to receive incoming client
+                // requests, which it waits for.
+                Socket client = server.accept();
+
+                // Displaying that new client is connected
+                // to server
+                System.out.println("New client connected: "
+                        + client.getInetAddress()
+                        .getHostAddress());
+
                 // create a new thread object
                 ClientHandler clientSock
-                        = new ClientHandler(socket);
+                        = new ClientHandler(client);
 
                 // This thread will handle the client
                 // separately
                 new Thread(clientSock).start();
-            } catch(IOException ex) {
-                ex.printStackTrace();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (server != null) {
+                try {
+                    server.close();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -106,6 +121,7 @@ public class Server {
     // ClientHandler class allows us to handle multiple clients
     private static class ClientHandler implements Runnable {
         private final Socket clientSocket;
+//        private final String socketName;
 
         // Constructor
         public ClientHandler(Socket socket)
@@ -135,7 +151,7 @@ public class Server {
                     // writing the received message from
                     // client
                     System.out.printf(
-                            " Sent from the client: %s\n",
+                            " Sent from the client %d: %s\n",
                             line);
                     out.println(line);
                 }

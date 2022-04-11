@@ -1,5 +1,7 @@
 package za.co.wethinkcode.robotworlds.client;
 
+import za.co.wethinkcode.robotworlds.server.SimpleServer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,10 +9,12 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 
 // Client class
-class Socket {
+class ClientSocket {
     static String name;
     public void setName(String name){
-        Socket.name =name;};
+        ClientSocket.name =name;};
+    static String response;
+
 
     // driver code
     public static void run()
@@ -18,7 +22,7 @@ class Socket {
 
         // establish a connection by providing host and port
         // number
-        try (java.net.Socket socket = new java.net.Socket("localhost", 1234)) {
+        try (java.net.Socket socket = new java.net.Socket("localhost", SimpleServer.PORT)) {
 
             // writing to server
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -40,8 +44,9 @@ class Socket {
                 out.flush();
 
                 // displaying server reply
-                System.out.println("Server: Socket "+name+" command: "
-                        + in.readLine());
+//                System.out.println("Server: Socket "+name+" command: "
+//                        + in.readLine());
+                response = in.readLine();
             }
 
             // closing the scanner object
