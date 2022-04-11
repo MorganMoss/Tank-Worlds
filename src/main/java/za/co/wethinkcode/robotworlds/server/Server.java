@@ -1,11 +1,11 @@
-package src.main.java.za.co.wethinkcode.robotworlds.server;
+package za.co.wethinkcode.robotworlds.server;
 
-import src.main.java.za.co.wethinkcode.robotworlds.protocol.*;
-import src.main.java.za.co.wethinkcode.robotworlds.server.map.BasicMap;
-import src.main.java.za.co.wethinkcode.robotworlds.server.map.Map;
+import za.co.wethinkcode.robotworlds.protocol.*;
+import za.co.wethinkcode.robotworlds.server.map.BasicMap;
+import za.co.wethinkcode.robotworlds.server.map.Map;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.net.*;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -15,8 +15,7 @@ public class Server {
     /**
      * The world the server interacts with when handling requests and responses
      */
-    private final World world;
-
+//    private final World world = new World(getMap(), getRepairTime());
 
     /**
      * The socket clients will connect to
@@ -32,20 +31,6 @@ public class Server {
      * The list of responses that will be sent in the next server tick
      */
     private List<Response> currentResponses;
-
-
-    /**
-     * Opens a server socket and initializes world from config.
-     */
-    public Server() {
-        try {
-            socket = new ServerSocket();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        world = new World(getMap(), getRepairTime());
-    }
-
 
     /**
      * This should take the config file and get the repair time
@@ -63,7 +48,6 @@ public class Server {
         Map map = new BasicMap();
         return map;
     }
-
 
     /**
      * Should execute all requests and create a new response for each client
@@ -85,15 +69,33 @@ public class Server {
         }
     }
 
-    /**
-     * should execute requests and send reponses to clients when run
-     * @param args : no args are handled
-     */
-    public static void main(String[] args) {
-        Server server = new Server();
-        do {
-            server.executeRequests();
-            server.sendResponses();
-        } while (true);
+    public static void main(String[] args) throws ClassNotFoundException, IOException {
+
+//        We use the PORT as defined in SimpleServer. This is the port that client
+//        applications must connect to. ServerSocket is used on the server side to
+//        manage client connections.
+        ServerSocket serverSocket = new ServerSocket(SimpleServer.PORT);
+        System.out.println("Server running & waiting for client connections.");
+
+        while(true) {
+            try {
+//        The accept() method blocks execution (i.e. it waits) until a client has
+//        connected, then it returns an instance of Socket that represents the
+//        connection with that specific client.
+                Socket socket = serverSocket.accept();
+                System.out.println("Connection: " + socket);
+
+//        We create an instance of SimpleServer that will handle the
+//        communications with the specific client that has connected.
+//        We then create a Thread that will let our SimpleServer instance
+//        run in the background, i.e. not affecting the code in this main
+//        method, or other client connections
+                Runnable r = new SimpleServer(socket);
+                Thread task = new Thread(r);
+                task.start();
+            } catch(IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }

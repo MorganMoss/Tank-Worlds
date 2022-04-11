@@ -1,7 +1,7 @@
-package src.main.java.za.co.wethinkcode.robotworlds.server.robot;
+package za.co.wethinkcode.robotworlds.server.robot;
 
-import src.main.java.za.co.wethinkcode.robotworlds.server.Direction;
-import src.main.java.za.co.wethinkcode.robotworlds.server.Position;
+import za.co.wethinkcode.robotworlds.server.Direction;
+import za.co.wethinkcode.robotworlds.server.Position;
 
 public abstract class Robot {
     private final String name;
