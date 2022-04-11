@@ -9,7 +9,7 @@ public class SimpleServer implements Runnable {
 
 //  	We define our default port as a constant. For a real-world application
 //  	you will rather read the port information from configuration files.
-    public static final int PORT = 5000;
+    public static final int PORT = 5008;
     private final BufferedReader in;
     private final PrintStream out;
     private final String clientMachine;
