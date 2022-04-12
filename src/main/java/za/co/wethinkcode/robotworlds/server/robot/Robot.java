@@ -1,5 +1,8 @@
 package za.co.wethinkcode.robotworlds.server.robot;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import za.co.wethinkcode.robotworlds.server.Direction;
 import za.co.wethinkcode.robotworlds.server.Position;
 
@@ -38,8 +41,11 @@ public abstract class Robot {
 
     public void decreaseAmmo() {this.currentAmmo--;}
 
-    public void resetAmmo() {this.currentAmmo = this.maxAmmo;}
-
+    public void resetAmmo() {
+        // Timer t = new Timer();
+        // t.schedule(new TimerTask(){this.currentAmmo = this.maxAmmo;} , reloadTime*1000);
+    }
+ 
     public int getShield() {return this.currentShield;}
 
     public void decreaseShield() {this.currentShield--;}
