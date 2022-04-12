@@ -1,11 +1,16 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.protocol.Request;
+import za.co.wethinkcode.robotworlds.server.command.Command;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
+import za.co.wethinkcode.robotworlds.server.robot.BasicRobot;
 
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * The server that will be run. Clients will connect to it. 
@@ -25,7 +30,7 @@ public class Server implements Runnable{
     /**
      * The list of requests that will be run in the next server tick
      */
-    private final HashMap<Integer, String> currentRequests;
+    private final List<Request> currentRequests;
 
     /**
      * The list of responses that will be sent in the next server tick
@@ -46,7 +51,7 @@ public class Server implements Runnable{
     private Server(int port) throws IOException{
         this.socket = new ServerSocket(port);
         world = new World(getMap(), getRepairTime());
-        currentRequests = new HashMap<>();
+        currentRequests = new ArrayList<>();
         currentResponses = new HashMap<>();
     }
 
@@ -74,16 +79,20 @@ public class Server implements Runnable{
         if (clientCount == 0) {
             return;
         }
+        Command command;
         for (int client = 1; client <= clientCount; client++) {
-            String request = currentRequests.get(client);
-            if (request == null){
+            if (currentRequests.get(client) == null){
                 System.out.println(client + ": idle");
             } else {
-                System.out.println(client + ": " + request);
-                currentResponses.put(client, "We got your message, number " + client + " : " + request);
-            }
-            currentRequests.remove(client);
+                for (Request request : currentRequests) {
+                    command = Command.create(request);
+                    command.execute();
+                    System.out.println(client + ": " + request);
+                    currentResponses.put(client, "We got your message, number " + client + " : " + request);
+                    }
+                }
         }
+        currentRequests.remove(client);
     }
     
     /**

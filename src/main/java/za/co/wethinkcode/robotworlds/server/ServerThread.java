@@ -48,7 +48,7 @@ public class ServerThread extends Thread{
                 while((messageFromClient = in.readLine()) != null) {
                     server.addRequest(number, messageFromClient);
                     while (true) {
-                        try 
+                        try
                         {
                             out.println(server.getResponse(number));   
                             break;
