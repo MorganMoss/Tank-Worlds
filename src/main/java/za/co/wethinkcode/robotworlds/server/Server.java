@@ -1,10 +1,12 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 
 import java.net.*;
 import java.io.*;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -12,6 +14,11 @@ import java.util.HashMap;
  * It has 2-way communication and support for many clients
  */
 public class Server implements Runnable{
+    /**
+     * The amount of milliseconds to wait before the next tick
+     */
+    private static int tickInterval = 100;
+
     /**
      * The world the server interacts with when handling requests and responses
      */
@@ -71,19 +78,30 @@ public class Server implements Runnable{
      * It should clear the list as it goes
      */
     private void executeRequests() {
+        String response = "";
+
         if (clientCount == 0) {
             return;
         }
-        for (int client = 1; client <= clientCount; client++) {
+        
+        for (int client : currentRequests.keySet()) {
             String request = currentRequests.get(client);
             if (request == null){
                 System.out.println(client + ": idle");
             } else {
                 System.out.println(client + ": " + request);
-                currentResponses.put(client, "We got your message, number " + client + " : " + request);
+                response += "We got your message, number " + client + " : " + request + '\n';
             }
-            currentRequests.remove(client);
         }
+
+        if (currentRequests.size() > 0){
+            for (int client = 1; client <= clientCount; client++) {
+                currentResponses.put(client, response);
+            }
+        }
+
+        currentRequests.clear();
+
     }
     
     /**
@@ -111,11 +129,10 @@ public class Server implements Runnable{
     }
 
     /**
-     * The server is run from here. 
-     * @param args : none are applicable
+     * Starts up the server
      * @throws IOException : raised when server object fails
      */
-    public static void main(String[] args) throws IOException {
+    public static void start() throws IOException {
         final int port = 5000;
         Server server = new Server(port);
 
@@ -138,6 +155,15 @@ public class Server implements Runnable{
     }
 
     /**
+     * The server is run from here. 
+     * @param args : none are applicable
+     * @throws IOException : raised when server object fails
+     */
+    public static void main(String[] args) throws IOException {
+        start();
+    }
+
+    /**
      * Executes current requests and makes responses for all the clients every time interval
      * when run on a separate thread
      */
@@ -147,7 +173,7 @@ public class Server implements Runnable{
             System.out.println("Loop Running");
             this.executeRequests();
             try {
-                Thread.sleep(5000);
+                Thread.sleep(tickInterval);
             } catch (InterruptedException ignored) {
             }
         } while (true);
