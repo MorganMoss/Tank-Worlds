@@ -8,84 +8,107 @@ import za.co.wethinkcode.robotworlds.protocol.Response;
 import java.io.*;
 
 public class Client {
-    public final String robotName;
-    public final Socket socket;
-    public Request currentRequest;
-    public Response currentResponse;
+    private static int port = 5000;
 
+    /**
+     * Starts the gui and the threads that handle input/output
+     * @param args : discarded
+     */
     public static void main(String args[]) {
-        // start up gui
+        
         GUI gui = new TextGUI();
-        Thread guiThread = new Thread(gui);
-        guiThread.start();
-
-        final int port = 5000;
 
         try (
             Socket socket = new Socket("LocalHost", port);
-            PrintStream out = new PrintStream(socket.getOutputStream());
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        )
-        {
-            class Out extends Thread {
-                private final BufferedReader in;
-                private final GUI gui;
-
-                public Out(BufferedReader in,GUI gui){
-                    this.in = in;
-                    this.gui = gui;
-                }
-                
-                @Override
-                public void run() {
-                    while(true) try {
-                        if (in.ready()) {
-                        String response = in.readLine(); //should be changed to a response object
-                        gui.showOutput(new Response(response));
-                        }
-                    } catch (IOException ignored) {}
-                }
-            }
-
-            Out output = new Out(in, gui);
+        ) {
+            Out output = new Out(socket, gui);
             output.start();
 
+            In input = new In(socket, gui);
+            input.start();
             
-            String input;
-
-            do {
-                input = "";
-
-                try {
-                    input = gui.getInput(); //tries to get input constantly
-                    Request request = new Request(input); //request will take something like "forward 5" from input
-
-                    // TODO need to serealize the request object before sending it to server
-                    String serializedRequest = "TODO : " + request;
-
-                    out.println(input); 
-                    out.flush();
-                } catch (NoNewInput ignored) {}
-
-
-                if (input.matches("quit")) {
-                    System.exit(0);
-                }
-
-            } while (true);
-
+            while (input.isAlive() && output.isAlive()) {}
+            
+            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
         } 
 
     }
+}
 
-    public Client(String robotName, Socket socket) {
-        this.robotName = robotName;
+/**
+ * Receives responses from server and makes GUI output them
+ */
+class Out extends Thread {
+    private final GUI gui;
+    private final Socket socket;
+
+    public Out(Socket socket, GUI gui){
+        this.socket = socket;
+        this.gui = gui;
+    }
+    
+    @Override
+    public void run() {
+        try(
+            BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        ) {
+            do {
+                try {
+                    String response = incoming.readLine(); //should be changed to a response object
+                    if (!response.matches("")){
+                        gui.showOutput(new Response(response));
+                    }
+                } catch (IOException ignored) {
+                    System.out.println(ignored);
+                }
+            } while (true);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+/**
+ * Gives requests to server, the input for which is given by the GUI
+ */
+class In extends Thread {
+    private String input;
+    private final GUI gui;
+    private final Socket socket;
+    
+    public In(Socket socket, GUI gui) {
+        this.gui = gui;
         this.socket = socket;
     }
 
-    void giveRequest(String input) {}
+    @Override
+    public void run() {
+        try(
+            PrintStream outgoing = new PrintStream(socket.getOutputStream());
+        ) {
+            do {
+                try {
+                    input = gui.getInput();
 
-    void getResponse() {}
+                    outgoing.println(input); 
+                    outgoing.flush();
+    
+                    // Request request = new Request(input);
+                    // String serializedRequest = "TODO : " + request;
+    
+                    if (input.matches("quit")) {
+                        System.exit(0);
+                    }
+                } catch (NoNewInput ignored) {}
+
+            } while (true);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

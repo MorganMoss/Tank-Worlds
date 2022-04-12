@@ -17,7 +17,7 @@ public class Server implements Runnable{
     /**
      * The amount of milliseconds to wait before the next tick
      */
-    private static int tickInterval = 100;
+    private static int tickInterval = 50;
 
     /**
      * The world the server interacts with when handling requests and responses
@@ -170,7 +170,6 @@ public class Server implements Runnable{
     @Override
     public void run() {
         do {
-            System.out.println("Loop Running");
             this.executeRequests();
             try {
                 Thread.sleep(tickInterval);
