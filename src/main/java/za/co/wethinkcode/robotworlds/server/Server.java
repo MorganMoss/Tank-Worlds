@@ -1,36 +1,54 @@
 package za.co.wethinkcode.robotworlds.server;
 
-import za.co.wethinkcode.robotworlds.protocol.*;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 
 import java.net.*;
 import java.io.*;
-import java.util.List;
+import java.util.HashMap;
 
 /**
- * The server that will be run. Clients will connect to it
+ * The server that will be run. Clients will connect to it. 
+ * It has 2-way communication and support for many clients
  */
-public class Server {
+public class Server implements Runnable{
     /**
      * The world the server interacts with when handling requests and responses
      */
-//    private final World world = new World(getMap(), getRepairTime());
+    private final World world;
 
     /**
      * The socket clients will connect to
      */
-    private ServerSocket socket;
+    private final ServerSocket socket;
 
     /**
      * The list of requests that will be run in the next server tick
      */
-    private List<Request> currentRequests;
+    private final HashMap<Integer, String> currentRequests;
 
     /**
      * The list of responses that will be sent in the next server tick
      */
-    private List<Response> currentResponses;
+    private final HashMap<Integer, String> currentResponses;
+
+    /**
+     * Used to indicate the number of clients connected to the server,
+     * as well as to give a new client a number.
+     */
+    public int clientCount = 0;
+
+    /**
+     * Makes an instance of a server. It uses the port given for the server socket
+     * @param port : the port clients will use to connect to the server
+     * @throws IOException : throws when server socket fails
+     */
+    private Server(int port) throws IOException{
+        this.socket = new ServerSocket(port);
+        world = new World(getMap(), getRepairTime());
+        currentRequests = new HashMap<>();
+        currentResponses = new HashMap<>();
+    }
 
     /**
      * This should take the config file and get the repair time
@@ -45,8 +63,7 @@ public class Server {
      * @return a map that will be used to define the world's size and it's obstacles
      */
     private Map getMap() {
-        Map map = new BasicMap();
-        return map;
+        return new BasicMap();
     }
 
     /**
@@ -54,125 +71,91 @@ public class Server {
      * It should clear the list as it goes
      */
     private void executeRequests() {
-        for (Request request : currentRequests) {
-            currentRequests.remove(request);
+        if (clientCount == 0) {
+            return;
+        }
+        for (int client = 1; client <= clientCount; client++) {
+            String request = currentRequests.get(client);
+            if (request == null){
+                System.out.println(client + ": idle");
+            } else {
+                System.out.println(client + ": " + request);
+                currentResponses.put(client, "We got your message, number " + client + " : " + request);
+            }
+            currentRequests.remove(client);
         }
     }
     
     /**
-     * Should send all responses to the respective clients
-     * It should clear the list as it goes
+     * Looks for a response from the server to give the client.
+     * Used by a server thread.
+     * @param client : the client looking for a response
+     * @return a formatted response
      */
-    private void sendResponses() {
-        for (Response response : currentResponses) {
-            currentResponses.remove(response);
+    public String getResponse(int client){
+        String response = currentResponses.get(client);
+        if (response == null) {
+            throw new NoChangeException();
         }
+        currentResponses.remove(client);
+        return response;
     }
 
-    public static void main(String[] args) {
-        ServerSocket server = null;
-
-        try {
-
-//        We use the PORT as defined in SimpleServer. This is the port that client
-//        applications must connect to. ServerSocket is used on the server side to
-//        manage client connections.
-            server = new ServerSocket(SimpleServer.PORT);
-            server.setReuseAddress(true);
-
-            // running infinite loop for getting
-            // client request
-            while (true) {
-
-                // socket object to receive incoming client
-                // requests, which it waits for.
-                Socket client = server.accept();
-
-                // Displaying that new client is connected
-                // to server
-                System.out.println("New client connected: "
-                        + client.getInetAddress()
-                        .getHostAddress());
-
-                // create a new thread object
-                ClientHandler clientSock
-                        = new ClientHandler(client);
-
-                // This thread will handle the client
-                // separately
-                new Thread(clientSock).start();
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (server != null) {
-                try {
-                    server.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    /**
+     * Allows a server thread to give the server a request for a client
+     * @param client : the client giving the request
+     * @param request : the request the client is giving
+     */
+    public void addRequest(int client, String request){
+        currentRequests.putIfAbsent(client, request);
     }
 
-    // ClientHandler class allows us to handle multiple clients
-    private static class ClientHandler implements Runnable {
-        private final Socket clientSocket;
-//        private final String socketName;
+    /**
+     * The server is run from here. 
+     * @param args : none are applicable
+     * @throws IOException : raised when server object fails
+     */
+    public static void main(String[] args) throws IOException {
+        final int port = 5000;
+        Server server = new Server(port);
 
-        // Constructor
-        public ClientHandler(Socket socket)
-        {
-            this.clientSocket = socket;
-        }
+        System.out.println("Server running & waiting for client connections.");
 
-        public void run()
-        {
-            PrintWriter out = null;
-            BufferedReader in = null;
+        Thread serverLoop = new Thread(server);
+        serverLoop.start();
 
+        while(true) {
             try {
-
-                // get the outputstream of client
-                out = new PrintWriter(
-                        clientSocket.getOutputStream(), true);
-
-                // get the inputstream of client
-                in = new BufferedReader(
-                        new InputStreamReader(
-                                clientSocket.getInputStream()));
-
-                String line;
-                while ((line = in.readLine()) != null) {
-
-                    // writing the received message from
-                    // client
-                    System.out.printf(
-                            " Sent from the client %d: %s\n",
-                            line);
-                    out.println(line);
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            finally {
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                    if (in != null) {
-                        in.close();
-                        clientSocket.close();
-                    }
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Socket socket = server.socket.accept();
+                server.clientCount += 1;
+                ServerThread serverThread = new ServerThread(server, socket, server.clientCount);
+                serverThread.start();
+                System.out.println("A client has been connected. Their number is : " + server.clientCount);
+            } catch(IOException ex) {
+                ex.printStackTrace();
             }
         }
     }
+
+    /**
+     * Executes current requests and makes responses for all the clients every time interval
+     * when run on a separate thread
+     */
+    @Override
+    public void run() {
+        do {
+            System.out.println("Loop Running");
+            this.executeRequests();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ignored) {
+            }
+        } while (true);
+    }
+}
+
+/**
+ * Raised when there is no new response from the server for a specific client
+ */
+class NoChangeException extends RuntimeException{
 }
