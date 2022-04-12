@@ -147,7 +147,7 @@ public class Server implements Runnable{
             System.out.println("Loop Running");
             this.executeRequests();
             try {
-                Thread.sleep(5000);
+                Thread.sleep(50);
             } catch (InterruptedException ignored) {
             }
         } while (true);
