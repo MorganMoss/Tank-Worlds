@@ -60,9 +60,8 @@ class Out extends Thread {
                     if (!response.matches("")){
                         gui.showOutput(new Response(response));
                     }
-                } catch (IOException ignored) {
-                    System.out.println(ignored);
-                }
+                } catch (IOException ignored) {}
+                
             } while (true);
 
         } catch (IOException e) {
