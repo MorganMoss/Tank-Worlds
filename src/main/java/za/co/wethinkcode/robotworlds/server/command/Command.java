@@ -28,7 +28,7 @@ public abstract class Command {
             case "forward":
                 return new ForwardCommand(args.get(1));
             case "back":
-                return new BackCommand();
+                return new BackCommand(args.get(1));
             case "left":
                 return new LeftCommand();
             case "right":
@@ -48,8 +48,10 @@ public abstract class Command {
             case "robot":
                 return new RobotCommand();
             default:
-                throw new IllegalArgumentException("Unsupported command: " + instruction);
+                throw new IllegalArgumentException("Unsupported command: " + request);
         }
     }
+
+    public abstract void execute();
 }
 
