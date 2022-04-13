@@ -91,19 +91,18 @@ public class Server implements Runnable{
             Request request = currentRequests.get(client);
             if (request == null){
                 System.out.println(client + ": idle");
-            } else {
-                try {
+            } else try {
                     Command command = Command.create(request);
 //                    for (Robot robot : world.getRobots()) {
 //                        if (robot.getName() == client) {
 //                            command.execute(robot);
 //                        }
 //                    }
-                } catch (IllegalArgumentException e) {
-                    currentResponses.putIfAbsent(client, new Response("robot " + client, "Command not found"));
-                }
-                System.out.println(client + ": " + request.toString());
+            } catch (IllegalArgumentException e) {
+                currentResponses.putIfAbsent(client, new Response("robot " + client, "Command not found"));
             }
+            System.out.println(client + ": " + request.toString());
+
             //TODO properly. it's just sending back the request, should be a general info about robot and surroundings
             currentResponses.putIfAbsent(client, new Response("robot " + client, request.serialize()));
             currentRequests.remove(client);
