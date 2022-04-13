@@ -8,7 +8,7 @@ public class ReloadCommand extends Command{
     }
 
     @Override
-    public boolean execute(Robot target) {
-        return false;
+    public void execute(Robot target) {
+        // TODO : execute command
     }
 }

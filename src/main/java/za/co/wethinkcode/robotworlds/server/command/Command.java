@@ -51,7 +51,5 @@ public abstract class Command {
                 throw new IllegalArgumentException("Unsupported command: " + request);
         }
     }
-
-    public abstract void execute();
 }
 
