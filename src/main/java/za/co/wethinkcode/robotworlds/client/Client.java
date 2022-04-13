@@ -1,7 +1,6 @@
 package za.co.wethinkcode.robotworlds.client;
 
 import java.net.Socket;
-import java.util.Scanner;
 
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
@@ -9,48 +8,105 @@ import za.co.wethinkcode.robotworlds.protocol.Response;
 import java.io.*;
 
 public class Client {
-    public final String robotName;
-    public final Socket socket;
-    public Request currentRequest;
-    public Response currentResponse;
+    private static int port = 5000;
 
+    /**
+     * Starts the gui and the threads that handle input/output
+     * @param args : discarded
+     */
     public static void main(String args[]) {
-//        TankWar gui = new TankWar();
-        final int port = 5000;
+        
+        GUI gui = new TextGUI();
 
         try (
-                Socket socket = new Socket("localhost", port);
-                PrintStream out = new PrintStream(socket.getOutputStream());
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        )
-        {
-            Scanner scanner = new Scanner(System.in);
-            String userInput;
+            Socket socket = new Socket("LocalHost", port);
+        ) {
+            Out output = new Out(socket, gui);
+            output.start();
 
+            In input = new In(socket, gui);
+            input.start();
+            
+            while (input.isAlive() && output.isAlive()) {}
+            
+            System.exit(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } 
+
+    }
+}
+
+/**
+ * Receives responses from server and makes GUI output them
+ */
+class Out extends Thread {
+    private final GUI gui;
+    private final Socket socket;
+
+    public Out(Socket socket, GUI gui){
+        this.socket = socket;
+        this.gui = gui;
+    }
+    
+    @Override
+    public void run() {
+        try(
+            BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        ) {
             do {
-                userInput = scanner.nextLine();
-                out.println(userInput);
-                out.flush();
-
-                String messageFromServer = in.readLine();
-                System.out.println("Response: "+messageFromServer);
+                try {
+                    String serializedResponse = incoming.readLine(); //should be changed to a response object
+                    if (!serializedResponse.matches("")){
+                        gui.showOutput(Response.deSerialize(serializedResponse));
+                    }
+                } catch (IOException ignored) {}
                 
-            } while (!userInput.matches("quit"));
-
-            scanner.close();
+            } while (true);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+}
 
-    public Client(String robotName, Socket socket) {
-        this.robotName = robotName;
+
+/**
+ * Gives requests to server, the input for which is given by the GUI
+ */
+class In extends Thread {
+    private String input;
+    private final GUI gui;
+    private final Socket socket;
+    
+    public In(Socket socket, GUI gui) {
+        this.gui = gui;
         this.socket = socket;
     }
 
-    void giveRequest(String input) {}
+    @Override
+    public void run() {
+        try(
+            PrintStream outgoing = new PrintStream(socket.getOutputStream());
+        ) {
+            do {
+                try {
+                    input = gui.getInput();
+                    Request request = new Request("Client", input);
+                    String serializedRequest = request.serialize();
 
-    public Response getResponse() {return this.currentResponse;}
+                    outgoing.println(serializedRequest); 
+                    outgoing.flush();
+    
+                    if (input.matches("quit")) {
+                        System.exit(0);
+                    }
+                } catch (NoNewInput ignored) {}
+
+            } while (true);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

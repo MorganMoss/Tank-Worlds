@@ -2,6 +2,7 @@ package za.co.wethinkcode.robotworlds.protocol;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Request {
@@ -37,9 +38,17 @@ public class Request {
         return gson.toJson(this);
     }
 
-    public Request deSerialize(String json){
+    public static Request deSerialize(String json){
         Gson gson = new Gson();
         return gson.fromJson(json,Request.class);
     }
 
+    public Request(String clientInput){
+        //split into vars, validation of input happens here; 
+        //i.e. the command name is valid and arguments valid
+        // clientInput.split(" ");
+        clientName = "";
+        command = ""; //[0]
+        arguments = new ArrayList<String>(); //[The rest]
+    }
 }

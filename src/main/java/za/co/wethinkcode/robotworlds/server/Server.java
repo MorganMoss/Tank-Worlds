@@ -1,5 +1,7 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.protocol.Request;
+import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 
@@ -13,6 +15,11 @@ import java.util.HashMap;
  */
 public class Server implements Runnable{
     /**
+     * The amount of milliseconds to wait before the next tick
+     */
+    private static int tickInterval = 50;
+
+    /**
      * The world the server interacts with when handling requests and responses
      */
     private final World world;
@@ -25,12 +32,12 @@ public class Server implements Runnable{
     /**
      * The list of requests that will be run in the next server tick
      */
-    private final HashMap<Integer, String> currentRequests;
+    private final HashMap<Integer, Request> currentRequests;
 
     /**
      * The list of responses that will be sent in the next server tick
      */
-    private final HashMap<Integer, String> currentResponses;
+    private final HashMap<Integer, Response> currentResponses;
 
     /**
      * Used to indicate the number of clients connected to the server,
@@ -74,16 +81,19 @@ public class Server implements Runnable{
         if (clientCount == 0) {
             return;
         }
-        for (int client = 1; client <= clientCount; client++) {
-            String request = currentRequests.get(client);
+        
+        for (int client : currentRequests.keySet()) {
+            Request request = currentRequests.get(client);
             if (request == null){
                 System.out.println(client + ": idle");
             } else {
-                System.out.println(client + ": " + request);
-                currentResponses.put(client, "We got your message, number " + client + " : " + request);
+                System.out.println(client + ": " + request.toString());
             }
-            currentRequests.remove(client);
+            currentResponses.put(client, new Response("robot " + client, request.toString()));
         }
+
+        currentRequests.clear();
+
     }
     
     /**
@@ -92,8 +102,8 @@ public class Server implements Runnable{
      * @param client : the client looking for a response
      * @return a formatted response
      */
-    public String getResponse(int client){
-        String response = currentResponses.get(client);
+    public Response getResponse(int client){
+        Response response = currentResponses.get(client);
         if (response == null) {
             throw new NoChangeException();
         }
@@ -106,16 +116,15 @@ public class Server implements Runnable{
      * @param client : the client giving the request
      * @param request : the request the client is giving
      */
-    public void addRequest(int client, String request){
+    public void addRequest(int client, Request request){
         currentRequests.putIfAbsent(client, request);
     }
 
     /**
-     * The server is run from here. 
-     * @param args : none are applicable
+     * Starts up the server
      * @throws IOException : raised when server object fails
      */
-    public static void main(String[] args) throws IOException {
+    public static void start() throws IOException {
         final int port = 5000;
         Server server = new Server(port);
 
@@ -138,16 +147,24 @@ public class Server implements Runnable{
     }
 
     /**
+     * The server is run from here. 
+     * @param args : none are applicable
+     * @throws IOException : raised when server object fails
+     */
+    public static void main(String[] args) throws IOException {
+        start();
+    }
+
+    /**
      * Executes current requests and makes responses for all the clients every time interval
      * when run on a separate thread
      */
     @Override
     public void run() {
         do {
-            System.out.println("Loop Running");
             this.executeRequests();
             try {
-                Thread.sleep(50);
+                Thread.sleep(tickInterval);
             } catch (InterruptedException ignored) {
             }
         } while (true);

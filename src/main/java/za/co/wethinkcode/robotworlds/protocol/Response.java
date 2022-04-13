@@ -34,14 +34,13 @@ public class Response {
         this.result = request;
     }
 
-    public Request deSerialize(String json){
+    public static Response deSerialize(String json){
         Gson gson = new Gson();
-        return gson.fromJson(json,Request.class);
+        return gson.fromJson(json,Response.class);
     }
 
     public String serialize(){
         Gson gson = new Gson();
         return gson.toJson(this);
     }
-
 }
