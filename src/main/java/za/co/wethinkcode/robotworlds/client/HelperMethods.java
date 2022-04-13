@@ -5,6 +5,9 @@ import java.awt.*;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.google.gson.Gson;
+import za.co.wethinkcode.robotworlds.protocol.Request;
+
 
 class HelperMethods {
     private static Random RANDOM = new Random();
@@ -62,6 +65,13 @@ class HelperMethods {
             Logger.getLogger(HelperMethods.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    static String serialize(Object object){
+        Gson gson = new Gson();
+        return gson.toJson(object);
+    }
+
+
 
 // TANK DIAGONAL
     //        int dist = (WIDTH - 120) / 11;

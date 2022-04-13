@@ -15,6 +15,7 @@ public class Client {
     public Response currentResponse;
 
     public static void main(String args[]) {
+//        TankWar gui = new TankWar();
         final int port = 5000;
 
         try (
@@ -51,5 +52,5 @@ public class Client {
 
     void giveRequest(String input) {}
 
-    void getResponse() {}
+    public Response getResponse() {return this.currentResponse;}
 }
