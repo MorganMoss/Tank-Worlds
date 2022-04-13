@@ -7,7 +7,7 @@ import za.co.wethinkcode.robotworlds.server.Direction;
 import za.co.wethinkcode.robotworlds.server.Position;
 
 public abstract class Robot {
-    private final String name;
+    private final int name;
     private final String visibilityPattern;
     private final int maxShield;
     private final int maxAmmo;
@@ -18,13 +18,17 @@ public abstract class Robot {
     private int currentShield;
     private int currentAmmo;
 
-    public Robot(String name, String visibilityPattern, int maxShield, int maxAmmo, int reloadTime, String firingPattern) {
+    public Robot(int name, String visibilityPattern, int maxShield, int maxAmmo, int reloadTime, String firingPattern) {
         this.name = name;
         this.visibilityPattern = visibilityPattern;
         this.maxShield = maxShield;
         this.maxAmmo = maxAmmo;
         this.reloadTime = reloadTime;
         this.firingPattern = firingPattern;
+    }
+
+    public int getName() {
+        return name;
     }
 
     public void setPosition(Position position) {}

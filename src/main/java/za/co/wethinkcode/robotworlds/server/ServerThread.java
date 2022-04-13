@@ -1,12 +1,13 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.protocol.Request;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-import za.co.wethinkcode.robotworlds.protocol.Request;
 
 /**
  * A thread that allows 2-way communication 

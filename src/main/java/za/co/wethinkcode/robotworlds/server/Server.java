@@ -2,8 +2,10 @@ package za.co.wethinkcode.robotworlds.server;
 
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
+import za.co.wethinkcode.robotworlds.server.command.Command;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
+import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.net.*;
 import java.io.*;
@@ -73,6 +75,10 @@ public class Server implements Runnable{
         return new BasicMap();
     }
 
+    public World getWorld() {
+        return world;
+    }
+
     /**
      * Should execute all requests and create a new response for each client
      * It should clear the list as it goes
@@ -81,19 +87,22 @@ public class Server implements Runnable{
         if (clientCount == 0) {
             return;
         }
-        
         for (int client : currentRequests.keySet()) {
             Request request = currentRequests.get(client);
             if (request == null){
                 System.out.println(client + ": idle");
             } else {
+                Command command = Command.create(request);
+                for (Robot robot : world.getRobots()) {
+                    if (robot.getName() == client) {
+                        command.execute(robot);
+                    }
+                }
                 System.out.println(client + ": " + request.toString());
             }
             currentResponses.put(client, new Response("robot " + client, request.toString()));
+            currentRequests.remove(client);
         }
-
-        currentRequests.clear();
-
     }
     
     /**

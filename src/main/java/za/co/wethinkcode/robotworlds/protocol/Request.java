@@ -1,7 +1,6 @@
 package za.co.wethinkcode.robotworlds.protocol;
 
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,5 +49,6 @@ public class Request {
         clientName = "";
         command = ""; //[0]
         arguments = new ArrayList<String>(); //[The rest]
+
     }
 }
