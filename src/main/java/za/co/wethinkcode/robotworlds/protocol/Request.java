@@ -25,4 +25,8 @@ public class Request {
     public List<String> getArguments() {
         return arguments;
     }
+
+    public static Request deserialize(String message) {
+        return new Request("");
+    }
 }

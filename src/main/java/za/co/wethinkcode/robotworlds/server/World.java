@@ -20,6 +20,9 @@ public class World {
         grid = null;
     }
 
+    public List<Robot> getRobots() {
+        return robots;
+    }
 
     public void add(Robot robot) {
         robots.add(robot);

@@ -4,7 +4,7 @@ import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.server.command.Command;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
-import za.co.wethinkcode.robotworlds.server.robot.BasicRobot;
+import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.net.*;
 import java.io.*;
@@ -71,6 +71,10 @@ public class Server implements Runnable{
         return new BasicMap();
     }
 
+    public World getWorld() {
+        return world;
+    }
+
     /**
      * Should execute all requests and create a new response for each client
      * It should clear the list as it goes
@@ -79,20 +83,23 @@ public class Server implements Runnable{
         if (clientCount == 0) {
             return;
         }
-        Command command;
         for (int client = 1; client <= clientCount; client++) {
-            if (currentRequests.get(client) == null){
+            Request request = currentRequests.get(client);
+            if (request == null){
                 System.out.println(client + ": idle");
             } else {
-                for (Request request : currentRequests) {
-                    command = Command.create(request);
-                    command.execute();
-                    System.out.println(client + ": " + request);
-                    currentResponses.put(client, "We got your message, number " + client + " : " + request);
+                Command command = Command.create(request);
+                for (Robot robot : world.getRobots()) {
+                    if (robot.getName() == client) {
+                        command.execute(robot);
                     }
                 }
+                System.out.println(client + ": " + request);
+                currentResponses.put(client, "We got your message, number " + client + " : " + request);
+
+                currentRequests.remove(client);
+            }
         }
-        currentRequests.remove(client);
     }
     
     /**
@@ -115,8 +122,10 @@ public class Server implements Runnable{
      * @param client : the client giving the request
      * @param request : the request the client is giving
      */
-    public void addRequest(int client, String request){
-        currentRequests.putIfAbsent(client, request);
+    public void addRequest(int client, Request request){
+        if (currentRequests != null) {
+            currentRequests.add(client, request);
+        }
     }
 
     /**

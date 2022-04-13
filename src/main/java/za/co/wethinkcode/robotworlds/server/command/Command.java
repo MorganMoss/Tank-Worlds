@@ -9,7 +9,7 @@ public abstract class Command {
     String name;
     String argument;
 
-    public abstract boolean execute(Robot target);
+    public abstract void execute(Robot target);
 
     public Command(String name){
         this.name = name.trim().toLowerCase();

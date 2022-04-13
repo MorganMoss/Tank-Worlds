@@ -8,7 +8,6 @@ public class ForwardCommand extends Command{
     }
 
     @Override
-    public boolean execute(Robot target) {
-        return false;
+    public void execute(Robot target) {
     }
 }

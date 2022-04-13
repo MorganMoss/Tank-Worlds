@@ -1,5 +1,9 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.protocol.Request;
+import za.co.wethinkcode.robotworlds.server.robot.BasicRobot;
+import za.co.wethinkcode.robotworlds.server.robot.Robot;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -43,10 +47,13 @@ public class ServerThread extends Thread{
      */
     @Override
     public void run() {
+        Robot robot = new BasicRobot(this.number);
+        this.server.getWorld().add(robot);
         try {
             String messageFromClient;
                 while((messageFromClient = in.readLine()) != null) {
-                    server.addRequest(number, messageFromClient);
+                    Request request = Request.deserialize(messageFromClient);
+                    server.addRequest(number, request);
                     while (true) {
                         try
                         {
