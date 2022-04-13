@@ -22,7 +22,7 @@ public class TextGUI implements GUI {
 
     @Override
     public void showOutput(Response response) {
-        System.out.println(response);
+        System.out.println(response.serialize());
     }
 }
 

@@ -8,13 +8,13 @@ public class Request {
     // TODO: pull clientName from local global storage
     String clientName;
     String command = "idle";
-    List<?> arguments;
+    List<String> arguments;
 
     //default constructor
     public Request(){}
 
     //command and arguments constructor
-    public Request(String name, String command, List<?> arguments){
+    public Request(String name, String command, List<String> arguments){
         this.clientName = name;
         this.command = command;
         this.arguments = arguments;
@@ -42,13 +42,21 @@ public class Request {
         return gson.fromJson(json,Request.class);
     }
 
-    public Request(String clientInput){
-        //split into vars, validation of input happens here; 
-        //i.e. the command name is valid and arguments valid
-        // clientInput.split(" ");
-        clientName = "";
-        command = ""; //[0]
-        arguments = new ArrayList<String>(); //[The rest]
-
+    public String getCommand() {
+        return command;
     }
+
+    public List<String> getArguments() {
+        return arguments;
+    }
+
+    //    public Request(String clientInput){
+//        //split into vars, validation of input happens here;
+//        //i.e. the command name is valid and arguments valid
+//        // clientInput.split(" ");
+//        clientName = "";
+//        command = ""; //[0]
+//        arguments = new ArrayList<String>(); //[The rest]
+//
+//    }
 }

@@ -3,6 +3,7 @@ package za.co.wethinkcode.robotworlds.server.command;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Command {
@@ -23,12 +24,15 @@ public abstract class Command {
 
     public static Command create(Request request) {
         List<String> args = request.getArguments();
-
+        if (args == null) {
+            args = new ArrayList<>();
+            args.add("5");
+        }
         switch (request.getCommand()) {
             case "forward":
-                return new ForwardCommand(args.get(1));
+                return new ForwardCommand(args.get(0));
             case "back":
-                return new BackCommand(args.get(1));
+                return new BackCommand(args.get(0));
             case "left":
                 return new LeftCommand();
             case "right":

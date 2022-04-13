@@ -92,15 +92,20 @@ public class Server implements Runnable{
             if (request == null){
                 System.out.println(client + ": idle");
             } else {
-                Command command = Command.create(request);
-                for (Robot robot : world.getRobots()) {
-                    if (robot.getName() == client) {
-                        command.execute(robot);
-                    }
+                try {
+                    Command command = Command.create(request);
+//                    for (Robot robot : world.getRobots()) {
+//                        if (robot.getName() == client) {
+//                            command.execute(robot);
+//                        }
+//                    }
+                } catch (IllegalArgumentException e) {
+                    currentResponses.putIfAbsent(client, new Response("robot " + client, "Command not found"));
                 }
                 System.out.println(client + ": " + request.toString());
             }
-            currentResponses.put(client, new Response("robot " + client, request.toString()));
+            //TODO properly. it's just sending back the request, should be a general info about robot and surroundings
+            currentResponses.putIfAbsent(client, new Response("robot " + client, request.serialize()));
             currentRequests.remove(client);
         }
     }
@@ -109,7 +114,7 @@ public class Server implements Runnable{
      * Looks for a response from the server to give the client.
      * Used by a server thread.
      * @param client : the client looking for a response
-     * @return a formatted response
+     * @return a formatted response object
      */
     public Response getResponse(int client){
         Response response = currentResponses.get(client);

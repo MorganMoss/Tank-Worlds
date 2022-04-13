@@ -1,6 +1,7 @@
 package za.co.wethinkcode.robotworlds.server;
 
 import za.co.wethinkcode.robotworlds.protocol.Request;
+import za.co.wethinkcode.robotworlds.protocol.Response;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -102,7 +103,7 @@ class Responder extends Thread{
     public void run() {
         while (true) {
             try {
-                out.println(server.getResponse(clientNumber));
+                out.println(server.getResponse(clientNumber).serialize());
             } catch (NoChangeException ignored) {}
         }
     }
