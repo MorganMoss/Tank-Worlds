@@ -37,4 +37,9 @@ public class Request {
         return gson.toJson(this);
     }
 
+    public Request deSerialize(String json){
+        Gson gson = new Gson();
+        return gson.fromJson(json,Request.class);
+    }
+
 }
