@@ -1,5 +1,6 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
@@ -75,6 +76,7 @@ public class Server implements Runnable{
      * @return a map that will be used to define the world's size and it's obstacles
      */
     private Map getMap() {
+        //TODO : Get the map to be used from the config file
         return new BasicMap(new Position(0,0));
     }
 
@@ -95,16 +97,24 @@ public class Server implements Runnable{
             if (request == null){
                 System.out.println(client + ": idle");
             } else try {
-                    Command command = Command.create(request);
+                //TODO : Add all requests to log
+                System.out.println(client + ": " + request.serialize());
+
+                //TODO : Implement Commands
+                Command command = Command.create(request);
 //                    for (Robot robot : world.getRobots()) {
 //                        if (robot.getName() == client) {
 //                            command.execute(robot);
 //                        }
 //                    }
             } catch (IllegalArgumentException e) {
+                //TODO : Give a failed command response
 //                currentResponses.putIfAbsent(client, new Response("robot " + client, "Command not found"));
             }
-            System.out.println(client + ": " + request.toString());
+
+            //TODO : Add all requests to a buffer before adding them to current requests (to prevent multiple responses per request)
+
+            //TODO : use the look command on each robot to get the grid of values it
 
             //TODO properly. it's just sending back the request, should be a general info about robot and surroundings
             currentResponses.putIfAbsent(client, new Response("robot " + client, request.serialize()));
@@ -118,7 +128,7 @@ public class Server implements Runnable{
      * @param client : the client looking for a response
      * @return a formatted response object
      */
-    public Response getResponse(int client){
+    public Response getResponse(int client) throws NoChangeException {
         Response response = currentResponses.get(client);
         if (response == null) {
             throw new NoChangeException();
@@ -198,10 +208,4 @@ public class Server implements Runnable{
             }
         } while (true);
     }
-}
-
-/**
- * Raised when there is no new response from the server for a specific client
- */
-class NoChangeException extends RuntimeException{
 }
