@@ -11,6 +11,9 @@ import java.net.*;
 import java.io.*;
 import java.util.HashMap;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * The server that will be run. Clients will connect to it. 
  * It has 2-way communication and support for many clients
@@ -54,7 +57,7 @@ public class Server implements Runnable{
      */
     private Server(int port) throws IOException{
         this.socket = new ServerSocket(port);
-        world = new World(getMap(), getRepairTime());
+        world = new World(getMap());
         currentRequests = new HashMap<>();
         currentResponses = new HashMap<>();
     }
@@ -99,7 +102,7 @@ public class Server implements Runnable{
 //                        }
 //                    }
             } catch (IllegalArgumentException e) {
-                currentResponses.putIfAbsent(client, new Response("robot " + client, "Command not found"));
+//                currentResponses.putIfAbsent(client, new Response("robot " + client, "Command not found"));
             }
             System.out.println(client + ": " + request.toString());
 
@@ -165,6 +168,19 @@ public class Server implements Runnable{
      * @throws IOException : raised when server object fails
      */
     public static void main(String[] args) throws IOException {
+        InetAddress ip;
+        String hostname;
+
+        try {
+            ip = InetAddress.getLocalHost();
+            hostname = ip.getHostName();
+            System.out.println("Your current IP address : " + ip);
+            System.out.println("Your current Hostname : " + hostname);
+
+        } catch (UnknownHostException e) {
+
+            e.printStackTrace();
+        }
         start();
     }
 
