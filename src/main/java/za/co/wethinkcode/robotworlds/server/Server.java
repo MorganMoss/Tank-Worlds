@@ -72,7 +72,7 @@ public class Server implements Runnable{
      * @return a map that will be used to define the world's size and it's obstacles
      */
     private Map getMap() {
-        return new BasicMap();
+        return new BasicMap(new Position(0,0));
     }
 
     public World getWorld() {

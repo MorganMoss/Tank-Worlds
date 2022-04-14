@@ -3,6 +3,7 @@ package za.co.wethinkcode.robotworlds.server;
 import java.util.List;
 
 import za.co.wethinkcode.robotworlds.server.map.Map;
+import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 public class World {

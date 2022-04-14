@@ -4,14 +4,12 @@ import za.co.wethinkcode.robotworlds.server.Position;
 
 public abstract class Obstacle {
     private final String shape;
-    private final int height;
-    private final int width;
+    private final Position size;
     private final Position position;
 
-    public Obstacle(String shape, int height, int width, Position position) {
+    public Obstacle(String shape, Position size, Position position) {
         this.shape = shape;
-        this.height = height;
-        this.width = width;
+        this.size = size;
         this.position = position;
     }
 
@@ -19,13 +17,10 @@ public abstract class Obstacle {
         return shape;
     }
 
-    public int getHeight() {
-        return height;
+    public Position getSize() {
+        return size;
     }
 
-    public int getWidth() {
-        return width;
-    }
 
     public Position getPosition() {
         return position;
