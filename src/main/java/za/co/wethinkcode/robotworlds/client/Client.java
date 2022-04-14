@@ -8,8 +8,14 @@ import za.co.wethinkcode.robotworlds.protocol.Response;
 import java.io.*;
 
 public class Client {
+    /**
+     * The port the server uses
+     */
     private static int port = 5000;
 
+    /**
+     * Starts the gui and the threads that handle input/output
+     */
     private static void start(){
         GUI gui = new TextGUI();
 
@@ -32,84 +38,83 @@ public class Client {
     }
 
     /**
-     * Starts the gui and the threads that handle input/output
-     * @param args : discarded
+     * Run client from here
+     * @param args : does nothing
      */
     public static void main(String args[]) {
        Client.start();
     }
-}
 
-/**
- * Receives responses from server and makes GUI output them
- */
-class Out extends Thread {
-    private final GUI gui;
-    private final Socket socket;
+    /**
+     * Receives responses from server and makes GUI output them
+     */
+    private static class Out extends Thread {
+        private final GUI gui;
+        private final Socket socket;
 
-    public Out(Socket socket, GUI gui){
-        this.socket = socket;
-        this.gui = gui;
-    }
-    
-    @Override
-    public void run() {
-        try(
-            BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        ) {
-            do {
-                try {
-                    String serializedResponse = incoming.readLine(); //should be changed to a response object
-                    if (!serializedResponse.matches("")){
-                        gui.showOutput(Response.deSerialize(serializedResponse));
-                    }
-                } catch (IOException ignored) {}
-                
-            } while (true);
+        public Out(Socket socket, GUI gui){
+            this.socket = socket;
+            this.gui = gui;
+        }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        @Override
+        public void run() {
+            try(
+                    BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            ) {
+                do {
+                    try {
+                        String serializedResponse = incoming.readLine(); //should be changed to a response object
+                        if (!serializedResponse.matches("")){
+                            gui.showOutput(Response.deSerialize(serializedResponse));
+                        }
+                    } catch (IOException ignored) {}
+
+                } while (true);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
-}
 
+    /**
+     * Gives requests to server, the input for which is given by the GUI
+     */
+    private static class In extends Thread {
+        private String input;
+        private final GUI gui;
+        private final Socket socket;
 
-/**
- * Gives requests to server, the input for which is given by the GUI
- */
-class In extends Thread {
-    private String input;
-    private final GUI gui;
-    private final Socket socket;
-    
-    public In(Socket socket, GUI gui) {
-        this.gui = gui;
-        this.socket = socket;
-    }
+        public In(Socket socket, GUI gui) {
+            this.gui = gui;
+            this.socket = socket;
+        }
 
-    @Override
-    public void run() {
-        try(
-            PrintStream outgoing = new PrintStream(socket.getOutputStream());
-        ) {
-            do {
-                try {
-                    input = gui.getInput();
-                    Request request = new Request("Client", input);
-                    String serializedRequest = request.serialize();
+        @Override
+        public void run() {
+            try(
+                    PrintStream outgoing = new PrintStream(socket.getOutputStream());
+            ) {
+                do {
+                    try {
+                        input = gui.getInput();
+                        Request request = new Request("Client", input);
+                        String serializedRequest = request.serialize();
 
-                    outgoing.println(serializedRequest); 
-                    outgoing.flush();
-    
-                    if (input.matches("quit")) {
-                        System.exit(0);
-                    }
-                } catch (NoNewInput ignored) {}
+                        outgoing.println(serializedRequest);
+                        outgoing.flush();
 
-            } while (true);
+                        if (input.matches("quit")) {
+                            System.exit(0);
+                        }
+                    } catch (NoNewInput ignored) {}
 
-        } catch (IOException e) {
-            e.printStackTrace();
+                } while (true);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

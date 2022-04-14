@@ -3,6 +3,7 @@ package za.co.wethinkcode.robotworlds.server;
 import java.util.HashMap;
 import java.util.List;
 
+import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
@@ -47,18 +48,86 @@ public class World {
 
     public void add(Robot robot) {
         robots.add(robot);
+        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), robot.getNumber());
     }
 
     public void remove(Robot robot) {
+        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), ' ');
         robots.remove(robot);
     }
 
+    /**
+     * Looks at the path and sees if it's all an open path
+     * @param position : the old position
+     * @param newPosition : the new position
+     * @return true if there's something in the way, false if movement is unimpeded
+     */
+    private boolean pathBlocked(Position position, Position newPosition) {
+        final int low;
+        final int high;
 
-    public void updatePosition(Robot robot, int steps) {}
+        if (position.getX() == newPosition.getX()){
+            final int x = newPosition.getX();
 
+            if (position.getY() > newPosition.getY()) {
+                low = newPosition.getY();
+                high = position.getY();
+            } else {
+                low = position.getY();
+                high = newPosition.getY();
+            }
+
+            for (int y = low; y <= high; y++){
+                if (!map.get(x).get(y).equals(' ')){
+                    return true;
+                }
+            }
+        } else {
+            final int y = newPosition.getY();
+
+            if (position.getX() > newPosition.getX()) {
+                low = newPosition.getX();
+                high = position.getX();
+            } else {
+                low = position.getX();
+                high = newPosition.getX();
+            }
+
+            for (int x = low; x <= high; x++){
+                if (!map.get(x).get(y).equals(' ')){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Tries to move the robot a number of steps forward or backward relative to its direction.
+     * @param robot : the robot being moved
+     * @param steps : the distance the robot moves
+     * @throws PathBlockedException : thrown if the movement is not possible
+     */
+    public void updatePosition(Robot robot, int steps) throws PathBlockedException {
+        Position newPosition =  new Position(
+                (int) (robot.getPosition().getX() + round(steps * sin(toRadians(robot.getDirection().getAngle())))),
+                (int) (robot.getPosition().getY() + round(steps * cos(toRadians(robot.getDirection().getAngle()))))
+        );
+        if (!pathBlocked(robot.getPosition(), newPosition)) {
+            map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), ' ');
+            map.get(newPosition.getX()).put(newPosition.getY(), robot.getNumber());
+            robot.setPosition(newPosition);
+        } else {
+            throw new PathBlockedException();
+        }
+
+    }
+
+    //TODO
     public void updateDirection(Robot robot, int degrees) {}
 
-
+    //TODO
     public void fire(Robot robot) {}
 
     /**
@@ -99,9 +168,12 @@ public class World {
        return look(robot.getPosition());
     }
 
+    //TODO
     public void pause(Robot robot, int duration) {}
 
+    //TODO
     public void repair(Robot robot) {}
 
+    //TODO
     public void reload(Robot robot) {}
 }

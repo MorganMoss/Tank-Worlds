@@ -1,0 +1,3 @@
+repairTime = 3;
+//TODO (Optional) : "map = {serialized map object}" as to not need a switch case in server.getMap
+map = BasicMap;

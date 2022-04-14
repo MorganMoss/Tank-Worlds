@@ -13,28 +13,33 @@ public abstract class Robot {
     private final int maxAmmo;
     private final int reloadTime;
     private final String firingPattern;
+    private final char serverNumber;
     private Position position;
     private Direction direction;
     private int currentShield;
     private int currentAmmo;
 
-    public Robot(int name, String visibilityPattern, int maxShield, int maxAmmo, int reloadTime, String firingPattern) {
+    public Robot(int name, String visibilityPattern, int maxShield, int maxAmmo, int reloadTime, String firingPattern, char serverNumber) {
         this.name = name;
         this.visibilityPattern = visibilityPattern;
         this.maxShield = maxShield;
         this.maxAmmo = maxAmmo;
         this.reloadTime = reloadTime;
         this.firingPattern = firingPattern;
+        this.serverNumber = serverNumber;
     }
 
     public int getName() {
         return name;
     }
 
-    public void setPosition(Position position) {}
+    public void setPosition(Position position) {
+        this.position = position;
+    }
 
     public Position getPosition() {return this.position;}
 
+    //TODO : implement this method
     public void setDirection(int angle) {}
 
     public Direction getDirection() {return this.direction;}
@@ -45,6 +50,7 @@ public abstract class Robot {
 
     public void decreaseAmmo() {this.currentAmmo--;}
 
+    //TODO : implement this method
     public void resetAmmo() {
         // Timer t = new Timer();
         // t.schedule(new TimerTask(){this.currentAmmo = this.maxAmmo;} , reloadTime*1000);
@@ -56,4 +62,11 @@ public abstract class Robot {
 
     public void resetShield() {this.currentShield = this.maxShield;}
 
+    /**
+     * Gets the number this robot was assigned by the server
+     * @return the number assigned by the server
+     */
+    public Character getNumber() {
+        return serverNumber;
+    }
 }

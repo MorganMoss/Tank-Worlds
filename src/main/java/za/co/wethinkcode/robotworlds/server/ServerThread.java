@@ -1,14 +1,13 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
-import za.co.wethinkcode.robotworlds.protocol.Response;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-
 
 /**
  * A thread that allows 2-way communication 
@@ -83,56 +82,56 @@ public class ServerThread extends Thread{
         try { in.close(); out.close();
         } catch(IOException ex) {}
     }
-}
 
-/**
- * The thread used to send responses from the server to the client
- */
-class Responder extends Thread{
-    private final int clientNumber;
-    private final Server server;
-    private final PrintStream out;
+    /**
+     * The thread used to send responses from the server to the client
+     */
+    private static class Responder extends Thread{
+        private final int clientNumber;
+        private final Server server;
+        private final PrintStream out;
 
-    public Responder(Server server, PrintStream out, int number) {
-        clientNumber = number;
-        this.server = server;
-        this.out = out;
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                out.println(server.getResponse(clientNumber).serialize());
-            } catch (NoChangeException ignored) {}
+        public Responder(Server server, PrintStream out, int number) {
+            clientNumber = number;
+            this.server = server;
+            this.out = out;
         }
-    }
-}
 
-/**
- * The thread used to get requests from the client and give them to the server
- */
-class Requester extends Thread{
-    private final int clientNumber;
-    private final Server server;
-    private final BufferedReader in;
-
-    public Requester(Server server, BufferedReader in, int number) {
-        clientNumber = number;
-        this.server = server;
-        this.in = in;
-    }
-
-    @Override
-    public void run() {
-        String request;
-        try {
-            while((request = in.readLine()) != null){
-                server.addRequest(clientNumber, Request.deSerialize(request));
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    out.println(server.getResponse(clientNumber).serialize());
+                } catch (NoChangeException ignored) {}
             }
         }
-        catch(IOException ex) {
-            System.out.println("Shutting down client");
+    }
+
+    /**
+     * The thread used to get requests from the client and give them to the server
+     */
+    private static class Requester extends Thread{
+        private final int clientNumber;
+        private final Server server;
+        private final BufferedReader in;
+
+        public Requester(Server server, BufferedReader in, int number) {
+            clientNumber = number;
+            this.server = server;
+            this.in = in;
+        }
+
+        @Override
+        public void run() {
+            String request;
+            try {
+                while((request = in.readLine()) != null){
+                    server.addRequest(clientNumber, Request.deSerialize(request));
+                }
+            }
+            catch(IOException ex) {
+                System.out.println("Shutting down client");
+            }
         }
     }
 }
