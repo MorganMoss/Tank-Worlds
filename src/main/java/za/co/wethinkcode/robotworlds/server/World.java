@@ -5,6 +5,7 @@ import java.util.List;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.server.map.Map;
+import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import static java.lang.Math.*;

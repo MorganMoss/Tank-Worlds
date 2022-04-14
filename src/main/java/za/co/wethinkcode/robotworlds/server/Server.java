@@ -77,7 +77,7 @@ public class Server implements Runnable{
      */
     private Map getMap() {
         //TODO : Get the map to be used from the config file
-        return new BasicMap();
+        return new BasicMap(new Position(0,0));
     }
 
     public World getWorld() {
