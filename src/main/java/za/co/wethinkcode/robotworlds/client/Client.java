@@ -10,30 +10,33 @@ import java.io.*;
 public class Client {
     private static int port = 5000;
 
-    /**
-     * Starts the gui and the threads that handle input/output
-     * @param args : discarded
-     */
-    public static void main(String args[]) {
-        
+    private static void start(){
         GUI gui = new TextGUI();
 
         try (
-            Socket socket = new Socket("LocalHost", port);
+                Socket socket = new Socket("LocalHost", port);
         ) {
             Out output = new Out(socket, gui);
             output.start();
 
             In input = new In(socket, gui);
             input.start();
-            
+
             while (input.isAlive() && output.isAlive()) {}
-            
+
             System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
-        } 
+        }
 
+    }
+
+    /**
+     * Starts the gui and the threads that handle input/output
+     * @param args : discarded
+     */
+    public static void main(String args[]) {
+       Client.start();
     }
 }
 

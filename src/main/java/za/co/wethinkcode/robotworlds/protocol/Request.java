@@ -6,12 +6,10 @@ import java.util.List;
 
 public class Request {
     // TODO: pull clientName from local global storage
-    String clientName;
-    String command = "idle";
-    List<String> arguments;
+    private final String clientName;
+    private final String command;
+    private final List<String> arguments;
 
-    //default constructor
-    public Request(){}
 
     //command and arguments constructor
     public Request(String name, String command, List<String> arguments){
@@ -22,8 +20,7 @@ public class Request {
 
     //command and no arguments constructor
     public Request(String name, String command) {
-        this.clientName = name;
-        this.command = command;
+        this(name, command, null);
     }
 
     /* serialize function
@@ -49,14 +46,4 @@ public class Request {
     public List<String> getArguments() {
         return arguments;
     }
-
-    //    public Request(String clientInput){
-//        //split into vars, validation of input happens here;
-//        //i.e. the command name is valid and arguments valid
-//        // clientInput.split(" ");
-//        clientName = "";
-//        command = ""; //[0]
-//        arguments = new ArrayList<String>(); //[The rest]
-//
-//    }
 }
