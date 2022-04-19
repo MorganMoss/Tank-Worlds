@@ -11,7 +11,6 @@ import za.co.wethinkcode.robotworlds.server.robot.Robot;
 import static java.lang.Math.*;
 
 public class World {
-    private final Position mapSize;
     private List<Robot> robots;
     private final HashMap<Integer, HashMap<Integer, Character>> map;
 
@@ -20,7 +19,7 @@ public class World {
      * @param map : the map that has gives a list of obstacles for this world to use.
      */
     public World(Map map) {
-        this.mapSize = map.getMapSize();
+        Position mapSize = map.getMapSize();
 
         List<Obstacle> obstacleList = map.getObstacles();
 
