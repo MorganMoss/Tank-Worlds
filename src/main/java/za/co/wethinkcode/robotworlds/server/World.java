@@ -1,9 +1,11 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
+import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
@@ -11,7 +13,7 @@ import za.co.wethinkcode.robotworlds.server.robot.Robot;
 import static java.lang.Math.*;
 
 public class World {
-    private List<Robot> robots;
+    private ArrayList<Robot> robots;
     private final HashMap<Integer, HashMap<Integer, Character>> map;
 
     /**
@@ -42,13 +44,20 @@ public class World {
         }
     }
 
-    public List<Robot> getRobots() {
-        return robots;
+    public Robot getRobot(String name) throws RobotNotFoundException {
+        for (Robot robot : robots){
+            if (robot.getName().equals(name)) {
+                return robot;
+            }
+        }
+        throw new RobotNotFoundException();
     }
 
     public void add(Robot robot) {
+        robot.setPosition(new Position(-50,-50));
         robots.add(robot);
-        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), robot.getNumber());
+        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), (""+robots.indexOf(robot)).charAt(0));
+        System.out.println(robot.getPosition());
     }
 
     public void remove(Robot robot) {
@@ -105,27 +114,30 @@ public class World {
 
     /**
      * Tries to move the robot a number of steps forward or backward relative to its direction.
-     * @param robot : the robot being moved
+     * @param robotName : the robot being moved
      * @param steps : the distance the robot moves
      * @throws PathBlockedException : thrown if the movement is not possible
      */
-    public void updatePosition(Robot robot, int steps) throws PathBlockedException {
+    public void updatePosition(String robotName, int steps) throws PathBlockedException{
+        Robot robot = getRobot(robotName);
         Position newPosition =  new Position(
                 (int) (robot.getPosition().getX() + round(steps * sin(toRadians(robot.getDirection().getAngle())))),
                 (int) (robot.getPosition().getY() + round(steps * cos(toRadians(robot.getDirection().getAngle()))))
         );
         if (!pathBlocked(robot.getPosition(), newPosition)) {
             map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), ' ');
-            map.get(newPosition.getX()).put(newPosition.getY(), robot.getNumber());
+            map.get(newPosition.getX()).put(newPosition.getY(), (""+robots.indexOf(robot)).charAt(0));
             robot.setPosition(newPosition);
         } else {
             throw new PathBlockedException();
         }
-
     }
 
     //TODO
-    public void updateDirection(Robot robot, int degrees) {}
+    public void updateDirection(String robotName, int degrees) {
+        Robot robot = getRobot(robotName);
+        robot.setDirection((int) (robot.getDirection().getAngle()) + degrees);
+    }
 
     //TODO
     public void fire(Robot robot) {}

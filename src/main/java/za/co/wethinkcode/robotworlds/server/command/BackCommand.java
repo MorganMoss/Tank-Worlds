@@ -1,5 +1,7 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
+import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
+import za.co.wethinkcode.robotworlds.server.World;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 public class BackCommand extends Command{
@@ -8,7 +10,9 @@ public class BackCommand extends Command{
     }
 
     @Override
-    public void execute(Robot target) {
-        // TODO : execute command
+    public void execute(World world, String robotName) {
+        try {
+            world.updatePosition(robotName, 5);
+        } catch (PathBlockedException ignored) {}
     }
 }

@@ -88,7 +88,7 @@ public class Client {
      * Run client from here
      * @param args : does nothing
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
        Client.start();
     }
 
@@ -146,13 +146,15 @@ public class Client {
      * Gives requests to server, the input for which is given by the GUI
      */
     private static class In extends Thread {
-        private String input;
         private final GUI gui;
         private final Socket socket;
+        private final String name;
 
         public In(Socket socket, GUI gui) {
             this.gui = gui;
             this.socket = socket;
+            gui.showOutput(new Response("", "Enter a Name", new HashMap<>()));
+            this.name = gui.getInput();
         }
 
         @Override

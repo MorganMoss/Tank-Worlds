@@ -1,6 +1,7 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
 import za.co.wethinkcode.robotworlds.protocol.Request;
+import za.co.wethinkcode.robotworlds.server.World;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ public abstract class Command {
     String name;
     String argument;
 
-    public abstract void execute(Robot target);
+    public abstract void execute(World world, String robotName);
 
     public Command(String name){
         this.name = name.trim().toLowerCase();
@@ -24,6 +25,8 @@ public abstract class Command {
 
     public static Command create(Request request) {
         List<String> args = request.getArguments();
+        String robotName = request.getClientName();
+
         if (args == null) {
             args = new ArrayList<>();
             args.add("5");
