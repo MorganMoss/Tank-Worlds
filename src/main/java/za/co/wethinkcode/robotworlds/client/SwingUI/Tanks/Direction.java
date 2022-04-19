@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI;
+package za.co.wethinkcode.robotworlds.client.SwingUI.Tanks;
 
 import za.co.wethinkcode.robotworlds.client.SwingUI.HelperMethods;
 
@@ -7,15 +7,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 //implement 8 directions can go diagonal once we implement diagonal movement
-enum Direction {
-    Left("L", -1, 0),
-    LeftUp("LU", -1, -1),
-    Up("U", 0, -1),
-    RightUp("RU", 1, -1),
-    Right("R", 1, 0),
-    RightDown("RD", 1, 1),
-    Down("D", 0, 1),
-    LeftDown("LD", -1, 1);
+public enum Direction {
+    Left("L", -1, 0) {
+
+        public Direction getLeft(){return Down;}
+        public Direction getRight(){return Up;}
+
+    },
+//    LeftUp("LU", -1, -1),
+    Up("U", 0, -1){
+        public Direction getLeft(){return Left;}
+        public Direction getRight(){return Right;}
+    },
+//    RightUp("RU", 1, -1),
+    Right("R", 1, 0){
+        public Direction getLeft(){return Up;}
+        public Direction getRight(){return Down;}
+    },
+//    RightDown("RD", 1, 1),
+    Down("D", 0, 1){
+    public Direction getLeft(){return Right;}
+    public Direction getRight(){return Left;}
+};
+//    LeftDown("LD", -1, 1);
+
+    public abstract Direction getLeft();
+    public abstract Direction getRight();
 
     private final String abbrev;
 
@@ -52,7 +69,7 @@ enum Direction {
      * </pre>
      * @param objectType    object type
      */
-    Image getImage(String objectType) {
+    public Image getImage(String objectType) {
         return CACHE.computeIfAbsent(objectType + this.abbrev, key -> HelperMethods.getImage(key + ".gif"));
     }
 }

@@ -8,6 +8,8 @@ import za.co.wethinkcode.robotworlds.server.map.Map;
 
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -17,7 +19,7 @@ import java.net.UnknownHostException;
  * It has 2-way communication and support for many clients
  */
 public class Server{
-    /**
+     /**
      * The world the server interacts with when handling requests and responses
      */
     private final World world;
@@ -60,6 +62,11 @@ public class Server{
         return new BasicMap(new Position(200,200));
     }
 
+    public static ArrayList<String> clientNames = new ArrayList<>();
+    public void addClient(String clientName){
+        clientNames.add(clientName);
+    }
+
     /**
      * Takes in a request, executes it as a command in the world, then returns a response
      * @param request : The request the client sent
@@ -90,7 +97,7 @@ public class Server{
      * @throws IOException : raised when server object fails
      */
     public static void start() throws IOException {
-        final int port = 5000;
+        final int port = 5001;
         Server server = new Server(port);
 
         System.out.println("Server running & waiting for client connections.");
@@ -99,7 +106,16 @@ public class Server{
             //TODO : Setup a separate input thread, so that commands like 'quit', 'dump' and 'robots' can be handled in the main loop
             try {
                 Socket socket = server.socket.accept();
-                ServerThread serverThread = new ServerThread(server, socket);
+
+                String socketName = socket.getLocalAddress().toString();
+                System.out.println(socketName);
+                System.out.println(clientNames);
+
+                if (!clientNames.contains(socketName)){
+                    clientNames.add(socketName);
+                    server.clientCount += 1;
+                }
+                ServerThread serverThread = new ServerThread(server, socket, server.clientCount);
                 serverThread.start();
                 System.out.println("A client has been connected. Their name is : " + socket.getLocalAddress());
             } catch(IOException ex) {

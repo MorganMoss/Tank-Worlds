@@ -12,7 +12,8 @@ import za.co.wethinkcode.robotworlds.server.Position;
  */
 public class TextGUI implements GUI {
     Scanner in = new Scanner(System.in);
-
+    String enemyName;
+    
     @Override
     public String getInput() throws NoNewInput {
         try {
@@ -20,6 +21,11 @@ public class TextGUI implements GUI {
         } catch (NoSuchElementException elevated) {
             throw new NoNewInput();
         }
+    }
+
+    @Override
+    public String getClientName() {
+        return null;
     }
 
     @Override
@@ -32,6 +38,16 @@ public class TextGUI implements GUI {
             System.out.print('\n');
         }
         System.out.println(response.getClientName() +  " : " + response.getResult());
+    }
+
+    @Override
+    public void enemyMovement(String command) {
+
+    }
+
+    @Override
+    public void setEnemyName(String enemyName) {
+        this.enemyName = enemyName;
     }
 }
 
