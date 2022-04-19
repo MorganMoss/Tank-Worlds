@@ -5,13 +5,19 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 
 public class Response {
-    // TODO: pull clientName from server global storage
 
     private final String robotName;
     private final String result;
     private final HashMap<Integer, HashMap<Integer, Character>> map;
 
-    /* TODO: create response DATA & STATE hashmap on server and getter for each */
+    /* TODO: create response DATA & STATE hashmap on server and getter for each
+    String key1 = "value1";
+    String key2 = "value2";
+    HashMap<String, String> data = new HashMap<String, String>();
+    public Response(String args){
+        data.put("key1",key1);
+        data.put("key2",key2);
+    }*/
 
     public Response(String name, String request, HashMap<Integer, HashMap<Integer, Character>> map) {
         this.robotName = name;
@@ -53,4 +59,6 @@ public class Response {
         Gson gson = new Gson();
         return gson.toJson(this);
     }
+
+
 }

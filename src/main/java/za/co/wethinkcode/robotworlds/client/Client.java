@@ -1,26 +1,73 @@
 package za.co.wethinkcode.robotworlds.client;
 
+import java.net.InetAddress;
 import java.net.Socket;
 
+import za.co.wethinkcode.robotworlds.client.SwingUI.HelperMethods;
+import za.co.wethinkcode.robotworlds.client.SwingUI.TankWorld;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 
+import javax.swing.*;
 import java.io.*;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class Client {
     /**
      * The port the server uses
      */
-    private static int port = 5000;
-
+    private static int port = 5001;
+    private static String clientName;
+    public static String getMyClientName(){return clientName;}
+    static Scanner scanner = new Scanner(System.in);
+    private static String enemyName;
+    public String getEnemyName(){return enemyName;};
     /**
      * Starts the gui and the threads that handle input/output
      */
     private static void start(){
-        GUI gui = new TextGUI();
+//        GUI gui = new TextGUI();
 
+        //print out ip address and server
+        InetAddress ip;
+        String hostname;
+        try {
+            ip = InetAddress.getLocalHost();
+            hostname = ip.getHostName();
+            System.out.println("Your current IP address : " + ip);
+            System.out.println("Your current Hostname : " + hostname);
+
+        } catch (UnknownHostException e) {
+
+            e.printStackTrace();
+        }
+
+        // Get player name
+        System.out.println("Enter Tank Name: ");
+        clientName = scanner.nextLine();
+
+        //Start swing gui
+        HelperMethods.setTheme();
+        JFrame frame = new JFrame("T A N K W O R L D S");
+        frame.setIconImage(HelperMethods.getImage("/icon.png"));
+        frame.setSize(TankWorld.getScreenWidth(), TankWorld.getScreenHeight());
+        frame.setLocation(400, 100);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        TankWorld gui = new TankWorld();
+
+        frame.add(gui);
+        gui.setFocusable(true);
+        frame.setVisible(true);
+        gui.start();
+
+
+        //start socket
         try (
-                Socket socket = new Socket("LocalHost", port);
+                //10.200.109.17
+            Socket socket = new Socket("localhost", port);
         ) {
             Out output = new Out(socket, gui);
             output.start();
@@ -66,7 +113,24 @@ public class Client {
                     try {
                         String serializedResponse = incoming.readLine(); //should be changed to a response object
                         if (!serializedResponse.matches("")){
-                            gui.showOutput(Response.deSerialize(serializedResponse));
+    //                        gui.showOutput(Response.deSerialize(serializedResponse));
+                            System.out.println(serializedResponse);
+                            System.out.println(gui.getClientName());
+                            if (serializedResponse.contains(gui.getClientName())){
+                                Response deserializedResponse = Response.deSerialize(serializedResponse);
+                                String enemyName = deserializedResponse.getClientName();
+                                gui.setEnemyName(enemyName);
+    
+                                if(serializedResponse.contains("forward")){
+                                gui.enemyMovement("forward");
+                                }else if(serializedResponse.contains("back")){
+                                    gui.enemyMovement("forward");
+                                }else if(serializedResponse.contains("left")){
+                                    gui.enemyMovement("left");
+                                }else if(serializedResponse.contains("right")){
+                                    gui.enemyMovement("right");
+                                }
+                            }
                         }
                     } catch (IOException ignored) {}
 
@@ -93,13 +157,21 @@ public class Client {
 
         @Override
         public void run() {
+            socket.setPerformancePreferences(1,0,2);
+            try {
+                socket.setTcpNoDelay(true);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
             try(
                     PrintStream outgoing = new PrintStream(socket.getOutputStream());
             ) {
                 do {
                     try {
                         input = gui.getInput();
-                        Request request = new Request("Client", input);
+                        System.out.println("ouput:\n"+input);
+
+                        Request request = new Request(gui.getClientName(), input);
                         String serializedRequest = request.serialize();
 
                         outgoing.println(serializedRequest);

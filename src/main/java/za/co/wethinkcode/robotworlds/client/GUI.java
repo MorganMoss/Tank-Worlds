@@ -12,14 +12,14 @@ public interface GUI{
      * @throws NoNewInput : if the user has not given input since last asked
      */
     public String getInput() throws NoNewInput;
-
+    public String getClientName();
     /**
      * Takes info from the response to draw the new changes
      * @param response : the response returned from the server
      */
     public void showOutput(Response response);
+
+    public void enemyMovement(String command);
+    public void setEnemyName(String enemyName);
 }
 
-class NoNewInput extends RuntimeException {
-    
-}

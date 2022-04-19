@@ -10,6 +10,7 @@ import za.co.wethinkcode.robotworlds.protocol.Response;
  */
 public class TextGUI implements GUI {
     Scanner in = new Scanner(System.in);
+    String enemyName;
     
     @Override
     public String getInput() throws NoNewInput {
@@ -21,8 +22,23 @@ public class TextGUI implements GUI {
     }
 
     @Override
+    public String getClientName() {
+        return null;
+    }
+
+    @Override
     public void showOutput(Response response) {
         System.out.println(response.serialize());
+    }
+
+    @Override
+    public void enemyMovement(String command) {
+
+    }
+
+    @Override
+    public void setEnemyName(String enemyName) {
+        this.enemyName = enemyName;
     }
 }
 
