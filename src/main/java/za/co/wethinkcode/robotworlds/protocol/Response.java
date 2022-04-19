@@ -7,14 +7,14 @@ import java.util.HashMap;
 public class Response {
     // TODO: pull clientName from server global storage
 
-    private final String clientName;
+    private final String robotName;
     private final String result;
     private final HashMap<Integer, HashMap<Integer, Character>> map;
 
     /* TODO: create response DATA & STATE hashmap on server and getter for each */
 
     public Response(String name, String request, HashMap<Integer, HashMap<Integer, Character>> map) {
-        this.clientName = name;
+        this.robotName = name;
         this.result = request;
         this.map = map;
         //hardcoded response
@@ -41,8 +41,8 @@ public class Response {
         return this.map;
     }
 
-    public String getClientName() {
-        return clientName;
+    public String getRobotName() {
+        return robotName;
     }
 
     public String getResult() {

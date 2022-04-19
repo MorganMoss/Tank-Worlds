@@ -1,19 +1,18 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
 import za.co.wethinkcode.robotworlds.protocol.Request;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.server.World;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Command {
-    String name;
+    String robotName;
     String argument;
 
-    public abstract void execute(Robot target);
+    public abstract void execute(World world);
 
     public Command(String name){
-        this.name = name.trim().toLowerCase();
+        this.robotName = name.trim().toLowerCase();
         this.argument = "";
     }
 
@@ -24,33 +23,31 @@ public abstract class Command {
 
     public static Command create(Request request) {
         List<String> args = request.getArguments();
-        if (args == null) {
-            args = new ArrayList<>();
-            args.add("5");
-        }
+        String robotName = request.getRobotName();
+
         switch (request.getCommand()) {
             case "forward":
-                return new ForwardCommand(args.get(0));
+                return new ForwardCommand(robotName, args.get(0));
             case "back":
-                return new BackCommand(args.get(0));
+                return new BackCommand(robotName, args.get(0));
             case "left":
-                return new LeftCommand();
+                return new LeftCommand(robotName);
             case "right":
-                return new RightCommand();
+                return new RightCommand(robotName);
             case "fire":
-                return new FireCommand();
+                return new FireCommand(robotName);
             case "repair":
-                return new RepairCommand();
+                return new RepairCommand(robotName);
             case "reload":
-                return new ReloadCommand();
+                return new ReloadCommand(robotName);
             case "look":
-                return new LookCommand();
+                return new LookCommand(robotName);
             case "state":
-                return new StateCommand();
+                return new StateCommand(robotName);
             case "dump":
-                return new DumpCommand();
+                return new DumpCommand(robotName);
             case "robot":
-                return new RobotCommand();
+                return new RobotCommand(robotName);
             default:
                 throw new IllegalArgumentException("Unsupported command: " + request);
         }

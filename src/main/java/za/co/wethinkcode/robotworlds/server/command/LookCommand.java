@@ -1,14 +1,14 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.server.World;
 
 public class LookCommand extends Command{
-    public LookCommand() {
-        super("look");
+    public LookCommand(String robotName) {
+        super(robotName);
     }
 
     @Override
-    public void execute(Robot target) {
+    public void execute(World world) {
         // TODO : execute command
     }
 }

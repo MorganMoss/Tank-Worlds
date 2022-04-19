@@ -1,14 +1,15 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.server.World;
 
 public class BackCommand extends Command{
-    public BackCommand(String argument) {
-        super("back", argument);
+
+    public BackCommand(String robotName, String argument) {
+        super(robotName, argument);
     }
 
     @Override
-    public void execute(Robot target) {
+    public void execute(World world) {
         // TODO : execute command
     }
 }

@@ -1,19 +1,18 @@
 package za.co.wethinkcode.robotworlds.protocol;
 
 import com.google.gson.Gson;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Request {
     // TODO: pull clientName from local global storage
-    private final String clientName;
+    private final String robotName;
     private final String command;
     private final List<String> arguments;
 
 
     //command and arguments constructor
     public Request(String name, String command, List<String> arguments){
-        this.clientName = name;
+        this.robotName = name;
         this.command = command;
         this.arguments = arguments;
     }
@@ -37,6 +36,10 @@ public class Request {
     public static Request deSerialize(String json){
         Gson gson = new Gson();
         return gson.fromJson(json,Request.class);
+    }
+
+    public String getRobotName() {
+        return robotName;
     }
 
     public String getCommand() {

@@ -1,14 +1,14 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.server.World;
 
 public class StateCommand extends Command{
-    public StateCommand() {
-        super("state");
+    public StateCommand(String robotName) {
+        super(robotName);
     }
 
     @Override
-    public void execute(Robot target) {
+    public void execute(World world) {
         // TODO : execute command
     }
 }

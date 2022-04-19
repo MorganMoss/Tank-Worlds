@@ -5,14 +5,15 @@ import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 /**
  * The server that will be run. Clients will connect to it. 
@@ -27,6 +28,11 @@ public class Server{
      * The socket clients will connect to
      */
     private final ServerSocket socket;
+
+    private List<Request> requestLog;
+    private List<Response> responseLog;
+
+
     /**
      * Used to indicate the number of clients connected to the server,
      * as well as to give a new client a number.
@@ -40,8 +46,10 @@ public class Server{
      * @throws IOException : throws when server socket fails
      */
     private Server(int port) throws IOException{
+        this.requestLog = new ArrayList<>();
+        this.responseLog = new ArrayList<>();
         this.socket = new ServerSocket(port);
-        world = new World(getMap());
+        this.world = new World(getMap());
 
         HashMap<Integer, HashMap<Integer, Character>> map = world.look(new Position(-50,-50));
         for (int x =0; x < map.size(); x++){
@@ -77,16 +85,20 @@ public class Server{
      * @return the response to the request
      */
     public Response executeRequest(int client, Request request){
-        //TODO : Add all requests and responses to a log, that can dumped to a file later
+        this.requestLog.add(request); //TODO: change to hashmap?
+
         try {
-            //TODO : Implement Commands, they should be executed by a specific robot
             Command command = Command.create(request);
+            command.execute(this.world);
+
         } catch (IllegalArgumentException badCommand) {
             //TODO : Error Handling
         }
 
         //TODO : use the look command robot position to get the grid of values it
-        return new Response("robot " + client, request.serialize(), world.look(new Position(0,0)));
+        Response response = new Response("robot " + client, request.serialize(), world.look(new Position(0,0)));
+        this.responseLog.add(response); //TODO: change to hashmap?
+        return response;
     }
 
     /**
