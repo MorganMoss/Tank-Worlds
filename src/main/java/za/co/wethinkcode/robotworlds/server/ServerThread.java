@@ -19,39 +19,29 @@ public class ServerThread extends Thread{
      * The server object this thread belongs to
      */
     private final Server server;
-
     /**
      * The client's requests are received from this
      */
     private final BufferedReader in;
-
     /**
      * The responses are sent to the client from this
      */
     private final PrintStream out;
-
     /**
      * The client's name
      */
     private final String clientMachine;
 
     /**
-     * The client's number on the server
-     */
-    private final int clientNumber;
-
-    /**
      * Makes a new thread for the server for a client that has just connected.
      * It will allow for communication between a client and the server when run
      * @param server : the server this is run from
      * @param socket : the socket used to connect the client to the server
-     * @param clientNumber : the number the client is assigned
      * @throws IOException : the connection failed
      */
-    public ServerThread(Server server, Socket socket, int clientNumber) throws IOException{
+    public ServerThread(Server server, Socket socket) throws IOException{
         this.server = server;
-        this.clientNumber = clientNumber;
-        
+
         clientMachine = socket.getInetAddress().getHostName();
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintStream(socket.getOutputStream());
@@ -68,7 +58,7 @@ public class ServerThread extends Thread{
         String request;
         try {
             while((request = in.readLine()) != null){
-                Response response = server.executeRequest(clientNumber, Request.deSerialize(request));
+                Response response = server.executeRequest(Request.deSerialize(request));
                 out.println(response.serialize());
             }
         } catch(IOException ex) {

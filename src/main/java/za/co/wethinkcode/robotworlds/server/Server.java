@@ -5,11 +5,9 @@ import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.net.*;
 import java.io.*;
-import java.util.HashMap;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -27,11 +25,11 @@ public class Server{
      * The socket clients will connect to
      */
     private final ServerSocket socket;
-    /**
-     * Used to indicate the number of clients connected to the server,
-     * as well as to give a new client a number.
-     */
-    public int clientCount = 0;
+//    /**
+//     * Used to indicate the number of clients connected to the server,
+//     * as well as to give a new client a number.
+//     */
+//    public int clientCount = 0;
 
 
     /**
@@ -42,14 +40,6 @@ public class Server{
     private Server(int port) throws IOException{
         this.socket = new ServerSocket(port);
         world = new World(getMap());
-
-        HashMap<Integer, HashMap<Integer, Character>> map = world.look(new Position(-50,-50));
-        for (int x =0; x < map.size(); x++){
-            for (int y = 0; y < map.get(x).size(); y++){
-                System.out.print(map.get(x).get(y));
-            }
-            System.out.print('\n');
-        }
     }
 
     /**
@@ -72,21 +62,27 @@ public class Server{
 
     /**
      * Takes in a request, executes it as a command in the world, then returns a response
-     * @param client : The client sending the request
      * @param request : The request the client sent
      * @return the response to the request
      */
-    public Response executeRequest(int client, Request request){
+    public Response executeRequest(Request request){
         //TODO : Add all requests and responses to a log, that can dumped to a file later
+        System.out.println(request.serialize());
+
         try {
             //TODO : Implement Commands, they should be executed by a specific robot
             Command command = Command.create(request);
+            command.execute(world, request.getClientName());
         } catch (IllegalArgumentException badCommand) {
             //TODO : Error Handling
         }
 
         //TODO : use the look command robot position to get the grid of values it
-        return new Response("robot " + client, request.serialize(), world.look(new Position(0,0)));
+        Response response = new Response(request.getClientName(), world.getRobot(request.getClientName()).serialize(), world.look(new Position(0,0)));
+
+        System.out.println(response.serialize());
+
+        return response;
     }
 
     /**
@@ -103,10 +99,9 @@ public class Server{
             //TODO : Setup a separate input thread, so that commands like 'quit', 'dump' and 'robots' can be handled in the main loop
             try {
                 Socket socket = server.socket.accept();
-                server.clientCount += 1;
-                ServerThread serverThread = new ServerThread(server, socket, server.clientCount);
+                ServerThread serverThread = new ServerThread(server, socket);
                 serverThread.start();
-                System.out.println("A client has been connected. Their number is : " + server.clientCount);
+                System.out.println("A client has been connected. Their name is : " + socket.getLocalAddress());
             } catch(IOException ex) {
                 ex.printStackTrace();
             }

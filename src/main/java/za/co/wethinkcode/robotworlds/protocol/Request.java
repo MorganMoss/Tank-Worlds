@@ -46,4 +46,8 @@ public class Request {
     public List<String> getArguments() {
         return arguments;
     }
+
+    public String getClientName() {
+        return clientName;
+    }
 }

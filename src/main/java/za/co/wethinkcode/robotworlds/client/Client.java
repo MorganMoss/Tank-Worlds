@@ -6,12 +6,13 @@ import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 
 import java.io.*;
+import java.util.HashMap;
 
 public class Client {
     /**
      * The port the server uses
      */
-    private static int port = 5000;
+    private static final int port = 5000;
 
     /**
      * Starts the gui and the threads that handle input/output
@@ -20,7 +21,7 @@ public class Client {
         GUI gui = new TextGUI();
 
         try (
-                Socket socket = new Socket("LocalHost", port);
+            Socket socket = new Socket("LocalHost", port);
         ) {
             Out output = new Out(socket, gui);
             output.start();
@@ -41,7 +42,7 @@ public class Client {
      * Run client from here
      * @param args : does nothing
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
        Client.start();
     }
 
@@ -82,13 +83,15 @@ public class Client {
      * Gives requests to server, the input for which is given by the GUI
      */
     private static class In extends Thread {
-        private String input;
         private final GUI gui;
         private final Socket socket;
+        private final String name;
 
         public In(Socket socket, GUI gui) {
             this.gui = gui;
             this.socket = socket;
+            gui.showOutput(new Response("", "Enter a Name", new HashMap<>()));
+            this.name = gui.getInput();
         }
 
         @Override
@@ -98,8 +101,8 @@ public class Client {
             ) {
                 do {
                     try {
-                        input = gui.getInput();
-                        Request request = new Request("Client", input);
+                        String input = gui.getInput();
+                        Request request = new Request(name, input);
                         String serializedRequest = request.serialize();
 
                         outgoing.println(serializedRequest);
