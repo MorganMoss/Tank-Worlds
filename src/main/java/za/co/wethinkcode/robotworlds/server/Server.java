@@ -12,41 +12,28 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * The server that will be run. Clients will connect to it. 
  * It has 2-way communication and support for many clients
  */
-public class Server implements Runnable{
-    /**
-     * The amount of milliseconds to wait before the next tick
-     */
-    private static int tickInterval = 2;
-
-    /**
+public class Server{
+     /**
      * The world the server interacts with when handling requests and responses
      */
     private final World world;
-
     /**
      * The socket clients will connect to
      */
     private final ServerSocket socket;
-
-    /**
-     * The list of requests that will be run in the next server tick
-     */
-    private final HashMap<Integer, Request> currentRequests;
-
-    /**
-     * The list of responses that will be sent in the next server tick
-     */
-    private final HashMap<Integer, Response> currentResponses;
-
     /**
      * Used to indicate the number of clients connected to the server,
      * as well as to give a new client a number.
      */
     public int clientCount = 0;
+
 
     /**
      * Makes an instance of a server. It uses the port given for the server socket
@@ -55,9 +42,15 @@ public class Server implements Runnable{
      */
     private Server(int port) throws IOException{
         this.socket = new ServerSocket(port);
-        world = new World(getMap(), getRepairTime());
-        currentRequests = new HashMap<>();
-        currentResponses = new HashMap<>();
+        world = new World(getMap());
+
+        HashMap<Integer, HashMap<Integer, Character>> map = world.look(new Position(-50,-50));
+        for (int x =0; x < map.size(); x++){
+            for (int y = 0; y < map.get(x).size(); y++){
+                System.out.print(map.get(x).get(y));
+            }
+            System.out.print('\n');
+        }
     }
 
     /**
@@ -73,11 +66,9 @@ public class Server implements Runnable{
      * @return a map that will be used to define the world's size and it's obstacles
      */
     private Map getMap() {
-        return new BasicMap();
-    }
-
-    public World getWorld() {
-        return world;
+        //TODO : Get the map to be used from the config file;
+        // Size for a map should be determined by the map, not the server.
+        return new BasicMap(new Position(200,200));
     }
 
     public static ArrayList<String> clientNames = new ArrayList<>();
@@ -86,64 +77,22 @@ public class Server implements Runnable{
     }
 
     /**
-     * Should execute all requests and create a new response for each client
-     * It should clear the list as it goes
+     * Takes in a request, executes it as a command in the world, then returns a response
+     * @param client : The client sending the request
+     * @param request : The request the client sent
+     * @return the response to the request
      */
-    private void executeRequests() {
-        if (clientCount == 0) {
-            return;
+    public Response executeRequest(int client, Request request){
+        //TODO : Add all requests and responses to a log, that can dumped to a file later
+        try {
+            //TODO : Implement Commands, they should be executed by a specific robot
+            Command command = Command.create(request);
+        } catch (IllegalArgumentException badCommand) {
+            //TODO : Error Handling
         }
-        for (int client : currentRequests.keySet()) {
-            Request request = currentRequests.get(client);
 
-            String clientName = request.getClientName();
-            System.out.println(clientName);
-            if(!clientNames.contains(clientName)){clientNames.add(clientName);}
-
-//            if (request == null){
-//                System.out.println(client + ": idle");
-//            } else try {
-//                    Command command = Command.create(request);
-////                    for (Robot robot : world.getRobots()) {
-////                        if (robot.getName() == client) {
-////                            command.execute(robot);
-////                        }
-////                    }
-//            } catch (IllegalArgumentException e) {
-//                currentResponses.putIfAbsent(client, new Response(clientName, "Command not found"));
-//            }
-
-            assert request != null;
-            System.out.println(client + ": " + request.serialize());
-
-            //TODO properly. it's just sending back the request, should be a general info about robot and surroundings
-            currentResponses.putIfAbsent(client, new Response(request.getClientName(), request.serialize()));
-            currentRequests.remove(client);
-        }
-    }
-    
-    /**
-     * Looks for a response from the server to give the client.
-     * Used by a server thread.
-     * @param client : the client looking for a response
-     * @return a formatted response object
-     */
-    public Response getResponse(int client){
-        Response response = currentResponses.get(client);
-        if (response == null) {
-            throw new NoChangeException();
-        }
-        currentResponses.remove(client);
-        return response;
-    }
-
-    /**
-     * Allows a server thread to give the server a request for a client
-     * @param client : the client giving the request
-     * @param request : the request the client is giving
-     */
-    public void addRequest(int client, Request request){
-        currentRequests.putIfAbsent(client, request);
+        //TODO : use the look command robot position to get the grid of values it
+        return new Response("robot " + client, request.serialize(), world.look(new Position(0,0)));
     }
 
     /**
@@ -151,15 +100,13 @@ public class Server implements Runnable{
      * @throws IOException : raised when server object fails
      */
     public static void start() throws IOException {
-        final int port = 5000;
+        final int port = 5001;
         Server server = new Server(port);
 
         System.out.println("Server running & waiting for client connections.");
 
-        Thread serverLoop = new Thread(server);
-        serverLoop.start();
-
         while(true) {
+            //TODO : Setup a separate input thread, so that commands like 'quit', 'dump' and 'robots' can be handled in the main loop
             try {
                 Socket socket = server.socket.accept();
 
@@ -180,33 +127,37 @@ public class Server implements Runnable{
         }
     }
 
+    public void dump(){
+        //TODO : Set up the dump function. It should output a list of the robots, with their current states and the world and all it's info
+    }
+
+    public void robots(){
+        //TODO : Get a list of robots with their current info, and output it.
+    }
+
+    public void quit(){
+        //TODO : Should send a response to all clients telling them that the server is shutting down, then close everything that needs closing on the server side
+    }
+
     /**
      * The server is run from here. 
      * @param args : none are applicable
      * @throws IOException : raised when server object fails
      */
     public static void main(String[] args) throws IOException {
+        InetAddress ip;
+        String hostname;
+
+        try {
+            ip = InetAddress.getLocalHost();
+            hostname = ip.getHostName();
+            System.out.println("Your current IP address : " + ip);
+            System.out.println("Your current Hostname : " + hostname);
+
+        } catch (UnknownHostException e) {
+
+            e.printStackTrace();
+        }
         start();
     }
-
-    /**
-     * Executes current requests and makes responses for all the clients every time interval
-     * when run on a separate thread
-     */
-    @Override
-    public void run() {
-        do {
-            this.executeRequests();
-            try {
-                Thread.sleep(tickInterval);
-            } catch (InterruptedException ignored) {
-            }
-        } while (true);
-    }
-}
-
-/**
- * Raised when there is no new response from the server for a specific client
- */
-class NoChangeException extends RuntimeException{
 }

@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Request {
-    // TODO: pull clientName from local global storage ?DONE
-    String clientName;
-    String command = "idle";
-    List<String> arguments;
+    // TODO: pull clientName from local global storage
+    private final String clientName;
+    private final String command;
+    private final List<String> arguments;
 
-    //default constructor
-    public Request(){}
 
     //command and arguments constructor
     public Request(String name, String command, List<String> arguments){
@@ -22,9 +20,9 @@ public class Request {
 
     //command and no arguments constructor
     public Request(String name, String command) {
-        this.clientName = name;
-        this.command = command;
+        this(name, command, null);
     }
+    
 
     /* serialize function
     * this function uses Google Gson a java
@@ -51,5 +49,4 @@ public class Request {
     public List<String> getArguments() {
         return arguments;
     }
-
 }

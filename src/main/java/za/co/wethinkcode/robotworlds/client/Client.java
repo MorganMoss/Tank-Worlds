@@ -15,19 +15,19 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class Client {
-    private static int port = 5000;
+    /**
+     * The port the server uses
+     */
+    private static int port = 5001;
     private static String clientName;
     public static String getMyClientName(){return clientName;}
     static Scanner scanner = new Scanner(System.in);
     private static String enemyName;
-    public String getEnemyName(){return this.enemyName;};
-
+    public String getEnemyName(){return enemyName;};
     /**
      * Starts the gui and the threads that handle input/output
-     * @param args : discarded
      */
-    public static void main(String args[]) {
-        
+    private static void start(){
 //        GUI gui = new TextGUI();
 
         //print out ip address and server
@@ -74,112 +74,119 @@ public class Client {
 
             In input = new In(socket, gui);
             input.start();
-            
+
             while (input.isAlive() && output.isAlive()) {}
-            
+
             System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
-        } 
+        }
 
     }
-}
 
-/**
- * Receives responses from server and makes GUI output them
- */
-class Out extends Thread {
-    private final GUI gui;
-    private final Socket socket;
-
-    public Out(Socket socket, GUI gui){
-        this.socket = socket;
-        this.gui = gui;
+    /**
+     * Run client from here
+     * @param args : does nothing
+     */
+    public static void main(String args[]) {
+       Client.start();
     }
+
+    /**
+     * Receives responses from server and makes GUI output them
+     */
+    private static class Out extends Thread {
+        private final GUI gui;
+        private final Socket socket;
+
+        public Out(Socket socket, GUI gui){
+            this.socket = socket;
+            this.gui = gui;
+        }
+
+        @Override
+        public void run() {
+            try(
+                    BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            ) {
+                do {
+                    try {
+                        String serializedResponse = incoming.readLine(); //should be changed to a response object
+                        if (!serializedResponse.matches("")){
+    //                        gui.showOutput(Response.deSerialize(serializedResponse));
+                            System.out.println(serializedResponse);
+                            System.out.println(gui.getClientName());
+                            if (serializedResponse.contains(gui.getClientName())){
+                                Response deserializedResponse = Response.deSerialize(serializedResponse);
+                                String enemyName = deserializedResponse.getClientName();
+                                gui.setEnemyName(enemyName);
     
-    @Override
-    public void run() {
-        try(
-            BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        ) {
-            do {
-                try {
-                    String serializedResponse = incoming.readLine(); //should be changed to a response object
-                    if (!serializedResponse.matches("")){
-//                        gui.showOutput(Response.deSerialize(serializedResponse));
-                        System.out.println(serializedResponse);
-                        System.out.println(gui.getClientName());
-                        if (!serializedResponse.contains(gui.getClientName())){
-                            Response deserializedResponse = Response.deSerialize(serializedResponse);
-                            String enemyName = deserializedResponse.getClientName();
-                            gui.setEnemyName(enemyName);
-
-                            if(serializedResponse.contains("forward")){
-                            gui.enemyMovement("forward");
-                            }else if(serializedResponse.contains("back")){
+                                if(serializedResponse.contains("forward")){
                                 gui.enemyMovement("forward");
-                            }else if(serializedResponse.contains("left")){
-                                gui.enemyMovement("left");
-                            }else if(serializedResponse.contains("right")){
-                                gui.enemyMovement("right");
+                                }else if(serializedResponse.contains("back")){
+                                    gui.enemyMovement("forward");
+                                }else if(serializedResponse.contains("left")){
+                                    gui.enemyMovement("left");
+                                }else if(serializedResponse.contains("right")){
+                                    gui.enemyMovement("right");
+                                }
                             }
                         }
-                    }
-                } catch (IOException ignored) {}
-                
-            } while (true);
+                    } catch (IOException ignored) {}
 
-        } catch (IOException e) {
-            e.printStackTrace();
+                } while (true);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
-}
 
+    /**
+     * Gives requests to server, the input for which is given by the GUI
+     */
+    private static class In extends Thread {
+        private String input;
+        private final GUI gui;
+        private final Socket socket;
 
-/**
- * Gives requests to server, the input for which is given by the GUI
- */
-class In extends Thread {
-    private String input;
-    private final GUI gui;
-    private final Socket socket;
-    
-    public In(Socket socket, GUI gui) {
-        this.gui = gui;
-        this.socket = socket;
-    }
-
-    @Override
-    public void run() {
-        socket.setPerformancePreferences(1,0,2);
-        try {
-            socket.setTcpNoDelay(true);
-        } catch (SocketException e) {
-            e.printStackTrace();
+        public In(Socket socket, GUI gui) {
+            this.gui = gui;
+            this.socket = socket;
         }
 
-        try(
-            PrintStream outgoing = new PrintStream(socket.getOutputStream());
-        ) {
-            do {
-                try {
-                    input = gui.getInput();
-                    System.out.println("input:\n"+input);
-                    Request request = new Request(gui.getClientName(), input);
-                    String serializedRequest = request.serialize();
+        @Override
+        public void run() {
+            socket.setPerformancePreferences(1,0,2);
+            try {
+                socket.setTcpNoDelay(true);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+            try(
+                    PrintStream outgoing = new PrintStream(socket.getOutputStream());
+            ) {
+                do {
+                    try {
+                        input = gui.getInput();
+                        System.out.println("ouput:\n"+input);
 
-                    outgoing.println(serializedRequest); 
-                    outgoing.flush();
-    
-                    if (input.matches("quit")) {
-                        System.exit(0);
-                    }
-                } catch (NoNewInput ignored) {}
+                        Request request = new Request(gui.getClientName(), input);
+                        String serializedRequest = request.serialize();
 
-            } while (true);
+                        outgoing.println(serializedRequest);
+                        outgoing.flush();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+                        if (input.matches("quit")) {
+                            System.exit(0);
+                        }
+                    } catch (NoNewInput ignored) {}
+
+                } while (true);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

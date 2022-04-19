@@ -47,10 +47,10 @@ public class TankWorld extends JComponent implements GUI {
     }
 
 
-    private static Request request = new Request();
+    private static Request request = new Request("Robot","idle");
 
     //FIFO stack for requests
-    static Request queue1=new Request();
+    static Request queue1= new Request("Robot","idle");
     private static LinkedList<Request> lastRequest = new LinkedList<Request>();
 
 
