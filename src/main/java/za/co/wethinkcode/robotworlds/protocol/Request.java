@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Request {
-    // TODO: pull clientName from local global storage
+    // TODO: pull clientName from local global storage ?DONE
     String clientName;
     String command = "idle";
     List<String> arguments;
@@ -46,17 +46,10 @@ public class Request {
         return command;
     }
 
+    public String getClientName(){return clientName;}
+
     public List<String> getArguments() {
         return arguments;
     }
 
-    //    public Request(String clientInput){
-//        //split into vars, validation of input happens here;
-//        //i.e. the command name is valid and arguments valid
-//        // clientInput.split(" ");
-//        clientName = "";
-//        command = ""; //[0]
-//        arguments = new ArrayList<String>(); //[The rest]
-//
-//    }
 }

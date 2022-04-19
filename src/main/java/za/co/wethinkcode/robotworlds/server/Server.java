@@ -9,6 +9,7 @@ import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -19,7 +20,7 @@ public class Server implements Runnable{
     /**
      * The amount of milliseconds to wait before the next tick
      */
-    private static int tickInterval = 50;
+    private static int tickInterval = 2;
 
     /**
      * The world the server interacts with when handling requests and responses
@@ -79,6 +80,11 @@ public class Server implements Runnable{
         return world;
     }
 
+    public static ArrayList<String> clientNames = new ArrayList<>();
+    public void addClient(String clientName){
+        clientNames.add(clientName);
+    }
+
     /**
      * Should execute all requests and create a new response for each client
      * It should clear the list as it goes
@@ -89,22 +95,29 @@ public class Server implements Runnable{
         }
         for (int client : currentRequests.keySet()) {
             Request request = currentRequests.get(client);
-            if (request == null){
-                System.out.println(client + ": idle");
-            } else try {
-                    Command command = Command.create(request);
-//                    for (Robot robot : world.getRobots()) {
-//                        if (robot.getName() == client) {
-//                            command.execute(robot);
-//                        }
-//                    }
-            } catch (IllegalArgumentException e) {
-                currentResponses.putIfAbsent(client, new Response("robot " + client, "Command not found"));
-            }
-            System.out.println(client + ": " + request.toString());
+
+            String clientName = request.getClientName();
+            System.out.println(clientName);
+            if(!clientNames.contains(clientName)){clientNames.add(clientName);}
+
+//            if (request == null){
+//                System.out.println(client + ": idle");
+//            } else try {
+//                    Command command = Command.create(request);
+////                    for (Robot robot : world.getRobots()) {
+////                        if (robot.getName() == client) {
+////                            command.execute(robot);
+////                        }
+////                    }
+//            } catch (IllegalArgumentException e) {
+//                currentResponses.putIfAbsent(client, new Response(clientName, "Command not found"));
+//            }
+
+            assert request != null;
+            System.out.println(client + ": " + request.serialize());
 
             //TODO properly. it's just sending back the request, should be a general info about robot and surroundings
-            currentResponses.putIfAbsent(client, new Response("robot " + client, request.serialize()));
+            currentResponses.putIfAbsent(client, new Response(request.getClientName(), request.serialize()));
             currentRequests.remove(client);
         }
     }
@@ -149,7 +162,15 @@ public class Server implements Runnable{
         while(true) {
             try {
                 Socket socket = server.socket.accept();
-                server.clientCount += 1;
+
+                String socketName = socket.getLocalAddress().toString();
+                System.out.println(socketName);
+                System.out.println(clientNames);
+
+                if (!clientNames.contains(socketName)){
+                    clientNames.add(socketName);
+                    server.clientCount += 1;
+                }
                 ServerThread serverThread = new ServerThread(server, socket, server.clientCount);
                 serverThread.start();
                 System.out.println("A client has been connected. Their number is : " + server.clientCount);

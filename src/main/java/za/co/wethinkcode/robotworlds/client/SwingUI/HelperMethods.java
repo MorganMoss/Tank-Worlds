@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import com.google.gson.Gson;
 
 
-class HelperMethods {
+public class HelperMethods {
     private static Random RANDOM = new Random();
 
     static boolean nextBoolean() {
@@ -36,7 +36,7 @@ class HelperMethods {
      * Get {@link Image} from given file
      * @param imageFileName name of image file under directory "assets/images"
      */
-    static Image getImage(final String imageFileName) {
+    public static Image getImage(final String imageFileName) {
         return new ImageIcon("assets/images/" + imageFileName).getImage();
     }
 
@@ -51,7 +51,7 @@ class HelperMethods {
     /**
      * Set Swing Theme: Windows or Nimbus
      */
-    static void setTheme() {
+    public static void setTheme() {
         String theme = System.getProperty("os.name").startsWith("Windows") ? "Windows" : "Nimbus";
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -65,9 +65,22 @@ class HelperMethods {
         }
     }
 
+    /**
+     * Use googles gson module to serialize an Object of any class to a Json string
+     * Usage: String json = serialize(myClassInstance)
+     * */
     static String serialize(Object object){
         Gson gson = new Gson();
         return gson.toJson(object);
+    }
+
+    /**
+     * Use googles gson module to deserialize a Json string to its corresponding class.
+     * Usage: Object deserializedClass = deserialize(myJsonSerializedClass)
+     * */
+    static Object deSerialize(String json){
+        Gson gson = new Gson();
+        return gson.fromJson(json, json.getClass());
     }
 
 

@@ -10,6 +10,8 @@ public class Response {
     String clientName;
     String result = "OK";
 
+    public String getClientName(){return this.clientName;}
+
     /* TODO: create response DATA & STATE hashmap on server and getter for each
     String key1 = "value1";
     String key2 = "value2";
@@ -43,4 +45,6 @@ public class Response {
         Gson gson = new Gson();
         return gson.toJson(this);
     }
+
+
 }
