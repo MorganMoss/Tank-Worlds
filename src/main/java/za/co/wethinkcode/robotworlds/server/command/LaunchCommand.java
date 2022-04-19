@@ -8,8 +8,16 @@ public class LaunchCommand extends Command{
         super(robotName);
     }
 
+
     @Override
     public void execute(World world) {
+        world.add(new BasicRobot(robotName));
 
+//        try {
+//            world.getRobot(robotName);
+//        } catch (RobotNotFoundException robotDoesNotExist) {
+//        }
     }
+
+
 }

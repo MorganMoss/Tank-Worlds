@@ -49,15 +49,7 @@ public class Server{
         this.requestLog = new ArrayList<>();
         this.responseLog = new ArrayList<>();
         this.socket = new ServerSocket(port);
-        this.world = new World(getMap());
-
-        HashMap<Integer, HashMap<Integer, Character>> map = world.look(new Position(-50,-50));
-        for (int x =0; x < map.size(); x++){
-            for (int y = 0; y < map.get(x).size(); y++){
-                System.out.print(map.get(x).get(y));
-            }
-            System.out.print('\n');
-        }
+        world = new World(getMap());
     }
 
     /**
@@ -85,24 +77,27 @@ public class Server{
 
     /**
      * Takes in a request, executes it as a command in the world, then returns a response
-     * @param client : The client sending the request
      * @param request : The request the client sent
      * @return the response to the request
      */
-    public Response executeRequest(int client, Request request){
+    public Response executeRequest(Request request){
         this.requestLog.add(request); //TODO: change to hashmap?
+        //TODO : Add all requests and responses to a log, that can dumped to a file later
+        System.out.println(request.serialize());
 
         try {
             Command command = Command.create(request);
-            command.execute(this.world);
-
+            command.execute(world);
         } catch (IllegalArgumentException badCommand) {
             //TODO : Error Handling
         }
 
         //TODO : use the look command robot position to get the grid of values it
-        Response response = new Response("robot " + client, request.serialize(), world.look(new Position(0,0)));
-        this.responseLog.add(response); //TODO: change to hashmap?
+        Response response = new Response(request.getClientName(), world.getRobot(request.getClientName()).serialize(), world.look(new Position(0,0)));
+        
+        this.responseLog.add(response); 
+        System.out.println(response.serialize());
+
         return response;
     }
 
@@ -131,7 +126,7 @@ public class Server{
                 }
                 ServerThread serverThread = new ServerThread(server, socket, server.clientCount);
                 serverThread.start();
-                System.out.println("A client has been connected. Their number is : " + server.clientCount);
+                System.out.println("A client has been connected. Their name is : " + socket.getLocalAddress());
             } catch(IOException ex) {
                 ex.printStackTrace();
             }

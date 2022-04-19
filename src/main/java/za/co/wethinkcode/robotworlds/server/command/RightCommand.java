@@ -9,6 +9,6 @@ public class RightCommand extends Command{
 
     @Override
     public void execute(World world) {
-        // TODO : execute command
+        world.updateDirection(robotName, 90);
     }
 }

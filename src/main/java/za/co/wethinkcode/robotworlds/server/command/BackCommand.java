@@ -10,6 +10,8 @@ public class BackCommand extends Command{
 
     @Override
     public void execute(World world) {
-        // TODO : execute command
+        try {
+            world.updatePosition(robotName, 5);
+        } catch (PathBlockedException ignored) {}
     }
 }
