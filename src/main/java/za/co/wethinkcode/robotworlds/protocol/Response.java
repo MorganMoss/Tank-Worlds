@@ -1,64 +1,77 @@
 package za.co.wethinkcode.robotworlds.protocol;
 
 import com.google.gson.Gson;
+import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.util.HashMap;
 
 public class Response {
-
-    private final String robotName;
-    private final String result;
+    /**
+     * The client's robot with its current state
+     */
+    private final Robot robot;
+    /**
+     * The response given by the executed response
+     */
+    private final String commandResponse;
+    /**
+     * A view given by the world.look method.
+     * It is a grid that represents what this robot can see
+     */
     private final HashMap<Integer, HashMap<Integer, Character>> map;
+    /**
+     * A list of nearby robots with their current states.
+     */
+    private final HashMap<String, Robot> enemyRobots;
 
-    /* TODO: create response DATA & STATE hashmap on server and getter for each
-    String key1 = "value1";
-    String key2 = "value2";
-    HashMap<String, String> data = new HashMap<String, String>();
-    public Response(String args){
-        data.put("key1",key1);
-        data.put("key2",key2);
-    }*/
-
-    public Response(String name, String request, HashMap<Integer, HashMap<Integer, Character>> map) {
-        this.robotName = name;
-        this.result = request;
+    /**
+     * The constructor for response
+     * @param robot : the robot that gave the request for this response
+     * @param commandResponse : the response to the command in the request given
+     * @param map : an updated view on the world
+     * @param enemyRobots : a list of the robots with the key being their identifier on the map
+     */
+    public Response(Robot robot, String commandResponse, HashMap<Integer, HashMap<Integer, Character>> map, HashMap<String, Robot> enemyRobots) {
+        this.robot = robot;
+        this.commandResponse = commandResponse;
         this.map = map;
-        //hardcoded response
-//        this.map = new HashMap<>();
-//        for (int x = 0; x < 10; x++) {
-//            HashMap<Integer, Character> row = new HashMap<>();
-//            for (int y = 0; y < 10; y++) {
-//                row.putIfAbsent(y, ' '); //open space
-//            }
-//            this.map.putIfAbsent(x, row);
-//        }
-//        this.map.get(5).put(5, 'P'); //this player
-//        this.map.get(7).put(6, 'X'); //obstacle
-//        this.map.get(3).put(5, '1'); //enemy
-//        this.map.get(3).put(1, '2'); //enemy
-    }
-
-    public static Response deSerialize(String json){
-        Gson gson = new Gson();
-        return gson.fromJson(json,Response.class);
+        this.enemyRobots = enemyRobots;
     }
 
     public HashMap<Integer, HashMap<Integer, Character>> getMap() {
         return this.map;
     }
 
-    public String getRobotName() {
-        return robotName;
+    public Robot getRobot() {
+        return robot;
     }
 
-    public String getResult() {
-        return result;
+    public String getCommandResponse() {
+        return commandResponse;
     }
 
+    public HashMap<String, Robot> getEnemyRobots() {
+        return enemyRobots;
+    }
+
+    /**
+     * this function uses Google Gson a java
+     * data serialization package that takes an object
+     * @return a string Json
+     */
     public String serialize(){
         Gson gson = new Gson();
         return gson.toJson(this);
     }
 
-
+    /**
+     * this function uses Google Gson a java
+     * Takes in a string Json and makes a response object
+     * @param json : the string to be converted
+     * @return a response object
+     */
+    public static Response deSerialize(String json){
+        Gson gson = new Gson();
+        return gson.fromJson(json,Response.class);
+    }
 }

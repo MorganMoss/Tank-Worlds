@@ -1,6 +1,6 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI.Obstacles;
+package za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles;
 
-import za.co.wethinkcode.robotworlds.client.SwingUI.HelperMethods;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
 import za.co.wethinkcode.robotworlds.server.Position;
 
 import java.awt.*;

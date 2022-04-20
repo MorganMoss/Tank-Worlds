@@ -1,5 +1,6 @@
 package za.co.wethinkcode.robotworlds.server;
 
+//TODO : make javadocs!!
 public class Position {
 
     private final int x;

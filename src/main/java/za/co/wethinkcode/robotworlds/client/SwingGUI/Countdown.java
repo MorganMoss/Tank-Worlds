@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI;
+package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
 import java.awt.*;
 import javax.swing.JFrame;

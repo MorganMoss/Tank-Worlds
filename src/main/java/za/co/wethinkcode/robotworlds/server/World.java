@@ -1,6 +1,8 @@
+// TODO : Waiting for Maggie and Sisipho to push their updated version
+//  This may need merge conflicts to be resolved.
 package za.co.wethinkcode.robotworlds.server;
 
-import java.util.ArrayList;
+import static java.lang.Math.*;
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,10 +12,9 @@ import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
-import static java.lang.Math.*;
 
 public class World {
-    private ArrayList<Robot> robots;
+    private final HashMap<String, Robot> robots;
     private final HashMap<Integer, HashMap<Integer, Character>> map;
 
     /**
@@ -42,27 +43,32 @@ public class World {
 
             this.map.putIfAbsent(x, row);
         }
+        this.robots = new HashMap<>();
     }
 
     public Robot getRobot(String name) throws RobotNotFoundException {
-        for (Robot robot : robots){
-            if (robot.getName().equals(name)) {
-                return robot;
-            }
+        Robot robot = robots.get(name.toLowerCase());
+        if (robot == null){
+            throw new RobotNotFoundException();
         }
-        throw new RobotNotFoundException();
+        return robot;
     }
 
     public void add(Robot robot) {
         robot.setPosition(new Position(-50,-50));
-        robots.add(robot);
-        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), (""+robots.indexOf(robot)).charAt(0));
-        System.out.println(robot.getPosition());
+        robot.setDirection(0);
+        robots.put(robot.getName(), robot);
+        System.out.println(robots);
+        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), 'R');
+    }
+
+    public void remove(String robotName) {
+        this.remove(getRobot(robotName));
     }
 
     public void remove(Robot robot) {
         map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), ' ');
-        robots.remove(robot);
+        robots.remove(robot.getName());
     }
 
     /**
@@ -126,7 +132,7 @@ public class World {
         );
         if (!pathBlocked(robot.getPosition(), newPosition)) {
             map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), ' ');
-            map.get(newPosition.getX()).put(newPosition.getY(), (""+robots.indexOf(robot)).charAt(0));
+            map.get(newPosition.getX()).put(newPosition.getY(), 'R');
             robot.setPosition(newPosition);
         } else {
             throw new PathBlockedException();

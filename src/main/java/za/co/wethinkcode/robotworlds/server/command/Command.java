@@ -1,3 +1,5 @@
+// TODO : Waiting for Maggie and Sisipho to push their updated version
+//  This goes for all commands.
 package za.co.wethinkcode.robotworlds.server.command;
 
 import za.co.wethinkcode.robotworlds.protocol.Request;
@@ -9,7 +11,7 @@ public abstract class Command {
     String robotName;
     String argument;
 
-    public abstract void execute(World world);
+    public abstract String execute(World world);
 
     public Command(String name){
         this.robotName = name.trim().toLowerCase();
@@ -26,10 +28,12 @@ public abstract class Command {
         String robotName = request.getRobotName();
 
         switch (request.getCommand()) {
+            case "launch":
+                return new LaunchCommand(robotName);
             case "forward":
-                return new ForwardCommand(robotName, args.get(0));
+                return new ForwardCommand(robotName, "5");
             case "back":
-                return new BackCommand(robotName, args.get(0));
+                return new BackCommand(robotName, "5");
             case "left":
                 return new LeftCommand(robotName);
             case "right":

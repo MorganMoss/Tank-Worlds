@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI.Tanks;
+package za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks;
 
 public abstract class Tank {
     private String name;

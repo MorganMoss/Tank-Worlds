@@ -5,14 +5,15 @@ import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
+import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -28,17 +29,15 @@ public class Server{
      * The socket clients will connect to
      */
     private final ServerSocket socket;
-
-    private List<Request> requestLog;
-    private List<Response> responseLog;
-
-
+    //TODO : Perhaps unify these into a list of Strings (i.e. Serialize them as you store them)
     /**
-     * Used to indicate the number of clients connected to the server,
-     * as well as to give a new client a number.
+     * Stores history of requests made to the server
      */
-    public int clientCount = 0;
-
+    private List<Request> requestLog;
+    /**
+     * Stores history of responses made to the server
+     */
+    private List<Response> responseLog;
 
     /**
      * Makes an instance of a server. It uses the port given for the server socket
@@ -70,11 +69,6 @@ public class Server{
         return new BasicMap(new Position(200,200));
     }
 
-    public static ArrayList<String> clientNames = new ArrayList<>();
-    public void addClient(String clientName){
-        clientNames.add(clientName);
-    }
-
     /**
      * Takes in a request, executes it as a command in the world, then returns a response
      * @param request : The request the client sent
@@ -85,15 +79,26 @@ public class Server{
         //TODO : Add all requests and responses to a log, that can dumped to a file later
         System.out.println(request.serialize());
 
+        String commandResponse;
         try {
             Command command = Command.create(request);
-            command.execute(world);
+            commandResponse = command.execute(world);
         } catch (IllegalArgumentException badCommand) {
-            //TODO : Error Handling
+            commandResponse = "failed! bad input";
         }
 
-        //TODO : use the look command robot position to get the grid of values it
-        Response response = new Response(request.getClientName(), world.getRobot(request.getClientName()).serialize(), world.look(new Position(0,0)));
+        HashMap<Integer, HashMap<Integer, Character>> map = world.look(new Position(0,0));
+        Robot robot = world.getRobot(request.getRobotName());
+
+        Response response = new Response(
+                robot,
+                commandResponse,
+                map,
+                //TODO set up a way to get robots around this one; i.e. world.getEnemies(map)
+                // That method could go through it and copy the items that come up in the map given
+                // It should be a list of enemy robot objects.
+                null
+        );
         
         this.responseLog.add(response); 
         System.out.println(response.serialize());
@@ -106,7 +111,7 @@ public class Server{
      * @throws IOException : raised when server object fails
      */
     public static void start() throws IOException {
-        final int port = 5001;
+        final int port = 5000;
         Server server = new Server(port);
 
         System.out.println("Server running & waiting for client connections.");
@@ -118,15 +123,10 @@ public class Server{
 
                 String socketName = socket.getLocalAddress().toString();
                 System.out.println(socketName);
-                System.out.println(clientNames);
 
-                if (!clientNames.contains(socketName)){
-                    clientNames.add(socketName);
-                    server.clientCount += 1;
-                }
-                ServerThread serverThread = new ServerThread(server, socket, server.clientCount);
+                ServerThread serverThread = new ServerThread(server, socket);
                 serverThread.start();
-                System.out.println("A client has been connected. Their name is : " + socket.getLocalAddress());
+                System.out.println("A client has been connected. Their name is : " + socket.getInetAddress().getHostName());
             } catch(IOException ex) {
                 ex.printStackTrace();
             }

@@ -1,5 +1,6 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
+import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.server.World;
 
 public class ForwardCommand extends Command{

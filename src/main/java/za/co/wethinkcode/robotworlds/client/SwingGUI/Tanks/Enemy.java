@@ -1,7 +1,7 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI.Tanks;
+package za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks;
 
 
-import za.co.wethinkcode.robotworlds.client.SwingUI.HelperMethods;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
 
 import java.awt.*;
 

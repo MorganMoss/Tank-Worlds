@@ -1,6 +1,5 @@
 package za.co.wethinkcode.robotworlds.server;
 
-import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 
@@ -27,10 +26,6 @@ public class ServerThread extends Thread{
      * The responses are sent to the client from this
      */
     private final PrintStream out;
-    /**
-     * The client's name
-     */
-    private final String clientMachine;
 
     /**
      * Makes a new thread for the server for a client that has just connected.
@@ -42,11 +37,10 @@ public class ServerThread extends Thread{
     public ServerThread(Server server, Socket socket) throws IOException{
         this.server = server;
 
-        clientMachine = socket.getInetAddress().getHostName();
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintStream(socket.getOutputStream());
 
-        System.out.println("Connection from " + clientMachine);
+        System.out.println("Connection from " + socket.getInetAddress().getHostName());
     }
 
     /**

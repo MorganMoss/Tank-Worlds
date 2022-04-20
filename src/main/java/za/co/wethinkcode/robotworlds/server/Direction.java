@@ -1,5 +1,6 @@
 package za.co.wethinkcode.robotworlds.server;
 
+//TODO : make javadocs!!
 public enum Direction {
     NORTH, EAST, SOUTH, WEST;
 

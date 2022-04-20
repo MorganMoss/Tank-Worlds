@@ -1,9 +1,8 @@
+// TODO : Waiting for Maggie and Sisipho to push their updated version of robot
 package za.co.wethinkcode.robotworlds.server.robot;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import com.google.gson.Gson;
+
 import za.co.wethinkcode.robotworlds.server.Direction;
 import za.co.wethinkcode.robotworlds.server.Position;
 
@@ -14,6 +13,7 @@ public abstract class Robot {
     private final int maxAmmo;
     private final int reloadTime;
     private final String firingPattern;
+
     private Position position;
     private Direction direction;
     private int currentShield;
@@ -42,6 +42,21 @@ public abstract class Robot {
 
     //TODO : implement this method
     public void setDirection(int angle) {
+
+        switch (Math.round((angle / 90f)%4)) {
+            case 1:
+                this.direction = Direction.EAST;
+                break;
+            case 2:
+                this.direction = Direction.SOUTH;
+                break;
+            case 3:
+                this.direction = Direction.WEST;
+                break;
+            default:
+                this.direction = Direction.NORTH;
+                break;
+        }
     }
 
     public Direction getDirection() {
