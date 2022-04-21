@@ -22,7 +22,9 @@ public class SwingGUI implements GUI {
         // TODO : This looks like it is setup in TankWorld. Could reuse
         //  You can setup a call for the predictive movement here, or in the thread that is checking for user input
         if (!latestInput.equals("")){
-            return new Request("TODO", "TODO", null);
+            Request request = new Request("TODO", "TODO", null);
+            assumeOutput(request);
+
         }
         throw new NoNewInput();
     }
@@ -33,4 +35,8 @@ public class SwingGUI implements GUI {
     }
 
     // TODO : Add private methods as necessary
+    private void assumeOutput(Request request){
+        // TODO : guesses what it'll look like while it waits for the server to respond
+
+    }
 }

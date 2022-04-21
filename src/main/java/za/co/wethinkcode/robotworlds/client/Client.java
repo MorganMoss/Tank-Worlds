@@ -19,6 +19,7 @@ public class Client {
      */
     private static final int port = 5000;
 
+
     /**
      * Starts the gui and the threads that handle input/output
      */

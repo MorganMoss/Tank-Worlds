@@ -46,12 +46,6 @@ public abstract class Command {
                 return new ReloadCommand(robotName);
             case "look":
                 return new LookCommand(robotName);
-            case "state":
-                return new StateCommand(robotName);
-            case "dump":
-                return new DumpCommand(robotName);
-            case "robot":
-                return new RobotCommand(robotName);
             default:
                 throw new IllegalArgumentException("Unsupported command: " + request);
         }
