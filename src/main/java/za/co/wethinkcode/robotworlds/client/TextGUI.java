@@ -22,13 +22,14 @@ public class TextGUI implements GUI {
     /**
      * Flag to check if a robot has been launched into the server successfully
      */
-    boolean hasLaunched;
+    boolean hasLaunched, waiting;
 
     /**
      * Sets the text GUI up to be ready to launch a robot.
      */
     public TextGUI(){
         hasLaunched = false;
+        waiting = false;
     }
 
     /**
@@ -44,7 +45,8 @@ public class TextGUI implements GUI {
 
         try {
             // if the robot has not launched, make request with new name and send launch request.
-            if (!hasLaunched){
+            if (!hasLaunched && !waiting){
+                waiting = true;
                 // TODO : could specify kind of robot to be launched here too.
                 System.out.print("Enter Robot Name : ");
                 this.robotName = in.nextLine();
@@ -80,33 +82,32 @@ public class TextGUI implements GUI {
     @Override
     public void showOutput(Response response) {
         // checks if the server has let the robot launch, otherwise tries again.
-        if (!hasLaunched && response.getCommandResponse().equals("success")){
+        if (!hasLaunched && response.getCommandResponse().equalsIgnoreCase("success")){
             hasLaunched = true;
         } else if (!hasLaunched) {
+            System.out.println("Launch failed : " + response.getCommandResponse());
             return;
         }
+        waiting = false;
 
-        // if it runs out of shield, game-over
-        if (response.getRobot().getShield() == 0)
-        {
-            quit();
-            return;
-        }
-
+//        // if it runs out of shield, game-over
+//        if (response.getRobot().getShield() == 0)
+//        {
+//            quit();
+//            return;
+//        }
 
         HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
 
         for (int x =0; x < map.size(); x++){
             for (int y = 0; y < map.get(x).size(); y++){
                 System.out.print(map.get(x).get(y).charAt(0));
-
             }
             System.out.print('\n');
-
         }
 
         HashMap<String, Robot> enemyRobots = response.getEnemyRobots();
-        if (enemyRobots != null){
+        if (enemyRobots != null && enemyRobots.size() > 0){
             System.out.println("There are enemies nearby:");
             for (Robot robot : enemyRobots.values()){
                 System.out.println(robot.getName() + " :");

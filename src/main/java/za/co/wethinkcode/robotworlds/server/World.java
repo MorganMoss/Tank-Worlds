@@ -55,7 +55,7 @@ public class World {
     }
 
     public void add(Robot robot) {
-        robot.setPosition(new Position(-50,-50));
+        robot.setPosition(new Position(0,0));
         robot.setDirection(0);
         robots.put(robot.getName(), robot);
         System.out.println(robots);
@@ -155,7 +155,7 @@ public class World {
      * @return : a grid of data representing the relative view from this position
      */
     public HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter) {
-        int distance = 10; //hardcoded for now
+        int distance = 25; //hardcoded for now
 
         int current_x = 0;
         HashMap<Integer, HashMap<Integer, String>> result = new HashMap<>();

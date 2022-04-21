@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import za.co.wethinkcode.robotworlds.server.Direction;
 import za.co.wethinkcode.robotworlds.server.Position;
 
-public abstract class Robot {
+public class Robot {
     private final String name;
     private final String visibilityPattern;
     private final int maxShield;

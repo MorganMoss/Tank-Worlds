@@ -66,7 +66,7 @@ public class Server{
     private Map getMap() {
         //TODO : Get the map to be used from the config file;
         // Size for a map should be determined by the map, not the server.
-        return new BasicMap(new Position(200,200));
+        return new BasicMap(new Position(100,100));
     }
 
     /**
