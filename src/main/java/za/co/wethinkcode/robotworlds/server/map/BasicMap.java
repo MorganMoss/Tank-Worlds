@@ -16,7 +16,7 @@ public class BasicMap implements Map{
 
     public List<Obstacle> getObstacles() {
         List<Obstacle> obstacleList = new ArrayList<>();
-        Obstacle obstacle = new SquareObstacle(2, new Position(0,0));
+        Obstacle obstacle = new SquareObstacle(4, new Position(0,0));
         obstacleList.add(obstacle);
         return obstacleList;
     }

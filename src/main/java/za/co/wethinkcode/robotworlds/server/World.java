@@ -94,9 +94,9 @@ public class World {
 
             if (position.getY() > newPosition.getY()) {
                 low = newPosition.getY();
-                high = position.getY();
+                high = position.getY()-1;
             } else {
-                low = position.getY();
+                low = position.getY()+1;
                 high = newPosition.getY();
             }
 
@@ -147,7 +147,6 @@ public class World {
         }
     }
 
-    //TODO
     public void updateDirection(String robotName, int degrees) {
         Robot robot = getRobot(robotName);
         robot.setDirection((int) (robot.getDirection().getAngle()) + degrees);
@@ -156,6 +155,7 @@ public class World {
     //TODO
     public void fire(Robot robot) {}
 
+    // TODO : add an argument for viewDistance.
     /**
      * Makes a hashmap of hashmaps going from 0 to 2*viewDistance
      * contains characters representing obstacles, open spaces and robots
@@ -163,7 +163,7 @@ public class World {
      * @return : a grid of data representing the relative view from this position
      */
     public HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter) {
-        int distance = 25; //hardcoded for now
+        int distance = 10;//hardcoded for now
 
         int current_x = 0;
         HashMap<Integer, HashMap<Integer, String>> result = new HashMap<>();
@@ -184,6 +184,8 @@ public class World {
         return result;
     }
 
+    // TODO : Have this give the base method the viewDistance of the robot
+    //  (Do the to do for the base method first)
     /**
      * Makes a hashmap of hashmaps going from 0 to 2*viewDistance
      * contains characters representing obstacles, open spaces and robots

@@ -9,7 +9,7 @@ public class LeftCommand extends Command{
 
     @Override
     public String execute(World world) {
-        world.updateDirection(robotName,-90);
+        world.updateDirection(robotName,270);
         return "Success";
     }
 }

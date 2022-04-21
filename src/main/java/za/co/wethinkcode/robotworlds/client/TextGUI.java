@@ -10,7 +10,7 @@ import za.co.wethinkcode.robotworlds.server.robot.Robot;
 /**
  * Example of how to implement GUI, by using sout and sin
  */
-public class TextGUI implements GUI {
+public class TextGUI extends Thread implements GUI {
     /**
      * Used for input from user
      */
@@ -18,7 +18,7 @@ public class TextGUI implements GUI {
     /**
      * Stores the name of the robot that is currently controlled by this user
      */
-    String robotName;
+    String robotName, currentInput;
     /**
      * Flag to check if a robot has been launched into the server successfully
      */
@@ -30,6 +30,7 @@ public class TextGUI implements GUI {
     public TextGUI(){
         hasLaunched = false;
         waiting = false;
+        currentInput = "";
     }
 
     /**
@@ -53,7 +54,7 @@ public class TextGUI implements GUI {
 
                 System.out.print("Enter Type of Robot : ");
                 String robotType = in.nextLine();
-                // Hard coded for now.
+                // TODO : Hard coded for now.
                 robotType = "BasicRobot";
 
                 return new Request(
@@ -62,8 +63,20 @@ public class TextGUI implements GUI {
                         new ArrayList<String>(Collections.singletonList(robotType))
                 );
             }
+
+            if (currentInput.equals("")) {
+                try {
+                    sleep(2000);
+                } catch (InterruptedException ignored) { }
+                return new Request(
+                        robotName,
+                        "idle",
+                        new ArrayList<>()
+                );
+            }
             // default scenario. Gets input, splits it into command and args, returns usual request
-            String[] input = in.nextLine().split(" ");
+            String[] input = currentInput.split(" ");
+            currentInput = "";
             List<String> args = new ArrayList<>();
             if (input.length > 1){
                 args = Arrays.asList(Arrays.copyOfRange(input, 1, input.length-1));
@@ -88,24 +101,24 @@ public class TextGUI implements GUI {
         // checks if the server has let the robot launch, otherwise tries again.
         if (!hasLaunched && response.getCommandResponse().equalsIgnoreCase("success")){
             hasLaunched = true;
+            this.start();
         } else if (!hasLaunched) {
             System.out.println("Launch failed : " + response.getCommandResponse());
             return;
         }
         waiting = false;
 
-//        // if it runs out of shield, game-over
-//        if (response.getRobot().getShield() == 0)
-//        {
-//            quit();
-//            return;
-//        }
+        // if it runs out of shield, game-over
+        if (response.getRobot().getCurrentShield() == 0) {
+            quit();
+            return;
+        }
 
         HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
 
-        for (int x =0; x < map.size(); x++){
-            for (int y = 0; y < map.get(x).size(); y++){
-                System.out.print("" + map.get(x).get(y).charAt(0) + map.get(x).get(y).charAt(0));
+        for (int y = 0; y < map.get(0).size();  y++){
+            for (int x =0; x < map.size(); x++){
+                System.out.print("" + map.get(x).get(y).charAt(0) /*+ map.get(x).get(y).charAt(0)*/);
             }
             System.out.print('\n');
         }
@@ -136,6 +149,13 @@ public class TextGUI implements GUI {
             return;
         }
         System.exit(0);
+    }
+
+    @Override
+    public void run() {
+        while (hasLaunched) {
+            currentInput = in.nextLine();
+        }
     }
 }
 
