@@ -7,6 +7,15 @@ import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
+// TODO :
+//  I have not implemented any way for the output to update
+//  without the client first sending a request. This is not ideal,
+//  but you can type idle or any random string to get a new response.
+//  ...
+//  This issue comes from the fact that this class does not ever give input automatically.
+//  ...
+//  It's good enough to play around with for now.
+
 /**
  * Example of how to implement GUI, by using sout and sin
  */
