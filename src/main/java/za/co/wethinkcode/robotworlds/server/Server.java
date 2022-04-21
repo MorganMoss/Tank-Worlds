@@ -3,6 +3,7 @@ package za.co.wethinkcode.robotworlds.server;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
+import za.co.wethinkcode.robotworlds.server.command.IdleCommand;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
@@ -81,7 +82,13 @@ public class Server{
 
         String commandResponse;
         try {
-            Command command = Command.create(request);
+            Robot robot = world.getRobot(request.getRobotName());
+            Command command;
+            if (robot.isPaused()) {
+                command = new IdleCommand(request.getRobotName());
+            } else {
+                command = Command.create(request);
+            }
             commandResponse = command.execute(world);
         } catch (IllegalArgumentException badCommand) {
             commandResponse = "failed! bad input";

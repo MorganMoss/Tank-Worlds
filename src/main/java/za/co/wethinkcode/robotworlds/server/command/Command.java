@@ -13,13 +13,13 @@ public abstract class Command {
 
     public abstract String execute(World world);
 
-    public Command(String name){
-        this.robotName = name.trim().toLowerCase();
+    public Command(String robotName){
+        this.robotName = robotName.trim().toLowerCase();
         this.argument = "";
     }
 
-    public Command(String name, String argument) {
-        this(name);
+    public Command(String robotName, String argument) {
+        this(robotName);
         this.argument = argument.trim();
     }
 

@@ -188,10 +188,14 @@ public class World {
     public void pause(Robot robot, int duration) {}
 
     //TODO
-    public void repair(Robot robot) {}
+    public void repair(Robot robot) {
+        robot.resetShield();
+    }
 
     //TODO
-    public void reload(Robot robot) {}
+    public void reload(Robot robot) {
+        robot.resetAmmo();
+    }
 
     public HashMap<String, Robot> getEnemies(HashMap<Integer, HashMap<Integer, String>> map){
         HashMap<String, Robot> enemies = new HashMap<>();
