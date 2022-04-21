@@ -7,6 +7,15 @@ import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
+// TODO :
+//  I have not implemented any way for the output to update
+//  without the client first sending a request. This is not ideal,
+//  but you can type idle or any random string to get a new response.
+//  ...
+//  This issue comes from the fact that this class does not ever give input automatically.
+//  ...
+//  It's good enough to play around with for now.
+
 /**
  * Example of how to implement GUI, by using sout and sin
  */
@@ -23,6 +32,10 @@ public class TextGUI implements GUI {
      * Flag to check if a robot has been launched into the server successfully
      */
     boolean hasLaunched, waiting;
+    /**
+     * This lets it check if there's changes; if there are, it will update the output
+     */
+    Response previousResponse;
 
     /**
      * Sets the text GUI up to be ready to launch a robot.
@@ -53,7 +66,7 @@ public class TextGUI implements GUI {
 
                 System.out.print("Enter Type of Robot : ");
                 String robotType = in.nextLine();
-                // Hard coded for now.
+                // TODO : Hard coded for now.
                 robotType = "BasicRobot";
 
                 return new Request(
@@ -64,10 +77,14 @@ public class TextGUI implements GUI {
             }
             // default scenario. Gets input, splits it into command and args, returns usual request
             String[] input = in.nextLine().split(" ");
+            List<String> args = new ArrayList<>();
+            if (input.length > 1){
+                args = Arrays.asList(Arrays.copyOfRange(input, 1, input.length-1));
+            }
             return new Request(
-                    robotName,
-                    input[0],
-                    Arrays.asList(Arrays.copyOfRange(input, 1, input.length-1))
+                robotName,
+                input[0],
+                args
             );
 
         } catch (NoSuchElementException elevated) {
@@ -83,6 +100,7 @@ public class TextGUI implements GUI {
     public void showOutput(Response response) {
         // checks if the server has let the robot launch, otherwise tries again.
         if (!hasLaunched && response.getCommandResponse().equalsIgnoreCase("success")){
+            previousResponse = response;
             hasLaunched = true;
         } else if (!hasLaunched) {
             System.out.println("Launch failed : " + response.getCommandResponse());
@@ -90,18 +108,23 @@ public class TextGUI implements GUI {
         }
         waiting = false;
 
-//        // if it runs out of shield, game-over
-//        if (response.getRobot().getShield() == 0)
-//        {
-//            quit();
-//            return;
-//        }
+        if (previousResponse.serialize().equals(response.serialize())){
+            return;
+        }
+
+        previousResponse = response;
+
+        // if it runs out of shield, game-over
+        if (response.getRobot().getCurrentShield() == 0) {
+            quit();
+            return;
+        }
 
         HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
 
-        for (int x =0; x < map.size(); x++){
-            for (int y = 0; y < map.get(x).size(); y++){
-                System.out.print(map.get(x).get(y).charAt(0));
+        for (int y = 0; y < map.get(0).size();  y++){
+            for (int x =0; x < map.size(); x++){
+                System.out.print("" + map.get(x).get(y).charAt(0) /*+ map.get(x).get(y).charAt(0)*/);
             }
             System.out.print('\n');
         }
@@ -113,6 +136,8 @@ public class TextGUI implements GUI {
                 System.out.println(robot.getRobotName() + " :");
                 System.out.println("\tShield Remaining: " + robot.getCurrentShield());
                 System.out.println("\tFacing: " + robot.getDirection());
+                System.out.println("\tAbsolute Position: " + robot.getPosition());
+
             }
         }
 

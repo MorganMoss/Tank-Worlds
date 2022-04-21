@@ -36,6 +36,9 @@ public class Response {
         this.commandResponse = commandResponse;
         this.map = map;
         this.enemyRobots = enemyRobots;
+        // for (Robot enemy : enemyRobots.values()){
+        //     enemy.getRobotName();
+        // }
     }
 
     public HashMap<Integer, HashMap<Integer, String>> getMap() {
