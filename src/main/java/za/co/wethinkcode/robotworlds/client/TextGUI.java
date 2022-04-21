@@ -10,7 +10,7 @@ import za.co.wethinkcode.robotworlds.server.robot.Robot;
 /**
  * Example of how to implement GUI, by using sout and sin
  */
-public class TextGUI extends Thread implements GUI {
+public class TextGUI implements GUI {
     /**
      * Used for input from user
      */
@@ -18,11 +18,15 @@ public class TextGUI extends Thread implements GUI {
     /**
      * Stores the name of the robot that is currently controlled by this user
      */
-    String robotName, currentInput;
+    String robotName;
     /**
      * Flag to check if a robot has been launched into the server successfully
      */
     boolean hasLaunched, waiting;
+    /**
+     * This lets it check if there's changes; if there are, it will update the output
+     */
+    Response previousResponse;
 
     /**
      * Sets the text GUI up to be ready to launch a robot.
@@ -30,7 +34,6 @@ public class TextGUI extends Thread implements GUI {
     public TextGUI(){
         hasLaunched = false;
         waiting = false;
-        currentInput = "";
     }
 
     /**
@@ -63,20 +66,8 @@ public class TextGUI extends Thread implements GUI {
                         new ArrayList<String>(Collections.singletonList(robotType))
                 );
             }
-
-            if (currentInput.equals("")) {
-                try {
-                    sleep(2000);
-                } catch (InterruptedException ignored) { }
-                return new Request(
-                        robotName,
-                        "idle",
-                        new ArrayList<>()
-                );
-            }
             // default scenario. Gets input, splits it into command and args, returns usual request
-            String[] input = currentInput.split(" ");
-            currentInput = "";
+            String[] input = in.nextLine().split(" ");
             List<String> args = new ArrayList<>();
             if (input.length > 1){
                 args = Arrays.asList(Arrays.copyOfRange(input, 1, input.length-1));
@@ -100,13 +91,19 @@ public class TextGUI extends Thread implements GUI {
     public void showOutput(Response response) {
         // checks if the server has let the robot launch, otherwise tries again.
         if (!hasLaunched && response.getCommandResponse().equalsIgnoreCase("success")){
+            previousResponse = response;
             hasLaunched = true;
-            this.start();
         } else if (!hasLaunched) {
             System.out.println("Launch failed : " + response.getCommandResponse());
             return;
         }
         waiting = false;
+
+        if (previousResponse.serialize().equals(response.serialize())){
+            return;
+        }
+
+        previousResponse = response;
 
         // if it runs out of shield, game-over
         if (response.getRobot().getCurrentShield() == 0) {
@@ -149,13 +146,6 @@ public class TextGUI extends Thread implements GUI {
             return;
         }
         System.exit(0);
-    }
-
-    @Override
-    public void run() {
-        while (hasLaunched) {
-            currentInput = in.nextLine();
-        }
     }
 }
 
