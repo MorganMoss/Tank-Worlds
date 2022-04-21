@@ -18,7 +18,7 @@ public class Response {
      * A view given by the world.look method.
      * It is a grid that represents what this robot can see
      */
-    private final HashMap<Integer, HashMap<Integer, Character>> map;
+    private final HashMap<Integer, HashMap<Integer, String>> map;
     /**
      * A list of nearby robots with their current states.
      */
@@ -31,14 +31,14 @@ public class Response {
      * @param map : an updated view on the world
      * @param enemyRobots : a list of the robots with the key being their identifier on the map
      */
-    public Response(Robot robot, String commandResponse, HashMap<Integer, HashMap<Integer, Character>> map, HashMap<String, Robot> enemyRobots) {
+    public Response(Robot robot, String commandResponse, HashMap<Integer, HashMap<Integer, String>> map, HashMap<String, Robot> enemyRobots) {
         this.robot = robot;
         this.commandResponse = commandResponse;
         this.map = map;
         this.enemyRobots = enemyRobots;
     }
 
-    public HashMap<Integer, HashMap<Integer, Character>> getMap() {
+    public HashMap<Integer, HashMap<Integer, String>> getMap() {
         return this.map;
     }
 

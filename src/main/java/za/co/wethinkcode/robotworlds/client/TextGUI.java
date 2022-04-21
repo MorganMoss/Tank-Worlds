@@ -94,11 +94,11 @@ public class TextGUI implements GUI {
         }
 
 
-        HashMap<Integer, HashMap<Integer, Character>> map = response.getMap();
+        HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
 
         for (int x =0; x < map.size(); x++){
             for (int y = 0; y < map.get(x).size(); y++){
-                System.out.print(map.get(x).get(y));
+                System.out.print(map.get(x).get(y).charAt(0));
 
             }
             System.out.print('\n');

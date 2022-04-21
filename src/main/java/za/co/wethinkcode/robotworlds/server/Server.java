@@ -87,17 +87,16 @@ public class Server{
             commandResponse = "failed! bad input";
         }
 
-        HashMap<Integer, HashMap<Integer, Character>> map = world.look(new Position(0,0));
+        HashMap<Integer, HashMap<Integer, String>> map = world.look(new Position(0,0));
         Robot robot = world.getRobot(request.getRobotName());
+        HashMap<String, Robot> enemies = world.getEnemies(map);
+        enemies.remove(robot.getName());
 
         Response response = new Response(
                 robot,
                 commandResponse,
                 map,
-                //TODO set up a way to get robots around this one; i.e. world.getEnemies(map)
-                // That method could go through it and copy the items that come up in the map given
-                // It should be a list of enemy robot objects.
-                null
+                enemies
         );
         
         this.responseLog.add(response); 
