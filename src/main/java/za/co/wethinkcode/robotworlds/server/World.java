@@ -3,6 +3,7 @@ package za.co.wethinkcode.robotworlds.server;
 import static java.lang.Math.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
@@ -53,7 +54,16 @@ public class World {
     }
 
     public void add(Robot robot) {
-        robot.setPosition(new Position(0,0));
+        Position launchPosition;
+        Random random = new Random();
+        do {
+//            int x = random.nextInt(2 * map.size()) - map.size();
+//            int y = random.nextInt(2 * map.get(0).size()) - map.get(0).size();
+            int x = random.nextInt(20) - 10;
+            int y = random.nextInt(20) - 10;
+            launchPosition = new Position(x,y);
+        } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
+        robot.setPosition(launchPosition);
         robot.setDirection(0);
         robots.put(robot.getRobotName(), robot);
         System.out.println(robots);

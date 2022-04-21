@@ -3,7 +3,7 @@ package za.co.wethinkcode.robotworlds.server.robot;
 import za.co.wethinkcode.robotworlds.server.Direction;
 import za.co.wethinkcode.robotworlds.server.Position;
 
-public abstract class Robot {
+public class Robot {
     private final String robotName;
     private final int maxShield;
     private final int maxAmmo;
@@ -18,12 +18,16 @@ public abstract class Robot {
     private boolean paused;
 
     public Robot(String robotName, int visibilityDistance, int maxShield, int maxAmmo, int reloadTime, int fireDistance) {
+        //These are immutable
         this.robotName = robotName;
-        this.visibilityDistance = visibilityDistance;
         this.maxShield = maxShield;
         this.maxAmmo = maxAmmo;
-        this.reloadTime = reloadTime;
+        this.visibilityDistance = visibilityDistance;
         this.fireDistance = fireDistance;
+        this.reloadTime = reloadTime;
+        //These are initialized, but are mutable
+        this.currentAmmo = maxAmmo;
+        this.currentShield = maxShield;
         this.paused = false;
     }
 
@@ -56,7 +60,6 @@ public abstract class Robot {
     }
 
     public void setDirection(int angle) {
-
         switch (Math.round((angle / 90f)%4)) {
             case 1:
                 this.direction = Direction.EAST;

@@ -64,10 +64,14 @@ public class TextGUI implements GUI {
             }
             // default scenario. Gets input, splits it into command and args, returns usual request
             String[] input = in.nextLine().split(" ");
+            List<String> args = new ArrayList<>();
+            if (input.length > 1){
+                args = Arrays.asList(Arrays.copyOfRange(input, 1, input.length-1));
+            }
             return new Request(
-                    robotName,
-                    input[0],
-                    Arrays.asList(Arrays.copyOfRange(input, 1, input.length-1))
+                robotName,
+                input[0],
+                args
             );
 
         } catch (NoSuchElementException elevated) {
@@ -101,7 +105,7 @@ public class TextGUI implements GUI {
 
         for (int x =0; x < map.size(); x++){
             for (int y = 0; y < map.get(x).size(); y++){
-                System.out.print(map.get(x).get(y).charAt(0));
+                System.out.print("" + map.get(x).get(y).charAt(0) + map.get(x).get(y).charAt(0));
             }
             System.out.print('\n');
         }
@@ -113,6 +117,8 @@ public class TextGUI implements GUI {
                 System.out.println(robot.getRobotName() + " :");
                 System.out.println("\tShield Remaining: " + robot.getCurrentShield());
                 System.out.println("\tFacing: " + robot.getDirection());
+                System.out.println("\tAbsolute Position: " + robot.getPosition());
+
             }
         }
 
