@@ -8,7 +8,8 @@ public class RepairCommand extends Command{
     }
 
     @Override
-    public void execute(World world) {
+    public String execute(World world) {
         // TODO : execute command
+        return "Success";
     }
 }

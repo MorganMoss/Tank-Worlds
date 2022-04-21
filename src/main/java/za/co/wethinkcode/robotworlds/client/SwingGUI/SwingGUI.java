@@ -20,6 +20,7 @@ public class SwingGUI implements GUI {
     @Override
     public Request getInput() throws NoNewInput {
         // TODO : This looks like it is setup in TankWorld. Could reuse
+        //  You can setup a call for the predictive movement here, or in the thread that is checking for user input
         if (!latestInput.equals("")){
             return new Request("TODO", "TODO", null);
         }

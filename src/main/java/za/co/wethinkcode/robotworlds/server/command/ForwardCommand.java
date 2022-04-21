@@ -9,9 +9,10 @@ public class ForwardCommand extends Command{
     }
 
     @Override
-    public void execute(World world) {
+    public String execute(World world) {
         try {
             world.updatePosition(robotName, 5);
         } catch (PathBlockedException ignored) {}
+        return "Success";
     }
 }
