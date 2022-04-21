@@ -1,5 +1,3 @@
-// TODO : Waiting for Maggie and Sisipho to push their updated version
-//  This may need merge conflicts to be resolved.
 package za.co.wethinkcode.robotworlds.server;
 
 import static java.lang.Math.*;
@@ -57,7 +55,7 @@ public class World {
     public void add(Robot robot) {
         robot.setPosition(new Position(-50,-50));
         robot.setDirection(0);
-        robots.put(robot.getName(), robot);
+        robots.put(robot.getRobotName(), robot);
         System.out.println(robots);
         map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), 'R');
     }
@@ -68,7 +66,7 @@ public class World {
 
     public void remove(Robot robot) {
         map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), ' ');
-        robots.remove(robot.getName());
+        robots.remove(robot.getRobotName());
     }
 
     /**
