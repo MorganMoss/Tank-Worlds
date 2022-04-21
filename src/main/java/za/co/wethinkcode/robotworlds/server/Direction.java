@@ -13,10 +13,4 @@ public enum Direction {
         }
         throw new IllegalStateException();
     }
-
-    //TODO : Implement to have this object make a new object an angle equal to this.getAngle() + angle
-    public Direction turn(int angle) {
-        return null;
-    }
-
 }
