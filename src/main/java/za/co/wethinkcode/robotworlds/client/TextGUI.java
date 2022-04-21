@@ -110,8 +110,8 @@ public class TextGUI implements GUI {
         if (enemyRobots != null && enemyRobots.size() > 0){
             System.out.println("There are enemies nearby:");
             for (Robot robot : enemyRobots.values()){
-                System.out.println(robot.getName() + " :");
-                System.out.println("\tShield Remaining: " + robot.getShield());
+                System.out.println(robot.getRobotName() + " :");
+                System.out.println("\tShield Remaining: " + robot.getCurrentShield());
                 System.out.println("\tFacing: " + robot.getDirection());
             }
         }

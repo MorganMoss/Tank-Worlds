@@ -90,7 +90,7 @@ public class Server{
         HashMap<Integer, HashMap<Integer, String>> map = world.look(new Position(0,0));
         Robot robot = world.getRobot(request.getRobotName());
         HashMap<String, Robot> enemies = world.getEnemies(map);
-        enemies.remove(robot.getName());
+        enemies.remove(robot.getRobotName());
 
         Response response = new Response(
                 robot,
