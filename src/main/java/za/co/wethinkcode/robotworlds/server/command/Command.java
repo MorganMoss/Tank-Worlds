@@ -13,13 +13,13 @@ public abstract class Command {
 
     public abstract String execute(World world);
 
-    public Command(String name){
-        this.robotName = name.trim().toLowerCase();
+    public Command(String robotName){
+        this.robotName = robotName.trim().toLowerCase();
         this.argument = "";
     }
 
-    public Command(String name, String argument) {
-        this(name);
+    public Command(String robotName, String argument) {
+        this(robotName);
         this.argument = argument.trim();
     }
 
@@ -46,12 +46,6 @@ public abstract class Command {
                 return new ReloadCommand(robotName);
             case "look":
                 return new LookCommand(robotName);
-            case "state":
-                return new StateCommand(robotName);
-            case "dump":
-                return new DumpCommand(robotName);
-            case "robot":
-                return new RobotCommand(robotName);
             default:
                 throw new IllegalArgumentException("Unsupported command: " + request);
         }

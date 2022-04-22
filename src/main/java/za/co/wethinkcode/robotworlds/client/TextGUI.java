@@ -7,6 +7,15 @@ import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
+// TODO :
+//  I have not implemented any way for the output to update
+//  without the client first sending a request. This is not ideal,
+//  but you can type idle or any random string to get a new response.
+//  ...
+//  This issue comes from the fact that this class does not ever give input automatically.
+//  ...
+//  It's good enough to play around with for now.
+
 /**
  * Example of how to implement GUI, by using sout and sin
  */
@@ -22,13 +31,18 @@ public class TextGUI implements GUI {
     /**
      * Flag to check if a robot has been launched into the server successfully
      */
-    boolean hasLaunched;
+    boolean hasLaunched, waiting;
+    /**
+     * This lets it check if there's changes; if there are, it will update the output
+     */
+    Response previousResponse;
 
     /**
      * Sets the text GUI up to be ready to launch a robot.
      */
     public TextGUI(){
         hasLaunched = false;
+        waiting = false;
     }
 
     /**
@@ -44,14 +58,15 @@ public class TextGUI implements GUI {
 
         try {
             // if the robot has not launched, make request with new name and send launch request.
-            if (!hasLaunched){
+            if (!hasLaunched && !waiting){
+                waiting = true;
                 // TODO : could specify kind of robot to be launched here too.
                 System.out.print("Enter Robot Name : ");
                 this.robotName = in.nextLine();
 
                 System.out.print("Enter Type of Robot : ");
                 String robotType = in.nextLine();
-                // Hard coded for now.
+                // TODO : Hard coded for now.
                 robotType = "BasicRobot";
 
                 return new Request(
@@ -62,10 +77,14 @@ public class TextGUI implements GUI {
             }
             // default scenario. Gets input, splits it into command and args, returns usual request
             String[] input = in.nextLine().split(" ");
+            List<String> args = new ArrayList<>();
+            if (input.length > 1){
+                args = Arrays.asList(Arrays.copyOfRange(input, 1, input.length-1));
+            }
             return new Request(
-                    robotName,
-                    input[0],
-                    Arrays.asList(Arrays.copyOfRange(input, 1, input.length-1))
+                robotName,
+                input[0],
+                args
             );
 
         } catch (NoSuchElementException elevated) {
@@ -80,38 +99,45 @@ public class TextGUI implements GUI {
     @Override
     public void showOutput(Response response) {
         // checks if the server has let the robot launch, otherwise tries again.
-        if (!hasLaunched && response.getCommandResponse().equals("success")){
+        if (!hasLaunched && response.getCommandResponse().equalsIgnoreCase("success")){
+            previousResponse = response;
             hasLaunched = true;
         } else if (!hasLaunched) {
+            System.out.println("Launch failed : " + response.getCommandResponse());
+            return;
+        }
+        waiting = false;
+
+        if (previousResponse.serialize().equals(response.serialize())){
             return;
         }
 
+        previousResponse = response;
+
         // if it runs out of shield, game-over
-        if (response.getRobot().getShield() == 0)
-        {
+        if (response.getRobot().getCurrentShield() == 0) {
             quit();
             return;
         }
 
+        HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
 
-        HashMap<Integer, HashMap<Integer, Character>> map = response.getMap();
-
-        for (int x =0; x < map.size(); x++){
-            for (int y = 0; y < map.get(x).size(); y++){
-                System.out.print(map.get(x).get(y));
-
+        for (int y = 0; y < map.get(0).size();  y++){
+            for (int x =0; x < map.size(); x++){
+                System.out.print("" + map.get(x).get(y).charAt(0) /*+ map.get(x).get(y).charAt(0)*/);
             }
             System.out.print('\n');
-
         }
 
         HashMap<String, Robot> enemyRobots = response.getEnemyRobots();
-        if (enemyRobots != null){
+        if (enemyRobots != null && enemyRobots.size() > 0){
             System.out.println("There are enemies nearby:");
             for (Robot robot : enemyRobots.values()){
-                System.out.println(robot.getName() + " :");
-                System.out.println("\tShield Remaining: " + robot.getShield());
+                System.out.println(robot.getRobotName() + " :");
+                System.out.println("\tShield Remaining: " + robot.getCurrentShield());
                 System.out.println("\tFacing: " + robot.getDirection());
+                System.out.println("\tAbsolute Position: " + robot.getPosition());
+
             }
         }
 

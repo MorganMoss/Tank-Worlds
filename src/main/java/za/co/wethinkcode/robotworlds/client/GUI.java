@@ -8,7 +8,7 @@ import za.co.wethinkcode.robotworlds.protocol.Response;
  * Interface for GUI's to have when run by the client
  */
 public interface GUI{
-    //TODO : Possibly a quit() for game over
+    //TODO : Possibly a private quit() for game over
     // (i.e. their robot in their most recent response has a currentShield of 0)
     // or client quitting manually.
     // this can be done from showOutput, then quit can be a private method called by showOutput,

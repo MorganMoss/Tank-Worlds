@@ -37,6 +37,6 @@ public class FireCommand extends Command {
 //        } else {
 //
 //        }
-    return null;
+        return "Success";
     }
 }

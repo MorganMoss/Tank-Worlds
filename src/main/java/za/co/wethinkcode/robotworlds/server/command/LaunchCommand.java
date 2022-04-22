@@ -14,8 +14,9 @@ public class LaunchCommand extends Command{
 
 
     @Override
-    public void execute(World world) {
+    public String execute(World world) {
         world.add(new BasicRobot(robotName.toLowerCase()));
+        return "Success";
     }
 
 

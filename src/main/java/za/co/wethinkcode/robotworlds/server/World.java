@@ -1,10 +1,9 @@
-// TODO : Waiting for Maggie and Sisipho to push their updated version
-//  This may need merge conflicts to be resolved.
 package za.co.wethinkcode.robotworlds.server;
 
 import static java.lang.Math.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
@@ -15,7 +14,7 @@ import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 public class World {
     private final HashMap<String, Robot> robots;
-    private final HashMap<Integer, HashMap<Integer, Character>> map;
+    private final HashMap<Integer, HashMap<Integer, String>> map; //"X"," ",<RobotName>
 
     /**
      * Constructor for world
@@ -28,16 +27,16 @@ public class World {
 
         this.map = new HashMap<>();
         for (int x = round(-mapSize.getX()/2.0f); x <= round(mapSize.getX()/2.0f); x++) {
-            HashMap<Integer, Character> row = new HashMap<>();
+            HashMap<Integer, String> row = new HashMap<>();
 
             for (int y = round(-mapSize.getY()/2.0f); y <= round(mapSize.getY()/2.0f); y++) {
                 for (Obstacle obstacle : obstacleList){
                     if (obstacle.isPositionBlocked(new Position(x,y))){
-                        row.putIfAbsent(y, 'X'); //closed space
+                        row.putIfAbsent(y, "X"); //closed space
                         break;
                     }
 
-                    row.putIfAbsent(y, ' '); //open space
+                    row.putIfAbsent(y, " "); //open space
                 }
             }
 
@@ -55,11 +54,20 @@ public class World {
     }
 
     public void add(Robot robot) {
-        robot.setPosition(new Position(-50,-50));
+        Position launchPosition;
+        Random random = new Random();
+        do {
+//            int x = random.nextInt(2 * map.size()) - map.size();
+//            int y = random.nextInt(2 * map.get(0).size()) - map.get(0).size();
+            int x = random.nextInt(20) - 10;
+            int y = random.nextInt(20) - 10;
+            launchPosition = new Position(x,y);
+        } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
+        robot.setPosition(launchPosition);
         robot.setDirection(0);
-        robots.put(robot.getName(), robot);
+        robots.put(robot.getRobotName(), robot);
         System.out.println(robots);
-        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), 'R');
+        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), robot.getRobotName());
     }
 
     public void remove(String robotName) {
@@ -67,8 +75,8 @@ public class World {
     }
 
     public void remove(Robot robot) {
-        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), ' ');
-        robots.remove(robot.getName());
+        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
+        robots.remove(robot.getRobotName());
     }
 
     /**
@@ -86,14 +94,14 @@ public class World {
 
             if (position.getY() > newPosition.getY()) {
                 low = newPosition.getY();
-                high = position.getY();
+                high = position.getY()-1;
             } else {
-                low = position.getY();
+                low = position.getY()+1;
                 high = newPosition.getY();
             }
 
             for (int y = low; y <= high; y++){
-                if (!map.get(x).get(y).equals(' ')){
+                if (!map.get(x).get(y).equals(" ")){
                     return true;
                 }
             }
@@ -109,7 +117,7 @@ public class World {
             }
 
             for (int x = low; x <= high; x++){
-                if (!map.get(x).get(y).equals(' ')){
+                if (!map.get(x).get(y).equals(" ")){
                     return true;
                 }
             }
@@ -131,15 +139,14 @@ public class World {
                 (int) (robot.getPosition().getY() + round(steps * cos(toRadians(robot.getDirection().getAngle()))))
         );
         if (!pathBlocked(robot.getPosition(), newPosition)) {
-            map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), ' ');
-            map.get(newPosition.getX()).put(newPosition.getY(), 'R');
+            map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
+            map.get(newPosition.getX()).put(newPosition.getY(), robotName);
             robot.setPosition(newPosition);
         } else {
             throw new PathBlockedException();
         }
     }
 
-    //TODO
     public void updateDirection(String robotName, int degrees) {
         Robot robot = getRobot(robotName);
         robot.setDirection((int) (robot.getDirection().getAngle()) + degrees);
@@ -148,24 +155,25 @@ public class World {
     //TODO
     public void fire(Robot robot) {}
 
+    // TODO : add an argument for viewDistance.
     /**
      * Makes a hashmap of hashmaps going from 0 to 2*viewDistance
      * contains characters representing obstacles, open spaces and robots
      * @param relativeCenter : The position to look from
      * @return : a grid of data representing the relative view from this position
      */
-    public HashMap<Integer, HashMap<Integer, Character>> look(Position relativeCenter) {
-        int distance = 10; //hardcoded for now
+    public HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter) {
+        int distance = 10;//hardcoded for now
 
         int current_x = 0;
-        HashMap<Integer, HashMap<Integer, Character>> result = new HashMap<>();
+        HashMap<Integer, HashMap<Integer, String>> result = new HashMap<>();
 
         for (int x = relativeCenter.getX() - distance; x <= relativeCenter.getX() + distance; x++) {
-            HashMap<Integer, Character> row = new HashMap<>();
+            HashMap<Integer, String> row = new HashMap<>();
             int current_y = 0;
 
             for (int y = relativeCenter.getY() - distance; y <= relativeCenter.getY() + distance; y++) {
-                row.putIfAbsent(current_y, map.getOrDefault(x, new HashMap<>()).getOrDefault(y, 'X'));
+                row.putIfAbsent(current_y, map.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X"));
                 current_y ++;
             }
 
@@ -176,13 +184,15 @@ public class World {
         return result;
     }
 
+    // TODO : Have this give the base method the viewDistance of the robot
+    //  (Do the to do for the base method first)
     /**
      * Makes a hashmap of hashmaps going from 0 to 2*viewDistance
      * contains characters representing obstacles, open spaces and robots
      * @param robot : The robot that is used as a reference to look from
      * @return : a grid of data representing the relative view from this position
      */
-    public HashMap<Integer, HashMap<Integer, Character>> look(Robot robot) {
+    public HashMap<Integer, HashMap<Integer, String>> look(Robot robot) {
        return look(robot.getPosition());
     }
 
@@ -190,8 +200,25 @@ public class World {
     public void pause(Robot robot, int duration) {}
 
     //TODO
-    public void repair(Robot robot) {}
+    public void repair(Robot robot) {
+        robot.resetShield();
+    }
 
     //TODO
-    public void reload(Robot robot) {}
+    public void reload(Robot robot) {
+        robot.resetAmmo();
+    }
+
+    public HashMap<String, Robot> getEnemies(HashMap<Integer, HashMap<Integer, String>> map){
+        HashMap<String, Robot> enemies = new HashMap<>();
+        for ( HashMap<Integer, String> row : map.values()){
+            for (String object : row.values()) {
+                if (!object.equals(" ") && !object.equals("X")) try {
+                    Robot enemy = getRobot(object);
+                    enemies.put(object, enemy);
+                } catch (RobotNotFoundException ignored) {}
+            }
+        }
+        return enemies;
+    }
 }

@@ -3,6 +3,7 @@ package za.co.wethinkcode.robotworlds.client;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.Request;
@@ -18,6 +19,7 @@ public class Client {
      * The port the server uses
      */
     private static final int port = 5000;
+
 
     /**
      * Starts the gui and the threads that handle input/output

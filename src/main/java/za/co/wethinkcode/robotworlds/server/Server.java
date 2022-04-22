@@ -1,8 +1,10 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
+import za.co.wethinkcode.robotworlds.server.command.IdleCommand;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
@@ -15,6 +17,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The server that will be run. Clients will connect to it. 
@@ -66,7 +69,7 @@ public class Server{
     private Map getMap() {
         //TODO : Get the map to be used from the config file;
         // Size for a map should be determined by the map, not the server.
-        return new BasicMap(new Position(200,200));
+        return new BasicMap(new Position(100,100));
     }
 
     /**
@@ -79,25 +82,25 @@ public class Server{
         //TODO : Add all requests and responses to a log, that can dumped to a file later
         System.out.println(request.serialize());
 
+        Command command;
         String commandResponse;
         try {
-            Command command = Command.create(request);
+            command = Command.create(request);
             commandResponse = command.execute(world);
         } catch (IllegalArgumentException badCommand) {
             commandResponse = "failed! bad input";
         }
 
-        HashMap<Integer, HashMap<Integer, Character>> map = world.look(new Position(0,0));
+        HashMap<Integer, HashMap<Integer, String>> map = world.look(new Position(0,0));
         Robot robot = world.getRobot(request.getRobotName());
+        HashMap<String, Robot> enemies = world.getEnemies(map);
+        enemies.remove(robot.getRobotName());
 
         Response response = new Response(
                 robot,
                 commandResponse,
                 map,
-                //TODO set up a way to get robots around this one; i.e. world.getEnemies(map)
-                // That method could go through it and copy the items that come up in the map given
-                // It should be a list of enemy robot objects.
-                null
+                enemies
         );
         
         this.responseLog.add(response); 
