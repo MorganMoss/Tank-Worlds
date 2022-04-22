@@ -1,5 +1,6 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
@@ -16,6 +17,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The server that will be run. Clients will connect to it. 
@@ -80,15 +82,10 @@ public class Server{
         //TODO : Add all requests and responses to a log, that can dumped to a file later
         System.out.println(request.serialize());
 
+        Command command;
         String commandResponse;
         try {
-            Robot robot = world.getRobot(request.getRobotName());
-            Command command;
-            if (robot.isPaused()) {
-                command = new IdleCommand(request.getRobotName());
-            } else {
-                command = Command.create(request);
-            }
+            command = Command.create(request);
             commandResponse = command.execute(world);
         } catch (IllegalArgumentException badCommand) {
             commandResponse = "failed! bad input";
