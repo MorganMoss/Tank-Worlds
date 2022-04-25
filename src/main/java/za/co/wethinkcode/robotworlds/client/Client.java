@@ -1,11 +1,14 @@
 package za.co.wethinkcode.robotworlds.client;
 
-import java.net.InetAddress;
+import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.ArrayList;
 
 import za.co.wethinkcode.robotworlds.client.SwingUI.HelperMethods;
 import za.co.wethinkcode.robotworlds.client.SwingUI.TankWorld;
 import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Enemy;
+import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
@@ -18,7 +21,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+/**
+ * This is the back-end for the user, it handles communication between the GUI and the server.
+ * This class should not be modified further, outside of the TODO's given.
+ */
 public class Client {
+    //TODO : Have port be determined by a config file
     /**
      * The port the server uses
      */
@@ -40,43 +48,13 @@ public class Client {
      * Starts the gui and the threads that handle input/output
      */
     private static void start(){
-//        GUI gui = new TextGUI();
+        //TODO : Have a config file for client that sets which GUI you use
+        /*
+          all that should change in here is this line.
+          i.e. GUI gui = new SwingGUI(); or new TankWorlds();
+         */
+        GUI gui = new TextGUI();
 
-        //print out ip address and server
-        InetAddress ip;
-        String hostname;
-        try {
-            ip = InetAddress.getLocalHost();
-            hostname = ip.getHostName();
-            System.out.println("Your current IP address : " + ip);
-            System.out.println("Your current Hostname : " + hostname);
-
-        } catch (UnknownHostException e) {
-
-            e.printStackTrace();
-        }
-
-        // Get player name
-        System.out.println("Enter Tank Name: ");
-        clientName = scanner.nextLine();
-
-        //Start swing gui
-        HelperMethods.setTheme();
-        JFrame frame = new JFrame("T A N K W O R L D S");
-        frame.setIconImage(HelperMethods.getImage("/icon.png"));
-        frame.setSize(TankWorld.getScreenWidth(), TankWorld.getScreenHeight());
-        frame.setLocation(400, 100);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setResizable(false);
-        TankWorld gui = new TankWorld();
-
-        frame.add(gui);
-        gui.setFocusable(true);
-        frame.setVisible(true);
-        gui.start();
-
-
-        //start socket
         try (
                 //10.200.109.17 //localhost //maggie 10.200.110.163
             Socket socket = new Socket("localhost", port);
@@ -90,10 +68,10 @@ public class Client {
             while (input.isAlive() && output.isAlive()) {}
 
             System.exit(0);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -147,6 +125,10 @@ public class Client {
                                     gui.enemyMovement("right");
                                 }
                             }
+                        // String serializedResponse = incoming.readLine();
+                        // if (!serializedResponse.matches("")){
+                        //     //gui does everything from showOutput
+                        //     gui.showOutput(Response.deSerialize(serializedResponse));
                         }
                     } catch (IOException ignored) {}
 
@@ -181,6 +163,7 @@ public class Client {
             } catch (SocketException e) {
                 e.printStackTrace();
             }
+
             try(
                     PrintStream outgoing = new PrintStream(socket.getOutputStream());
             ) {
@@ -195,7 +178,7 @@ public class Client {
                         outgoing.println(input);
                         outgoing.flush();
 
-                        if (input.matches("quit")) {
+                        if (request.getCommand().matches("quit")) {
                             System.exit(0);
                         }
                     } catch (NoNewInput ignored) {}

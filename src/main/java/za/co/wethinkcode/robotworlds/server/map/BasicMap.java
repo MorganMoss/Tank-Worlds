@@ -17,16 +17,18 @@ public class BasicMap implements Map{
 
     public List<Obstacle> getObstacles() {
         List<Obstacle> obstacleList = new ArrayList<>();
-        Random random = new Random();
-        int randomValue = random.nextInt(9) + 1;
-        for(int i = 1;i<=randomValue ;i++) {
-            int x = random.nextInt(200) -100;
-            int y = random.nextInt(400) -200;
-            System.out.println();
-            Obstacle obstacle = new SquareObstacle(10, new Position(x,y));
-            obstacleList.add(obstacle);
-        }
+        // Random random = new Random();
+        // int randomValue = random.nextInt(9) + 1;
+        // for(int i = 1;i<=randomValue ;i++) {
+        //     int x = random.nextInt(200) -100;
+        //     int y = random.nextInt(400) -200;
+        //     System.out.println();
+        //     Obstacle obstacle = new SquareObstacle(10, new Position(x,y));
+        //     obstacleList.add(obstacle);
+        // }
 
+        Obstacle obstacle = new SquareObstacle(4, new Position(0,0));
+        obstacleList.add(obstacle);
         return obstacleList;
     }
     public Position getMapSize() {

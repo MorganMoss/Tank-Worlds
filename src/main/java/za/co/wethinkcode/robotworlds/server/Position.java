@@ -1,5 +1,6 @@
 package za.co.wethinkcode.robotworlds.server;
 
+//TODO : make javadocs!!
 public class Position {
 
     private final int x;
@@ -37,5 +38,10 @@ public class Position {
         boolean withinLeft = this.x <= topRight.getX();
         boolean withinRight = this.x >= bottomLeft.getX();
         return withinTop && withinBottom && withinLeft && withinRight;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + "," + y + ")";
     }
 }

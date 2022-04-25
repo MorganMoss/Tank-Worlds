@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI.Obstacles;
+package za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles;
 
 import za.co.wethinkcode.robotworlds.client.SwingUI.WorldObject;
 import za.co.wethinkcode.robotworlds.server.Position;

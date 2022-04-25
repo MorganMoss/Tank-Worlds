@@ -1,19 +1,20 @@
 package za.co.wethinkcode.robotworlds.server.robot;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import com.google.gson.Gson;
 import za.co.wethinkcode.robotworlds.server.Direction;
 import za.co.wethinkcode.robotworlds.server.Position;
 
-public abstract class Robot {
-    private final String name;
-    private final String visibilityPattern;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class Robot {
+
+    private final String robotName;
     private final int maxShield;
     private final int maxAmmo;
+    private final int visibilityDistance;
+    private final int fireDistance;
     private final int reloadTime;
-    private final String firingPattern;
+
     private Position position;
     private Direction direction;
     private int currentShield;
@@ -21,72 +22,108 @@ public abstract class Robot {
     private int range=5;
     private int kills=0;
     private int deaths=0;
+    private boolean paused;
 
-    public Robot(String name, String visibilityPattern, int maxShield, int maxAmmo, int reloadTime, String firingPattern) {
-        this.name = name;
-        this.visibilityPattern = visibilityPattern;
+    public Robot(String robotName, int visibilityDistance, int maxShield, int maxAmmo, int reloadTime, int fireDistance) {
+        //These are immutable
+        this.robotName = robotName;
         this.maxShield = maxShield;
         this.maxAmmo = maxAmmo;
+        this.visibilityDistance = visibilityDistance;
+        this.fireDistance = fireDistance;
         this.reloadTime = reloadTime;
-        this.firingPattern = firingPattern;
+        //These are initialized, but are mutable
+        this.currentAmmo = maxAmmo;
+        this.currentShield = maxShield;
+        this.paused = false;
     }
     public int getDeaths(){
         return this.deaths;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
+    public String getRobotName() {
+        return robotName;
     }
 
     public Position getPosition() {
         return this.position;
     }
 
-    //TODO : implement this method
-    public void setDirection(int angle) {
-    }
-
     public Direction getDirection() {
         return this.direction;
     }
 
-    public String getVisibilityPattern() {
-        return this.visibilityPattern;
+    public int getVisibilityDistance() {
+        return this.visibilityDistance;
     }
 
-    public int getAmmo() {
+    public int getFiringDistance() {
+        return fireDistance;
+    }
+
+    public int getCurrentAmmo() {
         return this.currentAmmo;
     }
 
-    public void decreaseAmmo() {
-        this.currentAmmo--;
-    }
-
-    //TODO : implement this method
-    public void resetAmmo() {
-        // Timer t = new Timer();
-        // t.schedule(new TimerTask(){this.currentAmmo = this.maxAmmo;} , reloadTime*1000);
-    }
-
-    public int getShield() {
+    public int getCurrentShield() {
         return this.currentShield;
+    }
+
+    public void setDirection(int angle) {
+        switch (Math.round((angle / 90f)%4)) {
+            case 1:
+                this.direction = Direction.EAST;
+                break;
+            case 2:
+                this.direction = Direction.SOUTH;
+                break;
+            case 3:
+                this.direction = Direction.WEST;
+                break;
+            default:
+                this.direction = Direction.NORTH;
+                break;
+        }
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public void decreaseShield() {
         this.currentShield--;
     }
 
-    public void resetShield() {
-        this.currentShield = this.maxShield;
+    public void decreaseAmmo() {
+        this.currentAmmo--;
     }
 
-    public String serialize(){
-        Gson gson = new Gson();
-        return gson.toJson(this);
+    public void resetShield() {
+        this.paused = true;
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                currentShield = maxShield;
+                paused = false;
+            }
+        }, reloadTime*1000);
+    }
+
+    public void resetAmmo() {
+        this.paused = true;
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                currentAmmo = maxAmmo;
+                paused = false;
+            }
+        }, reloadTime*1000);
+    }
+
+    public boolean isPaused() {
+        return this.paused;
     }
 
     public int getRange() {

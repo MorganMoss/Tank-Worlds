@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI;//import javafx.scene.media.MediaPlayer;
+package za.co.wethinkcode.robotworlds.client.SwingGUI;//import javafx.scene.media.MediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;

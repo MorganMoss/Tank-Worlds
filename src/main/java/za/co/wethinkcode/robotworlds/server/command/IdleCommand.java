@@ -2,14 +2,14 @@ package za.co.wethinkcode.robotworlds.server.command;
 
 import za.co.wethinkcode.robotworlds.server.World;
 
-public class LookCommand extends Command{
-    public LookCommand(String robotName) {
-        super(robotName);
+public class IdleCommand extends Command{
+
+    public IdleCommand(String RobotName) {
+        super(RobotName);
     }
 
     @Override
     public String execute(World world) {
-        // TODO : execute command
-        return "Success";
+        return "idle";
     }
 }
