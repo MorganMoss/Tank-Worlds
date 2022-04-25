@@ -90,7 +90,11 @@ public class Server{
         } catch (IllegalArgumentException badCommand) {
             commandResponse = "failed! bad input";
         }
+        return generateResponse(request, commandResponse);
+    }
 
+
+    public Response generateResponse(Request request, String commandResponse) {
         HashMap<Integer, HashMap<Integer, String>> map = world.look(new Position(0,0));
         Robot robot = world.getRobot(request.getRobotName());
         HashMap<String, Robot> enemies = world.getEnemies(map);
@@ -102,8 +106,8 @@ public class Server{
                 map,
                 enemies
         );
-        
-        this.responseLog.add(response); 
+
+        this.responseLog.add(response);
         System.out.println(response.serialize());
 
         return response;

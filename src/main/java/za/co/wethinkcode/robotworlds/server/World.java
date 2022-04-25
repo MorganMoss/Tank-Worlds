@@ -53,6 +53,10 @@ public class World {
         return robot;
     }
 
+    public HashMap<String, Robot> getRobots() {
+        return robots;
+    }
+
     public void add(Robot robot) {
         Position launchPosition;
         Random random = new Random();
@@ -85,7 +89,7 @@ public class World {
      * @param newPosition : the new position
      * @return true if there's something in the way, false if movement is unimpeded
      */
-    private boolean pathBlocked(Position position, Position newPosition) {
+    public PathBlockedResponse pathBlocked(Position position, Position newPosition) {
         final int low;
         final int high;
 
@@ -102,7 +106,11 @@ public class World {
 
             for (int y = low; y <= high; y++){
                 if (!map.get(x).get(y).equals(" ")){
-                    return true;
+                    if (map.get(x).get(y).equals("X")) {
+                        return PathBlockedResponse.OBSTACLE_HIT;
+                    } else {
+                        return PathBlockedResponse.ENEMY_HIT;
+                    }
                 }
             }
         } else {
@@ -118,12 +126,16 @@ public class World {
 
             for (int x = low; x <= high; x++){
                 if (!map.get(x).get(y).equals(" ")){
-                    return true;
+                    if (map.get(x).get(y).equals("X")) {
+                        return PathBlockedResponse.OBSTACLE_HIT;
+                    } else {
+                        return PathBlockedResponse.ENEMY_HIT;
+                    }
                 }
             }
         }
 
-        return false;
+        return PathBlockedResponse.MISS;
     }
 
     /**
@@ -138,7 +150,7 @@ public class World {
                 (int) (robot.getPosition().getX() + round(steps * sin(toRadians(robot.getDirection().getAngle())))),
                 (int) (robot.getPosition().getY() + round(steps * cos(toRadians(robot.getDirection().getAngle()))))
         );
-        if (!pathBlocked(robot.getPosition(), newPosition)) {
+        if (pathBlocked(robot.getPosition(), newPosition) == PathBlockedResponse.MISS) {
             map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
             map.get(newPosition.getX()).put(newPosition.getY(), robotName);
             robot.setPosition(newPosition);

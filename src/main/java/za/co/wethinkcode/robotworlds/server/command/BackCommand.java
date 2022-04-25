@@ -12,8 +12,10 @@ public class BackCommand extends Command{
     @Override
     public String execute(World world) {
         try {
-            world.updatePosition(robotName, 1);
-        } catch (PathBlockedException ignored) {}
-        return "Success";
+            world.updatePosition(robotName, -Integer.parseInt(argument));
+            return "Success";
+        } catch (PathBlockedException ignored) {
+            return "Path Blocked";
+        }
     }
 }

@@ -10,7 +10,6 @@ public class IdleCommand extends Command{
 
     @Override
     public String execute(World world) {
-        //TODO: implement command
-        return null;
+        return "idle";
     }
 }

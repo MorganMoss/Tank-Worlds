@@ -1,42 +1,107 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
+import za.co.wethinkcode.robotworlds.server.PathBlockedResponse;
 import za.co.wethinkcode.robotworlds.server.Position;
 import za.co.wethinkcode.robotworlds.server.World;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FireCommand extends Command {
-    public FireCommand(String robotName) {
-        super(robotName);
+    //TODO: implement command
+    // using world.pathBlocked does not tell you which object was hit - only returns true/false
+    // using isEnemyHit ignores obstacles
+
+    public FireCommand(String robotName, String argument) {
+        super(robotName, argument);
     }
+
+//    @Override
+//    public String execute(World world) {
+//        Robot robot = world.getRobot(robotName);
+//        if (robot.getCurrentAmmo() > 0) {
+//            robot.decreaseAmmo();
+//            for (Robot enemy : world.getRobots().values()) {
+//                if (isEnemyHit(robot, enemy)) {
+//                    enemy.decreaseShield();
+//                    return "Hit";
+//                }
+//            }
+//            return "Miss";
+//        } else {
+//            return "No ammo";
+//        }
+//    }
 
     @Override
     public String execute(World world) {
-        // TODO : execute command
-//        int distance = 5;
-//        Robot robot = world.getRobot(robotName);
-//        world.get
-//
-//
-//        Position initialBullet = robot.getPosition();
-//        Position finalBullet = new Position(0,0);//add distance depending on the direction.
-//
-//        if (robot.getDirection().getAngle() == 0) {
-//            finalBullet = new Position(initialBullet.getX(), initialBullet.getY() + distance);
-//        } else if (robot.getDirection().getAngle() == 90) {
-//            finalBullet = new Position(initialBullet.getX() + distance, initialBullet.getY());
-//
-//        } else if (robot.getDirection().getAngle() == 180) {
-//            finalBullet = new Position(initialBullet.getX(), initialBullet.getY() - distance);
-//
-//        } else if (robot.getDirection().getAngle() == 270) {
-//            finalBullet = new Position(initialBullet.getX() - distance, initialBullet.getY());
-//        }
-//
-//        if (!world.pathBlocked(initialBullet, finalBullet)) {
-//            return "miss";
-//        } else {
-//
-//        }
-        return "Success";
+        Robot robot = world.getRobot(robotName);
+        robot.decreaseAmmo();
+        PathBlockedResponse result = world.pathBlocked(robot.getPosition(),getFinalBullet(robot));
+
+        switch (result) {
+            case OBSTACLE_HIT:
+                return "Hit obstacle";
+            case ENEMY_HIT:
+                for (Robot enemy : world.getRobots().values()) {
+                    if (isEnemyHit(robot,enemy)) {
+                        enemy.decreaseShield();
+                        return "Hit enemy";
+                    }
+                }
+            default:
+                return "Miss";
+        }
+    }
+
+
+    private boolean isEnemyHit(Robot robot, Robot enemy) {
+        List<Position> bulletList = getBulletList(robot);
+        for (Position bulletPosition : bulletList) {
+            if (bulletPosition == enemy.getPosition()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private Position getFinalBullet(Robot robot) {
+        int distance = robot.getFiringDistance();
+        Position bulletPosition = new Position(0,0);
+
+        if (robot.getDirection().getAngle() == 0) {
+            bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() + distance);
+        } else if (robot.getDirection().getAngle() == 90) {
+            bulletPosition = new Position(robot.getPosition().getX() + distance, robot.getPosition().getY());
+        } else if (robot.getDirection().getAngle() == 180) {
+            bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() - distance);
+        } else if (robot.getDirection().getAngle() == 270) {
+            bulletPosition = new Position(robot.getPosition().getX() - distance, robot.getPosition().getY());
+        }
+        return bulletPosition;
+    }
+
+
+    public List<Position> getBulletList(Robot robot) {
+
+        int distance = Integer.parseInt(argument);
+        Position bulletPosition = new Position(0,0);
+        List<Position> bulletList = new ArrayList<>();
+
+        for (int i = 1; i <= distance; i++) {
+            if (robot.getDirection().getAngle() == 0) {
+                bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() + i);
+            } else if (robot.getDirection().getAngle() == 90) {
+                bulletPosition = new Position(robot.getPosition().getX() + i, robot.getPosition().getY());
+            } else if (robot.getDirection().getAngle() == 180) {
+                bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() - i);
+            } else if (robot.getDirection().getAngle() == 270) {
+                bulletPosition = new Position(robot.getPosition().getX() - i, robot.getPosition().getY());
+            }
+            bulletList.add(bulletPosition);
+        }
+        return bulletList;
     }
 }
