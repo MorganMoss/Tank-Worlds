@@ -21,7 +21,7 @@ public class Request {
     public Request(String name, String command) {
         this(name, command, null);
     }
-    
+
 
     /* serialize function
     * this function uses Google Gson a java
@@ -52,6 +52,6 @@ public class Request {
     }
 
     public String getClientName() {
-        return clientName;
+        return robotName;
     }
 }

@@ -18,6 +18,9 @@ public abstract class Robot {
     private Direction direction;
     private int currentShield;
     private int currentAmmo;
+    private int range=5;
+    private int kills=0;
+    private int deaths=0;
 
     public Robot(String name, String visibilityPattern, int maxShield, int maxAmmo, int reloadTime, String firingPattern) {
         this.name = name;
@@ -26,6 +29,9 @@ public abstract class Robot {
         this.maxAmmo = maxAmmo;
         this.reloadTime = reloadTime;
         this.firingPattern = firingPattern;
+    }
+    public int getDeaths(){
+        return this.deaths;
     }
 
     public String getName() {
@@ -81,5 +87,17 @@ public abstract class Robot {
     public String serialize(){
         Gson gson = new Gson();
         return gson.toJson(this);
+    }
+
+    public int getRange() {
+        return this.range;
+    }
+
+    public int getKills() {
+        return this.kills;
+    }
+
+    public boolean isFiring() {
+        return false;
     }
 }

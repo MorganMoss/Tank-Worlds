@@ -1,6 +1,6 @@
 package za.co.wethinkcode.robotworlds.client.SwingUI.Tanks;
 
-public abstract class Tank {
+public abstract class Tank implements TankI {
     private String name;
     private String sprite;
     private String deadImage;
@@ -8,21 +8,79 @@ public abstract class Tank {
     private int health;
     private int x;
     private int y;
+    private int range;
+    private int ammo;
+    private int kills=0;
+    private int deaths=0;
+    int size;
+
+    //getters
     public int getX(){return this.x;}
     public int getY(){return this.y;}
-    public void moveLeft(){this.x--;}
-    public void moveRight(){this.x++;}
-    public void moveUp(){this.y--;}
-    public void moveDown(){this.y++;}
-
+    public int getAmmo(){return this.ammo;}
     public String getTankName(){return this.name;}
     public String getSpriteName(){return this.sprite;}
-    public String getDeadImage(){return this.deadImage;}
-
     public int getTankHealth(){return this.health;}
+    public String getDeadImage(){return this.deadImage;}
+    public Direction getDirection(){return this.direction;}
+    public int getSize() {
+        return this.size;
+    }
+
+
+    //Position setters
+    public void setX(int x){this.x=x;}
+    public void setY(int y){this.y=y;}
+    public void addX(){x+=5;}
+    public void minusX(){x-=5;}
+    public void addY(){y+=5;}
+    public void minusY(){y-=5;}
+    public void addKill(){this.kills++;}
+    public void addDeaths(){this.deaths++;}
+    public void setDeaths(int deaths){this.deaths=deaths;}
+
+    //State setters
     public void setTankHealth(int health){this.health =health;}
-    public Direction getTankDirection(){return this.direction;}
     public void setTankDirection(Direction direction){this.direction =direction;}
-    public void takeHit(){this.health --;}
+    public void takeHit(){this.health--;}
     public void repair(){this.health=5;}
+    public void setAmmo(int ammo){this.ammo=ammo;}
+    public void setRange(int range){this.range=range;}
+    public void setSprite(String sprite){this.sprite=sprite;}
+    public void setKills(int kills){this.kills=kills;}
+
+    //Movement
+    public void turnLeft(){setTankDirection(this.getDirection().getLeft());}
+    public void turnRight(){setTankDirection(this.getDirection().getRight());}
+
+    public void moveForward(){
+        if(getDirection() == Direction.Up){
+            minusY();
+            System.out.println(y);
+            System.out.println(this.y);
+        }else if (getDirection() == Direction.Right){
+            addX();
+        }else if (getDirection() == Direction.Left){
+            minusX();
+        }else if (getDirection() == Direction.Down){
+            addY();
+        }
+    }
+
+    public void moveBack(){
+        if(getDirection() == Direction.Up){
+            addY();
+        }else if (getDirection() == Direction.Right){
+            minusX();
+        }else if (getDirection() == Direction.Left){
+            addX();
+        }else if (getDirection() == Direction.Down){
+            minusY();
+        }
+    }
+
+
+    public int getRange() {
+        return range;
+    }
 }

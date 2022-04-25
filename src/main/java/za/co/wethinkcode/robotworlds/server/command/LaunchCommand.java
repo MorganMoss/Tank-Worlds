@@ -1,6 +1,7 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
 import za.co.wethinkcode.robotworlds.server.World;
+import za.co.wethinkcode.robotworlds.server.robot.BasicRobot;
 
 public class LaunchCommand extends Command{
 

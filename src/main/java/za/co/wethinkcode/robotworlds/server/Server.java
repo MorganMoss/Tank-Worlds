@@ -1,5 +1,4 @@
 package za.co.wethinkcode.robotworlds.server;
-
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
@@ -20,7 +19,7 @@ import java.util.List;
  * It has 2-way communication and support for many clients
  */
 public class Server{
-     /**
+    /**
      * The world the server interacts with when handling requests and responses
      */
     private final World world;
@@ -93,9 +92,9 @@ public class Server{
         }
 
         //TODO : use the look command robot position to get the grid of values it
-        Response response = new Response(request.getClientName(), world.getRobot(request.getClientName()).serialize(), world.look(new Position(0,0)));
-        
-        this.responseLog.add(response); 
+        Response response = new Response(world.getRobot(request.getClientName()),request.getClientName(), new HashMap<>(), new HashMap<>());
+
+        this.responseLog.add(response);
         System.out.println(response.serialize());
 
         return response;
@@ -106,7 +105,7 @@ public class Server{
      * @throws IOException : raised when server object fails
      */
     public static void start() throws IOException {
-        final int port = 5001;
+        final int port = 5000;
         Server server = new Server(port);
 
         System.out.println("Server running & waiting for client connections.");
@@ -124,7 +123,7 @@ public class Server{
                     clientNames.add(socketName);
                     server.clientCount += 1;
                 }
-                ServerThread serverThread = new ServerThread(server, socket, server.clientCount);
+                ServerThread serverThread = new ServerThread(server, socket);
                 serverThread.start();
                 System.out.println("A client has been connected. Their name is : " + socket.getLocalAddress());
             } catch(IOException ex) {

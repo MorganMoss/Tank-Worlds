@@ -2,10 +2,15 @@ package za.co.wethinkcode.robotworlds.client.SwingUI;//import javafx.scene.media
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.google.gson.Gson;
+import za.co.wethinkcode.robotworlds.client.SwingUI.Obstacles.Obstacle;
+import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Enemy;
+import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Player;
 
 
 public class HelperMethods {
@@ -17,7 +22,8 @@ public class HelperMethods {
 
     /**
      * generate a random number less than giving number
-     * @param endExclusive  exclusive maximum number
+     *
+     * @param endExclusive exclusive maximum number
      */
     static int nextInt(final int endExclusive) {
         return RANDOM.nextInt(endExclusive);
@@ -34,6 +40,7 @@ public class HelperMethods {
 
     /**
      * Get {@link Image} from given file
+     *
      * @param imageFileName name of image file under directory "assets/images"
      */
     public static Image getImage(final String imageFileName) {
@@ -68,8 +75,8 @@ public class HelperMethods {
     /**
      * Use googles gson module to serialize an Object of any class to a Json string
      * Usage: String json = serialize(myClassInstance)
-     * */
-    static String serialize(Object object){
+     */
+    static String serialize(Object object) {
         Gson gson = new Gson();
         return gson.toJson(object);
     }
@@ -77,12 +84,12 @@ public class HelperMethods {
     /**
      * Use googles gson module to deserialize a Json string to its corresponding class.
      * Usage: Object deserializedClass = deserialize(myJsonSerializedClass)
-     * */
-    static Object deSerialize(String json){
+     */
+    static Object deSerialize(String json) {
         Gson gson = new Gson();
         return gson.fromJson(json, json.getClass());
     }
-
+}
 
 
 // TANK DIAGONAL
@@ -101,4 +108,48 @@ public class HelperMethods {
 //        g.drawImage(client.Direction.RightUp.getImage("missile"), WIDTH / 2 + 12, bulletY - 18, null);
 //        g.drawImage(client.Direction.RightDown.getImage("missile"), WIDTH / 2 + 12, bulletY + 12, null);
 //        g.drawImage(client.Direction.LeftDown.getImage("missile"), WIDTH / 2 - 12, bulletY + 12, null);
-}
+
+//    private boolean notPositionBlocked(Player player, ArrayList<Enemy> enemyList, ArrayList<Obstacle> obstacleList, String command){
+//        Player checkPlayer = new Player("machine","check");
+//        int playerX = player.getX();
+//        int playerY = player.getY();
+//        switch (player.getDirection()){
+//            case Right:
+//                if(Objects.equals(command, "forward")){
+//                    playerX+=5;
+//                }else playerX-=5;
+//                break;
+//            case Left:
+//                if(Objects.equals(command, "forward")){
+//                    playerX-=5;
+//                }else playerX+=5;
+//                break;
+//            case Up:
+//                if(Objects.equals(command, "forward")){
+//                    playerY-=5;
+//                }else playerY+=5;
+//                break;
+//            case Down:
+//                if(Objects.equals(command, "forward")){
+//                    playerY+=5;
+//                }else playerY-=5;
+//                break;
+//        }
+//        checkPlayer.setX(playerX);
+//        checkPlayer.setY(playerY);
+//
+//        for (Obstacle obstacle:obstacleList) {
+//            if (intersects(checkPlayer,obstacle )){
+//                return false;
+//            }
+//        }
+//
+//        for (Enemy enemy:enemyList) {
+//            if (intersects(checkPlayer,enemy )){
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
+//
+//}

@@ -1,6 +1,5 @@
 package za.co.wethinkcode.robotworlds.server;
 
-import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 
@@ -62,12 +61,12 @@ public class ServerThread extends Thread{
                 out.println(response.serialize());
             }
         } catch(IOException ex) {
-                System.out.println("Shutting down client");
+            System.out.println("Shutting down client");
         }
 
         closeQuietly();
     }
-        
+
     /**
      * Closes the communication without raising errors
      */

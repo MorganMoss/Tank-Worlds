@@ -5,25 +5,37 @@ import java.net.Socket;
 
 import za.co.wethinkcode.robotworlds.client.SwingUI.HelperMethods;
 import za.co.wethinkcode.robotworlds.client.SwingUI.TankWorld;
+import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Enemy;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
+import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import javax.swing.*;
 import java.io.*;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Client {
     /**
      * The port the server uses
      */
-    private static int port = 5001;
+    private static int port = 5000;
     private static String clientName;
     public static String getMyClientName(){return clientName;}
     static Scanner scanner = new Scanner(System.in);
     private static String enemyName;
+    private static Response guiResponse;
+
+
+    public static Response getResponse() {
+        return guiResponse;
+    }
+
     public String getEnemyName(){return enemyName;};
+
     /**
      * Starts the gui and the threads that handle input/output
      */
@@ -66,7 +78,7 @@ public class Client {
 
         //start socket
         try (
-                //10.200.109.17
+                //10.200.109.17 //localhost //maggie 10.200.110.163
             Socket socket = new Socket("localhost", port);
         ) {
             Out output = new Out(socket, gui);
@@ -112,13 +124,17 @@ public class Client {
                 do {
                     try {
                         String serializedResponse = incoming.readLine(); //should be changed to a response object
+                        guiResponse = Response.deSerialize(serializedResponse);
+
                         if (!serializedResponse.matches("")){
     //                        gui.showOutput(Response.deSerialize(serializedResponse));
                             System.out.println(serializedResponse);
                             System.out.println(gui.getClientName());
+
                             if (serializedResponse.contains(gui.getClientName())){
                                 Response deserializedResponse = Response.deSerialize(serializedResponse);
-                                String enemyName = deserializedResponse.getClientName();
+                                HashMap<String, Robot> enemies = deserializedResponse.getEnemyRobots();
+
                                 gui.setEnemyName(enemyName);
     
                                 if(serializedResponse.contains("forward")){
@@ -148,13 +164,13 @@ public class Client {
     private static class In extends Thread {
         private final GUI gui;
         private final Socket socket;
-        private final String name;
+//        private final String name;
 
         public In(Socket socket, GUI gui) {
             this.gui = gui;
             this.socket = socket;
-            gui.showOutput(new Response("", "Enter a Name", new HashMap<>()));
-            this.name = gui.getInput();
+//            gui.showOutput(new Response("", "Enter a Name", new HashMap<>()));
+//            this.name = gui.getInput();
         }
 
         @Override
@@ -170,13 +186,13 @@ public class Client {
             ) {
                 do {
                     try {
-                        input = gui.getInput();
+                        String input = gui.getInput();
                         System.out.println("ouput:\n"+input);
 
                         Request request = new Request(gui.getClientName(), input);
                         String serializedRequest = request.serialize();
 
-                        outgoing.println(serializedRequest);
+                        outgoing.println(input);
                         outgoing.flush();
 
                         if (input.matches("quit")) {
