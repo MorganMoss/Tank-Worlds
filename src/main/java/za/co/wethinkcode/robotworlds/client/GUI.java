@@ -44,5 +44,11 @@ public interface GUI{
     //TODO : Perhaps use a hasLaunched flag to check if it has launched and otherwise ask for name again,
     // This could be changed according to its next command response from showOutput().
     // Then the flag can be checked in getInput()
+
+    String getClientName();
+    void setEnemyName(String enemyName);
+    void enemyMovement(String command);
+
+
 }
 

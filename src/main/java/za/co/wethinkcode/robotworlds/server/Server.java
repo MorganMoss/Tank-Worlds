@@ -1,6 +1,5 @@
 package za.co.wethinkcode.robotworlds.server;
 
-import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
@@ -108,7 +107,6 @@ public class Server{
         );
 
         //TODO : use the look command robot position to get the grid of values it
-        Response response = new Response(world.getRobot(request.getClientName()),request.getClientName(), new HashMap<>(), new HashMap<>());
 
         this.responseLog.add(response);
         System.out.println(response.serialize());

@@ -1,14 +1,8 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI.Projectiles;
+package za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles;
 
-import za.co.wethinkcode.robotworlds.client.SwingUI.HelperMethods;
-import za.co.wethinkcode.robotworlds.client.SwingUI.TankWorld;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Direction;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Enemy;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Tank;
-import za.co.wethinkcode.robotworlds.client.SwingUI.WorldObject;
-
-import java.awt.*;
-import java.util.ArrayList;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.WorldObject;
 
 public abstract class Projectile implements ProjectileI{
     private int range;
@@ -30,7 +24,6 @@ public abstract class Projectile implements ProjectileI{
 
 
     public void strike() {
-
     }
 
     public boolean isHitting(WorldObject object) {

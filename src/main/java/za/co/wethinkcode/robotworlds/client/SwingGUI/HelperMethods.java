@@ -2,15 +2,10 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI;//import javafx.scene.medi
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.google.gson.Gson;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Obstacles.Obstacle;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Enemy;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Player;
 
 
 public class HelperMethods {

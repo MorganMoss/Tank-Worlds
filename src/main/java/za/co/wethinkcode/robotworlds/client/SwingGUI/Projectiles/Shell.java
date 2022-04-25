@@ -1,9 +1,9 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI.Projectiles;
+package za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles;
 
-import za.co.wethinkcode.robotworlds.client.SwingUI.TankWorld;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Direction;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Tank;
-import za.co.wethinkcode.robotworlds.client.SwingUI.WorldObject;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Tank;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.WorldObject;
 import java.awt.*;
 
 public class Shell extends Projectile{

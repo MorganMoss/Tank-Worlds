@@ -1,12 +1,13 @@
-package za.co.wethinkcode.robotworlds.client.SwingUI;
+package za.co.wethinkcode.robotworlds.client.SwingGUI;
 import za.co.wethinkcode.robotworlds.client.Client;
 import za.co.wethinkcode.robotworlds.client.GUI;
-import za.co.wethinkcode.robotworlds.client.NoNewInput;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Obstacles.Brick;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Obstacles.Obstacle;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Obstacles.Pit;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Projectiles.Projectile;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.*;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Brick;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Obstacle;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Pit;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Projectile;
+
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
+import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.Position;
@@ -50,7 +51,7 @@ public class TankWorld extends JComponent implements GUI {
     //getters
     public static int getScreenWidth(){return WIDTH;}
     public static int getScreenHeight(){return HEIGHT;}
-    @Override
+
     public String getClientName() {
         return Client.getMyClientName();
     }
@@ -66,9 +67,9 @@ public class TankWorld extends JComponent implements GUI {
 
     //Sends user input to Server as request objects
     @Override
-    public String getInput() throws NoNewInput{
+    public Request getInput() throws NoNewInput {
         if (lastRequest.getLast() != queue1){
-            return lastRequest.removeLast().serialize();
+            return lastRequest.removeLast();
         }else{
             throw new NoNewInput();}
     }
@@ -333,7 +334,7 @@ public class TankWorld extends JComponent implements GUI {
 
     }
 
-    public static boolean notCollision(Tank player,String command){
+    public static boolean notCollision(Tank player, String command){
         for (Enemy enemy:enemyList){
             if (intersects(player,enemy)){
                 return false;
@@ -370,7 +371,6 @@ public class TankWorld extends JComponent implements GUI {
 
     //TODO: CONNECT WITH RUNSERVERCORRECTIONS
     //Handles enemy movement using input from server
-    @Override
     public void enemyMovement(String command) {
         if (Objects.equals(command, "forward")){
             enemy1.moveForward();
@@ -390,9 +390,9 @@ public class TankWorld extends JComponent implements GUI {
 
         player.setX(serverPlayer.getPosition().getX());
         player.setY(serverPlayer.getPosition().getY());
-        player.setName(serverPlayer.getName());
-        player.setAmmo(serverPlayer.getAmmo());
-        player.setTankHealth(serverPlayer.getShield());
+        player.setName(serverPlayer.getRobotName());
+        player.setAmmo(serverPlayer.getCurrentAmmo());
+        player.setTankHealth(serverPlayer.getCurrentShield());
         player.setRange(serverPlayer.getRange());
         player.setSprite(serverPlayer.getClass().getName());
         player.setKills(serverPlayer.getKills());
@@ -404,9 +404,9 @@ public class TankWorld extends JComponent implements GUI {
         for(Robot serverEnemy:enemies.values()){
                 enemyList.get(i).setX(serverEnemy.getPosition().getX());
                 enemyList.get(i).setY(serverEnemy.getPosition().getY());
-                enemyList.get(i).setName(serverEnemy.getName());
-                enemyList.get(i).setAmmo(serverEnemy.getAmmo());
-                enemyList.get(i).setTankHealth(serverEnemy.getShield());
+                enemyList.get(i).setName(serverEnemy.getRobotName());
+                enemyList.get(i).setAmmo(serverEnemy.getCurrentAmmo());
+                enemyList.get(i).setTankHealth(serverEnemy.getCurrentShield());
                 enemyList.get(i).setRange(serverEnemy.getRange());
                 enemyList.get(i).setSprite(serverEnemy.getClass().getName());
                 enemyList.get(i).setKills(serverEnemy.getKills());

@@ -34,6 +34,21 @@ public class SwingGUI implements GUI {
         // TODO : Use the response to update your output to have the latest info
     }
 
+    @Override
+    public String getClientName() {
+        return null;
+    }
+
+    @Override
+    public void setEnemyName(String enemyName) {
+
+    }
+
+    @Override
+    public void enemyMovement(String command) {
+
+    }
+
     // TODO : Add private methods as necessary
     private void assumeOutput(Request request){
         // TODO : guesses what it'll look like while it waits for the server to respond

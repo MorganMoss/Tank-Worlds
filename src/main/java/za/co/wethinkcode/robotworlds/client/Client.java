@@ -3,21 +3,13 @@ package za.co.wethinkcode.robotworlds.client;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 
-import za.co.wethinkcode.robotworlds.client.SwingUI.HelperMethods;
-import za.co.wethinkcode.robotworlds.client.SwingUI.TankWorld;
-import za.co.wethinkcode.robotworlds.client.SwingUI.Tanks.Enemy;
 import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
-import javax.swing.*;
-import java.io.*;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -169,7 +161,7 @@ public class Client {
             ) {
                 do {
                     try {
-                        String input = gui.getInput();
+                        String input = gui.getInput().serialize();
                         System.out.println("ouput:\n"+input);
 
                         Request request = new Request(gui.getClientName(), input);
