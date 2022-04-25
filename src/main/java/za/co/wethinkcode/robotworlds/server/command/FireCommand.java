@@ -10,8 +10,7 @@ import java.util.List;
 
 public class FireCommand extends Command {
     //TODO: implement command
-    // using world.pathBlocked does not tell you which object was hit - only returns true/false
-    // using isEnemyHit ignores obstacles
+
 
     public FireCommand(String robotName, String argument) {
         super(robotName, argument);
@@ -47,11 +46,13 @@ public class FireCommand extends Command {
                 for (Robot enemy : world.getRobots().values()) {
                     if (isEnemyHit(robot,enemy)) {
                         enemy.decreaseShield();
-                        return "Hit enemy";
+                        return "Hit enemy : " + enemy;
                     }
                 }
-            default:
+            case MISS:
                 return "Miss";
+            default:
+                return "Error";
         }
     }
 
