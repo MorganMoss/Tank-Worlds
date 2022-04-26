@@ -1,15 +1,12 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI;
+
 import za.co.wethinkcode.robotworlds.client.Client;
 import za.co.wethinkcode.robotworlds.client.GUI;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Brick;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Obstacle;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Pit;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.*;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Projectile;
-
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
 import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
-import za.co.wethinkcode.robotworlds.protocol.Request;
-import za.co.wethinkcode.robotworlds.protocol.Response;
+import za.co.wethinkcode.robotworlds.protocol.*;
 import za.co.wethinkcode.robotworlds.server.Position;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
@@ -25,70 +22,39 @@ import java.awt.Color;
 
 public class TankWorld extends JComponent implements GUI {
     private static final int WIDTH = 600, HEIGHT = 600;
-    String clientName = this.getClientName();
     private static final int REPAINT_INTERVAL = 50;
     private static Boolean launched = false;
+    private static ArrayList<Enemy> enemyList = new ArrayList<>();
+    private static ArrayList<Brick> obstacleList = new ArrayList<>();
+    private static ArrayList<Projectile> projectileList = new ArrayList<>();
+
+    //FIFO stack for requests
+    private static Request request = new Request("Robot","idle");
+    private static Request queue1 = new Request("Robot","launch");
+    private static LinkedList<Request> lastRequest = new LinkedList<>();
 
     //shows state HUD/ExplosionAnimation on repaint if set to true
     private boolean showState = false;
     private boolean showFireAnimation = false;
 
     //animation control integers
-    int explodeCount = 1;
-    int explosionX;
-    int explosionY;
+    private int explodeCount = 1;
+    private int explosionX;
+    private int explosionY;
 
-    //World objects lists
-    private static ArrayList<Enemy> enemyList = new ArrayList<>();
-    private static ArrayList<Brick> obstacleList = new ArrayList<>();
-    private static ArrayList<Projectile> projectileList = new ArrayList<>();
+    private String clientName;
 
-    //Adds projectile to world
-    public static void addProjectile(Projectile projectile){
-        projectileList.add(projectile);
-    }
 
-    //getters
     public static int getScreenWidth(){return WIDTH;}
     public static int getScreenHeight(){return HEIGHT;}
-
-    public String getClientName() {
-        return Client.getMyClientName();
-    }
-    //setters
-    public void setEnemyName(String enemyName) {
-        enemy1.setName(enemyName);
-    }
-
-    //FIFO stack for requests
-    private static Request request = new Request("Robot","idle");
-    static Request queue1 = new Request("Robot","launch");
-    private static LinkedList<Request> lastRequest = new LinkedList<Request>();
-
-    //Sends user input to Server as request objects
-    @Override
-    public Request getInput() throws NoNewInput {
-        if (lastRequest.getLast() != queue1){
-            return lastRequest.removeLast();
-        }else{
-            throw new NoNewInput();}
-    }
-
-    // PaintComponent is our real showOutput
-    @Override
-    public void showOutput(Response response) {
-        System.out.println(response);
-    }
-
-    //TODO: SPAWN PLAYERS AND ENEMIES DYNAMICALLY FROM SERVER
-    Player player = new Player("sniper","Morgan");
-    Enemy enemy1 = new Enemy();
-    Enemy enemy2 = new Enemy();
-    Pit onePit = new Pit(new Position(400,300));
-
+    public String getClientName() {return Client.getMyClientName();}
+    public void setEnemyName(String enemyName) {enemy1.setName(enemyName);}
+    public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
 
     public TankWorld()  {
 
+
+        this.clientName = this.getClientName();
         player.setName(clientName);
         //Add first element of request stack
         lastRequest.add(queue1);
@@ -183,6 +149,27 @@ public class TankWorld extends JComponent implements GUI {
         //TODO: CONNECT WITH UPDATED SERVER
 //        runServerCorrections(Client.getResponse());
     }
+
+    //Sends user input to Server as request objects
+    @Override
+    public Request getInput() throws NoNewInput {
+        if (lastRequest.getLast() != queue1){
+            return lastRequest.removeLast();
+        }else{
+            throw new NoNewInput();}
+    }
+
+    // PaintComponent is our real showOutput
+    @Override
+    public void showOutput(Response response) {
+        System.out.println(response);
+    }
+
+    //TODO: SPAWN PLAYERS AND ENEMIES DYNAMICALLY FROM SERVER
+    Player player = new Player("sniper","Morgan");
+    Enemy enemy1 = new Enemy();
+    Enemy enemy2 = new Enemy();
+    Pit onePit = new Pit(new Position(400,300));
 
     /*Swing component that paints onto the window*/
     @Override

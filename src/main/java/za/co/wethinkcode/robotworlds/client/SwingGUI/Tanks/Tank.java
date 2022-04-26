@@ -6,12 +6,13 @@ public abstract class Tank implements WorldObject {
     private String name;
     private String sprite;
     private String deadImage;
-    private Direction direction;
+    private Direction direction=Direction.Up;
     private int health;
     private int x;
     private int y;
     private int range;
     private int ammo;
+    private int maxAmmo;
     private int kills=0;
     private int deaths=0;
     int size;
@@ -28,9 +29,15 @@ public abstract class Tank implements WorldObject {
     public int getSize() {
         return this.size;
     }
+    public int getRange() {
+        return range;
+    }
+    public int getKills() {return kills;}
+    public int getDeaths() {return deaths;}
 
 
     //Position setters
+    public void setName(String name) {this.name=name;}
     public void setX(int x){this.x=x;}
     public void setY(int y){this.y=y;}
     public void addX(){x+=5;}
@@ -45,11 +52,16 @@ public abstract class Tank implements WorldObject {
     public void setTankHealth(int health){this.health =health;}
     public void setTankDirection(Direction direction){this.direction =direction;}
     public void takeHit(){this.health--;}
+    public void reload(){this.ammo = maxAmmo;}
     public void repair(){this.health=5;}
     public void setAmmo(int ammo){this.ammo=ammo;}
+    public void setMaxAmmo(int ammo) {this.maxAmmo = ammo;}
+    public void decreaseAmmo() {this.ammo--;}
     public void setRange(int range){this.range=range;}
     public void setSprite(String sprite){this.sprite=sprite;}
     public void setKills(int kills){this.kills=kills;}
+    public void setSize(int size) {this.size=size;}
+
 
     //Movement
     public void turnLeft(){setTankDirection(this.getDirection().getLeft());}
@@ -82,7 +94,5 @@ public abstract class Tank implements WorldObject {
     }
 
 
-    public int getRange() {
-        return range;
-    }
+
 }

@@ -1,7 +1,7 @@
 package za.co.wethinkcode.robotworlds.protocol;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.util.HashMap;

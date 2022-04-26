@@ -7,138 +7,98 @@ import java.awt.*;
 
 public class Player extends Tank {
 
-    private String name;
-    private String sprite;
-    private Direction direction = Direction.Up;
-    private int health;
-    private final int startAmmo;
-    private int ammo;
-    private int kills = 0;
-    private int deaths = 0;
-    private int range;
-    private final int size;
 
     //TODO: SERVER GET ENEMY COUNT
     private int enemiesLeft = 1;
-    private int x=100;
-    private int y=200;
+//    private int x=100;
+//    private int y=200;
 
     public Player(String tankType,String name){
 
         switch (tankType){
             case "sniper":
-                this.sprite="sniper";
-                this.name = name;
-                this.health = 3;
-                this.ammo = 5;
-                this.startAmmo = 5;
-                this.range=125;
-                this.size = 40;
+                super.setSprite("sniper");
+                super.setName(name);
+                super.setTankHealth(3);
+                super.setAmmo(5);
+                super.setMaxAmmo(5);
+                super.setRange(125);
+                super.setSize(40);
+                super.setX(100);
+                super.setY(200);
 
                 break;
             case "machine":
-                this.sprite="machine";
-                this.name = name;
-                this.health = 1;
-                this.ammo = 20;
-                this.startAmmo = 20;
-                this.range=50;
-                this.size = 25;
+                super.setSprite("machine");
+                super.setName(name);
+                super.setTankHealth(1);
+                super.setAmmo(20);
+                super.setMaxAmmo(20);
+                super.setRange(50);
+                super.setSize(40);
+                super.setX(100);
+                super.setY(200);
                 break;
             case "bomber":
-                this.sprite="bomber";
-                this.name = name;
-                this.health = 2;
-                this.ammo = 3;
-                this.startAmmo = 3;
-                this.size = 50;
+                super.setSprite("bomber");
+                super.setName(name);
+                super.setTankHealth(2);
+                super.setAmmo(5);
+                super.setMaxAmmo(5);
+                super.setRange(75);
+                super.setSize(40);
+                super.setX(100);
+                super.setY(200);
                 break;
             default:
-                this.sprite="tank";
-                this.name = name;
-                this.health = 2;
-                this.ammo = 10;
-                this.startAmmo = 10;
-                this.range=75;
-                this.size = 25;
+                super.setSprite("tank");
+                super.setName(name);
+                super.setTankHealth(2);
+                super.setAmmo(10);
+                super.setMaxAmmo(10);
+                super.setRange(75);
+                super.setSize(40);
+                super.setX(100);
+                super.setY(200);
         }
 
     }
 
-    //SETTERS
-    @Override
-    public void addX(){this.x+=5;}
-    @Override
-    public void minusX(){this.x-=5;}
-    @Override
-    public void addY(){this.y+=5;}
-    @Override
-    public void minusY(){this.y-=5;}
-    @Override
-    public void setTankDirection(Direction direction){this.direction =direction;}
-    @Override
-    public void setRange(int range){this.range=range;}
-    @Override
-    public void setSprite(String sprite){this.sprite=sprite;}
-    @Override
-    public void setAmmo(int ammo){this.ammo=ammo;}
-    public void setName(String name){this.name=name;}
-    public void takeHit(){this.health--;}
-    public void repair(){this.health=5;}
-    public void reload(){this.ammo=startAmmo;}
-    @Override
-    public void addKill(){this.kills++;}
-    @Override
-    public void addDeaths(){this.deaths++;}
-
     public void fire() {
         Shell newBullet = new Shell();
         newBullet.discharge(this);
-        this.ammo--;
+        super.decreaseAmmo();
     }
-    @Override
-    public void setDeaths(int deaths){this.deaths=deaths;}
 
 
-    //GETTERS
-    public int getAmmo(){return this.ammo;}
-    public int getX(){return this.x;}
-    public int getY(){return this.y;}
-    @Override
-    public int getRange(){return this.range;}
-    public String getTankName(){return this.name;}
-    public String getSpriteName(){return this.sprite;}
     public String getDeadImage(){
         return "deademoji.png";}
-    public int getTankHealth(){return this.health;}
-    public Direction getDirection(){return this.direction;}
-    @Override
-    public int getSize(){return this.size;}
+
 
     //Display
     public void draw(Graphics g) {
         //name
         g.setColor(Color.WHITE);
         g.setFont(new Font("Default", Font.BOLD, 14));
-        g.drawString(name, this.x, this.y-20);
+        g.drawString(super.getSpriteName(), super.getX(), super.getY()-20);
 
         //health bar
         g.setColor(Color.RED);
-        g.fillRect(this.x, this.y-10, health*7, 10);
+        g.fillRect(super.getX(), super.getY()-10, super.getTankHealth()*7, 10);
 
         //position
         g.setColor(Color.GREEN);
-        g.drawRect(this.x-(range-1), this.y-(range-1), range*2, range*2);
+        g.drawRect(super.getX()-(super.getRange()-1), super.getY()-(super.getRange()-1), super.getRange()*2, super.getRange()*2);
 
-        boolean playerDead = health==0;
-        Image tankImage = this.getDirection().getImage(this.getSpriteName());
+        boolean playerDead = super.getTankHealth()==0;
+        Image tankImage = super.getDirection().getImage(super.getSpriteName());
 
         if (playerDead) {
-            g.drawImage(HelperMethods.getImage(this.getDeadImage()),
-                    this.x, this.y, null);
+            g.drawImage(HelperMethods.getImage("deademoji.png"),
+                    super.getX(), super.getY(), null);
         }
         else{
-            g.drawImage(tankImage, this.x, this.y, null);
+            g.drawImage(tankImage, super.getX(), super.getY(), null);
         }
     }
 
@@ -146,14 +106,13 @@ public class Player extends Tank {
 
         g.setColor(Color.BLACK);
         g.setFont(new Font("Default", Font.BOLD, 14));
-        g.drawString("Missiles: " + ammo, 10, 50);
-        g.drawString("Health: " + health, 10, 70);
+        g.drawString("Missiles: " + super.getAmmo(), 10, 50);
+        g.drawString("Health: " + super.getTankHealth(), 10, 70);
         g.drawString("Enemies Left: " + enemiesLeft, 10, 90);
-        g.drawString("Kills: " + kills, 10, 110);
-        g.drawString("Deaths: " + deaths, 10, 130);
+        g.drawString("Kills: " + super.getKills(), 10, 110);
+        g.drawString("Deaths: " + super.getDeaths(), 10, 130);
 //        double kdRatio = kills/deaths;
 //        g.drawString("K/D: " + kdRatio, 10, 150);
 
     }
-
 }

@@ -31,9 +31,9 @@ public abstract class Command {
             case "launch":
                 return new LaunchCommand(robotName);
             case "forward":
-                return new ForwardCommand(robotName, "1");
+                return new ForwardCommand(robotName, "5");
             case "back":
-                return new BackCommand(robotName, "1");
+                return new BackCommand(robotName, "5");
             case "left":
                 return new LeftCommand(robotName);
             case "right":

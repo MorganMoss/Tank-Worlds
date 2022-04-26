@@ -116,6 +116,7 @@ public class Client {
                     try {
                         String serializedResponse = incoming.readLine(); //should be changed to a response object
                         guiResponse = Response.deSerialize(serializedResponse);
+                        System.out.println(guiResponse.getEnemyRobots().values());
 
                         if (!serializedResponse.matches("")){
     //                        gui.showOutput(Response.deSerialize(serializedResponse));
@@ -183,7 +184,7 @@ public class Client {
                 do {
                     try {
                         String input = gui.getInput().serialize();
-                        System.out.println("ouput:\n"+input);
+                        System.out.println("output:\n"+input);
 
                         Request request = new Request(gui.getClientName(), input);
                         String serializedRequest = request.serialize();
