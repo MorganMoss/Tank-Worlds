@@ -14,23 +14,37 @@ public abstract class Projectile implements WorldObject {
     int size;
     Direction direction;
 
+
+
     //setters
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
 
     //Getters
-    public Direction getDirection() {
-        return this.direction;
+
+    public int getX() {
+        return this.x;
+    }
+    public int getY() {
+        return this.y;
+    }
+    public int getTankX() {return tankX;}
+    public int getTankY() {return tankY;}
+
+    public Direction getDirection(){return this.direction;}
+
+    public int getRange() {
+        return this.range;
     }
 
-    public String getSpriteName() {
-        return this.sprite;
-    }
+    public String getSpriteName() {return this.sprite;}
 
     public int getSize() {
         return this.size;
     }
+
+
 
 
     public void strike() {

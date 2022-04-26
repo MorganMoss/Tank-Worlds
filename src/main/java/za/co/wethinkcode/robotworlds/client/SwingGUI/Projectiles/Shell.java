@@ -18,33 +18,46 @@ public class Shell extends Projectile{
     Tank tank;
     int size = 10;
 
-    //setters
-    @Override
-    public void setDirection(Direction direction){this.direction=direction;}
+    public String getSprite() {
+        return sprite;
+    }
 
-    //Getters
+    @Override
+    public int getTankX() {
+        return tankX;
+    }
+
+    @Override
+    public int getTankY() {
+        return tankY;
+    }
+
     @Override
     public int getX() {
-        return this.x;
+        return x;
     }
+
     @Override
     public int getY() {
-        return this.y;
+        return y;
     }
-    public int getTankX() {return tankX;}
-    public int getTankY() {return tankY;}
-    @Override
-    public Direction getDirection(){return this.direction;}
+
     @Override
     public int getRange() {
-        return this.range;
+        return range;
     }
-    @Override
-    public String getSpriteName() {return this.sprite;}
+
+    public Tank getTank() {
+        return tank;
+    }
+
     @Override
     public int getSize() {
-        return this.size;
+        return size;
     }
+
+    @Override
+    public Direction getDirection(){return this.direction;}
 
 
     //ADD MISSILE TO WORLD
@@ -76,7 +89,6 @@ public class Shell extends Projectile{
                 this.y+=5;
                 break;
             case Left:
-                System.out.println("reached: "+this.x);
                 this.x-=5;
                 break;
             case Right:
