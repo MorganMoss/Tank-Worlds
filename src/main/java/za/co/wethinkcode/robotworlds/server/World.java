@@ -26,10 +26,10 @@ public class World {
         List<Obstacle> obstacleList = map.getObstacles();
 
         this.map = new HashMap<>();
-        for (int x = round(-mapSize.getX()/2.0f); x <= round(mapSize.getX()/2.0f); x++) {
+        for (int x = round(-mapSize.getX()/2.0f); x <= round(mapSize.getX()/2.0f); x++) { //ROWS
             HashMap<Integer, String> row = new HashMap<>();
 
-            for (int y = round(-mapSize.getY()/2.0f); y <= round(mapSize.getY()/2.0f); y++) {
+            for (int y = round(-mapSize.getY()/2.0f); y <= round(mapSize.getY()/2.0f); y++) { //COLUMNS
                 for (Obstacle obstacle : obstacleList){
                     if (obstacle.isPositionBlocked(new Position(x,y))){
                         row.putIfAbsent(y, "X"); //closed space

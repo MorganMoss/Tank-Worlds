@@ -90,7 +90,7 @@ public class Player extends Tank {
     public void addKill(){this.kills++;}
     @Override
     public void addDeaths(){this.deaths++;}
-    @Override
+
     public void fire() {
         Shell newBullet = new Shell();
         newBullet.discharge(this);

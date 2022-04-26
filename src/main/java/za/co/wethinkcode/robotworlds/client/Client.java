@@ -28,12 +28,11 @@ public class Client {
      */
     private static int port = 5000;
     private static String clientName;
-    public static String getMyClientName(){return clientName;}
-
     static Scanner scanner = new Scanner(System.in);
     private static String enemyName="enemy";
     private static Response guiResponse;
 
+    public static String getMyClientName(){return clientName;}
 
     public static Response getResponse() {
         return guiResponse;

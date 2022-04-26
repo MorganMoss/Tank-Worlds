@@ -4,7 +4,7 @@ import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.WorldObject;
 
-public abstract class Projectile implements ProjectileI{
+public abstract class Projectile implements WorldObject {
     private int range;
     String sprite;
     int x;
@@ -15,12 +15,22 @@ public abstract class Projectile implements ProjectileI{
     Direction direction;
 
     //setters
-    public void setDirection(Direction direction){this.direction=direction;}
-    //Getters
-    public Direction getDirection(){return this.direction;}
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
 
-    public String getSpriteName() {return this.sprite;}
-    public int getSize(){return this.size;}
+    //Getters
+    public Direction getDirection() {
+        return this.direction;
+    }
+
+    public String getSpriteName() {
+        return this.sprite;
+    }
+
+    public int getSize() {
+        return this.size;
+    }
 
 
     public void strike() {
@@ -31,4 +41,7 @@ public abstract class Projectile implements ProjectileI{
     }
 
     public abstract boolean reachedRange(Direction direction);
+
+    public abstract void project(Direction direction);
+
 }

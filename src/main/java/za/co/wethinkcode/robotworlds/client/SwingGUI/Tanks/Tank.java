@@ -1,6 +1,8 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks;
 
-public abstract class Tank implements TankI {
+import za.co.wethinkcode.robotworlds.client.SwingGUI.WorldObject;
+
+public abstract class Tank implements WorldObject {
     private String name;
     private String sprite;
     private String deadImage;

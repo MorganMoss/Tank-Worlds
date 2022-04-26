@@ -16,7 +16,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The server that will be run. Clients will connect to it. 
@@ -68,7 +67,7 @@ public class Server{
     private Map getMap() {
         //TODO : Get the map to be used from the config file;
         // Size for a map should be determined by the map, not the server.
-        return new BasicMap(new Position(100,100));
+        return new BasicMap(new Position(600,600));
     }
 
     /**
@@ -77,7 +76,7 @@ public class Server{
      * @return the response to the request
      */
     public Response executeRequest(Request request){
-        this.requestLog.add(request); //TODO: change to hashmap?
+        this.requestLog.add(request);
         //TODO : Add all requests and responses to a log, that can dumped to a file later
         System.out.println(request.serialize());
 

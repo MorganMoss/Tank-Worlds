@@ -40,10 +40,10 @@ public class Enemy extends Tank {
     @Override
     public void setY(int y){this.y=y;}
     public void addX(){x+=5;}
-    @Override
+
     public void fire() {ammo--;}
     public Direction getDirection(){return this.direction;}
-    @Override
+
     public void reload() {ammo=5;}
     public void minusX(){x-=5;}
     public void addY(){y+=5;}
@@ -87,7 +87,6 @@ public class Enemy extends Tank {
         }
     }
 
-    @Override
     public void showState(Graphics g) {
 
     }

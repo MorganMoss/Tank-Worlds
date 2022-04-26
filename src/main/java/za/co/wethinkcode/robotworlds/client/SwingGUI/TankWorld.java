@@ -110,19 +110,20 @@ public class TankWorld extends JComponent implements GUI {
                         System.out.println(player.getY());
                         request = new Request(clientName,"forward");
                         lastRequest.add(request);
-                        if(notCollision(player,"forward")){
-                            player.moveForward();
-                        }else player.moveBack();
+                        player.moveForward();
+                        if(collision(player)){
+                            player.moveBack();
+                        }
                         break;
 
                     case KeyEvent.VK_DOWN:
                         request = new Request(clientName,"back");
                         lastRequest.add(request);
                         System.out.println("request: "+request.serialize());
-
-                        if(notCollision(player,"back")){
-                            player.moveBack();
-                        }else player.moveForward();
+                        player.moveBack();
+                        if(collision(player)){
+                            player.moveForward();
+                        }
                         break;
 
                     case KeyEvent.VK_LEFT:
@@ -325,7 +326,7 @@ public class TankWorld extends JComponent implements GUI {
      * Checks path & position blocked for a range by geo-blocking their positions
      * using rectangles
      *
-     * REFACTORED TO CHECK FOR COLIDING WorldObjects
+     * REFACTORED TO CHECK FOR COLLIDING WorldObjects
      * */
     public static boolean intersects(WorldObject object1, WorldObject object2){
         Rectangle playerRect = new Rectangle(object1.getX(),object1.getY(),object1.getSize(),object1.getSize());
@@ -334,18 +335,18 @@ public class TankWorld extends JComponent implements GUI {
 
     }
 
-    public static boolean notCollision(Tank player, String command){
+    public static boolean collision(Tank player){
         for (Enemy enemy:enemyList){
             if (intersects(player,enemy)){
-                return false;
+                return true;
                 }
             }
         for (Obstacle obstacle:obstacleList){
             if (intersects(player,obstacle)){
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
 
@@ -363,11 +364,6 @@ public class TankWorld extends JComponent implements GUI {
         return bullet;
     }
 
-    //TODO: IMPLEMENT WALL AND OBSTACLE BLOCKING
-    //Is Position Blocked
-    private boolean isPositionBlocked(Player player, Enemy enemy){
-    return true;
-    }
 
     //TODO: CONNECT WITH RUNSERVERCORRECTIONS
     //Handles enemy movement using input from server
