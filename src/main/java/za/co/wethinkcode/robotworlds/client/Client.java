@@ -4,12 +4,16 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
+import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.SwingGUI;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -25,8 +29,9 @@ public class Client {
     private static int port = 5000;
     private static String clientName;
     public static String getMyClientName(){return clientName;}
+
     static Scanner scanner = new Scanner(System.in);
-    private static String enemyName;
+    private static String enemyName="enemy";
     private static Response guiResponse;
 
 
@@ -45,7 +50,24 @@ public class Client {
           all that should change in here is this line.
           i.e. GUI gui = new SwingGUI(); or new TankWorlds();
          */
-        GUI gui = new TextGUI();
+//        GUI gui = new SwingGUI();
+//        ((SwingGUI) gui).startGUI();
+        System.out.println("Enter Tank name: \n");
+        clientName = scanner.nextLine();
+
+        HelperMethods.setTheme();
+        JFrame frame = new JFrame("T A N K W O R L D S");
+        frame.setIconImage(HelperMethods.getImage("icon.png"));
+//        JLabel background = new JLabel(new ImageIcon(HelperMethods.getImage("/icon.png")));
+        frame.setSize(TankWorld.getScreenWidth(), TankWorld.getScreenHeight());
+        frame.setLocation(400, 100);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        TankWorld gui = new TankWorld();
+        frame.add(gui);
+        gui.setFocusable(true);
+        frame.setVisible(true);
+        gui.start();
 
         try (
                 //10.200.109.17 //localhost //maggie 10.200.110.163

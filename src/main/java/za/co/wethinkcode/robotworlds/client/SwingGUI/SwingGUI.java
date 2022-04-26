@@ -5,16 +5,23 @@ import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 
+import javax.swing.*;
+import java.util.Scanner;
+
 // TODO : This is a mock up of how the swing GUI should look in a sense
 public class SwingGUI implements GUI {
     // TODO : add variables as necessary
     private String latestInput = "";
+    TankWorld gui;
+    private static String clientName;
+    static Scanner scanner = new Scanner(System.in);
 
     public SwingGUI(){
         // TODO : Start up your GUI from here, instantiate all the windows/objects you need
         //  and set up any sort of flags etc here too.
         //  I'd suggest starting up a few threads here, specifically one for getting input
         latestInput = "";
+
     }
 
     @Override
@@ -36,12 +43,16 @@ public class SwingGUI implements GUI {
 
     @Override
     public String getClientName() {
-        return null;
+        return clientName;
     }
 
     @Override
     public void setEnemyName(String enemyName) {
 
+    }
+
+    public void startGUI() {
+        gui.start();
     }
 
     @Override
