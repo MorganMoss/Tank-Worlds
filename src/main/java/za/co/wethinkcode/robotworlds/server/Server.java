@@ -93,8 +93,8 @@ public class Server{
 
 
     public Response generateResponse(Request request, String commandResponse) {
-        HashMap<Integer, HashMap<Integer, String>> map = world.look(new Position(0,0));
         Robot robot = world.getRobot(request.getRobotName());
+        HashMap<Integer, HashMap<Integer, String>> map = world.look(robot);
         HashMap<String, Robot> enemies = world.getEnemies(map);
         enemies.remove(robot.getRobotName());
 
