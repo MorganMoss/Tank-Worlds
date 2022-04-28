@@ -42,7 +42,7 @@ public class TankWorld extends JComponent implements GUI {
     private int explosionX;
     private int explosionY;
 
-    private String clientName;
+    private final String clientName;
 
 
     public static int getScreenWidth(){return WIDTH;}
@@ -147,12 +147,14 @@ public class TankWorld extends JComponent implements GUI {
             }
         });
         //TODO: CONNECT WITH UPDATED SERVER
-//        runServerCorrections(Client.getResponse());
     }
 
     //Sends user input to Server as request objects
     @Override
     public Request getInput() throws NoNewInput {
+        if (Client.getResponse()!=null){
+        runServerCorrections(Client.getResponse());}
+
         if (lastRequest.getLast() != queue1){
             return lastRequest.removeLast();
         }else{
@@ -319,7 +321,6 @@ public class TankWorld extends JComponent implements GUI {
         Rectangle playerRect = new Rectangle(object1.getX(),object1.getY(),object1.getSize(),object1.getSize());
         Rectangle enemyRect = new Rectangle(object2.getX(),object2.getY(),object2.getSize(),object2.getSize());
         return playerRect.intersects(enemyRect);
-
     }
 
     public static boolean collision(Tank player){
@@ -371,22 +372,22 @@ public class TankWorld extends JComponent implements GUI {
         HashMap<String, Robot> enemies = response.getEnemyRobots();
         Robot serverPlayer = response.getRobot();
 
-        player.setX(serverPlayer.getPosition().getX());
-        player.setY(serverPlayer.getPosition().getY());
+        player.setX(serverPlayer.getPosition().getX()+300);
+        player.setY(serverPlayer.getPosition().getY()+300);
         player.setName(serverPlayer.getRobotName());
-        player.setAmmo(serverPlayer.getCurrentAmmo());
-        player.setTankHealth(serverPlayer.getCurrentShield());
-        player.setRange(serverPlayer.getRange());
-        player.setSprite(serverPlayer.getClass().getName());
-        player.setKills(serverPlayer.getKills());
-        player.setDeaths(serverPlayer.getDeaths());
+//        player.setAmmo(serverPlayer.getCurrentAmmo());
+//        player.setTankHealth(serverPlayer.getCurrentShield());
+//        player.setRange(serverPlayer.getRange());
+//        player.setSprite(serverPlayer.getClass().getName());
+//        player.setKills(serverPlayer.getKills());
+//        player.setDeaths(serverPlayer.getDeaths());
 //        player.setTankDirection(serverPlayer.getDirection());
 
 
         int i=0;
         for(Robot serverEnemy:enemies.values()){
-                enemyList.get(i).setX(serverEnemy.getPosition().getX());
-                enemyList.get(i).setY(serverEnemy.getPosition().getY());
+                enemyList.get(i).setX(serverEnemy.getPosition().getX()+300);
+                enemyList.get(i).setY(serverEnemy.getPosition().getY()+300);
                 enemyList.get(i).setName(serverEnemy.getRobotName());
                 enemyList.get(i).setAmmo(serverEnemy.getCurrentAmmo());
                 enemyList.get(i).setTankHealth(serverEnemy.getCurrentShield());

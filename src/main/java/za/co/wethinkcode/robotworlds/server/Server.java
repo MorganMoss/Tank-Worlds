@@ -16,12 +16,13 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The server that will be run. Clients will connect to it. 
  * It has 2-way communication and support for many clients
  */
-public class Server{
+public class Server implements Runnable {
     /**
      * The world the server interacts with when handling requests and responses
      */
@@ -78,8 +79,9 @@ public class Server{
     public Response executeRequest(Request request){
         this.requestLog.add(request);
         //TODO : Add all requests and responses to a log, that can dumped to a file later
-        System.out.println(request.serialize());
-
+        if (!Objects.equals(request.getCommand(), "idle")) {
+            System.out.println(request.serialize());
+        }
         Command command;
         String commandResponse;
         try {
@@ -95,8 +97,7 @@ public class Server{
     public Response generateResponse(Request request, String commandResponse) {
         Robot robot = world.getRobot(request.getRobotName());
         HashMap<Integer, HashMap<Integer, String>> map = world.look(robot);
-        HashMap<String, Robot> enemies = world.getEnemies(map);
-        enemies.remove(robot.getRobotName());
+        HashMap<String, Robot> enemies = world.getEnemies(robot);
 
         Response response = new Response(
                 robot,
@@ -108,7 +109,8 @@ public class Server{
         //TODO : use the look command robot position to get the grid of values it
 
         this.responseLog.add(response);
-        System.out.println(response.serialize());
+        if (!Objects.equals(response.getCommandResponse(), "idle"))
+            System.out.println(response.serialize());
 
         return response;
     }
@@ -126,8 +128,10 @@ public class Server{
         while(true) {
             //TODO : Setup a separate input thread, so that commands like 'quit', 'dump' and 'robots' can be handled in the main loop
             try {
-                Socket socket = server.socket.accept();
+                Thread thread = new Thread(server);
+                thread.start();
 
+                Socket socket = server.socket.accept();
                 String socketName = socket.getLocalAddress().toString();
                 System.out.println(socketName);
 
@@ -138,6 +142,12 @@ public class Server{
                 ex.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void run() {
+//        do {}
+//        while true;
     }
 
     public void dump(){
@@ -153,7 +163,7 @@ public class Server{
     }
 
     /**
-     * The server is run from here. 
+     * The server is run from here.
      * @param args : none are applicable
      * @throws IOException : raised when server object fails
      */

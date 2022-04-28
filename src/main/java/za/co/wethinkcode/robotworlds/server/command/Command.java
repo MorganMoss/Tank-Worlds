@@ -30,6 +30,8 @@ public abstract class Command {
         switch (request.getCommand()) {
             case "launch":
                 return new LaunchCommand(robotName);
+            case "idle":
+                return new IdleCommand(robotName);
             case "forward":
                 return new ForwardCommand(robotName, "5");
             case "back":

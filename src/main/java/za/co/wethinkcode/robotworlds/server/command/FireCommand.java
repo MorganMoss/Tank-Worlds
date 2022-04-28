@@ -43,7 +43,7 @@ public class FireCommand extends Command {
             case OBSTACLE_HIT:
                 return "Hit obstacle";
             case ENEMY_HIT:
-                for (Robot enemy : world.getRobots().values()) {
+                for (Robot enemy : world.getEnemies(robot).values()) {
                     if (isEnemyHit(robot,enemy)) {
                         enemy.decreaseShield();
                         return "Hit enemy : " + enemy;
