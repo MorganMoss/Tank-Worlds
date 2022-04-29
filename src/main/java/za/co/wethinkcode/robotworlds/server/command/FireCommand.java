@@ -37,7 +37,9 @@ public class FireCommand extends Command {
     public String execute(World world) {
         Robot robot = world.getRobot(robotName);
         robot.decreaseAmmo();
-        PathBlockedResponse result = world.pathBlocked(robot.getPosition(),getFinalBullet(robot));
+        List<Position> bulletList = getBulletList(robot);
+        Position finalBullet = bulletList.get(bulletList.size()-1);
+        PathBlockedResponse result = world.pathBlocked(robot.getPosition(),finalBullet);
 
         switch (result) {
             case OBSTACLE_HIT:
@@ -65,23 +67,6 @@ public class FireCommand extends Command {
             }
         }
         return false;
-    }
-
-
-    private Position getFinalBullet(Robot robot) {
-        int distance = robot.getFiringDistance();
-        Position bulletPosition = new Position(0,0);
-
-        if (robot.getDirection().getAngle() == 0) {
-            bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() + distance);
-        } else if (robot.getDirection().getAngle() == 90) {
-            bulletPosition = new Position(robot.getPosition().getX() + distance, robot.getPosition().getY());
-        } else if (robot.getDirection().getAngle() == 180) {
-            bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() - distance);
-        } else if (robot.getDirection().getAngle() == 270) {
-            bulletPosition = new Position(robot.getPosition().getX() - distance, robot.getPosition().getY());
-        }
-        return bulletPosition;
     }
 
 
