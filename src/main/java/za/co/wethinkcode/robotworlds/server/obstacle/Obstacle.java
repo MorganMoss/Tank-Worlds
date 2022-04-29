@@ -5,12 +5,12 @@ import za.co.wethinkcode.robotworlds.server.Position;
 public abstract class Obstacle {
     private final String shape;
     private final Position size;
-    private final Position position;
+    private final Position topLeft;
 
-    public Obstacle(String shape, Position size, Position position) {
+    public Obstacle(String shape, Position size, Position topLeft) {
         this.shape = shape;
         this.size = size;
-        this.position = position;
+        this.topLeft = topLeft;
     }
 
     public String getShape() {
@@ -21,9 +21,8 @@ public abstract class Obstacle {
         return size;
     }
 
-
     public Position getPosition() {
-        return position;
+        return topLeft;
     }
 
     public abstract boolean isPositionBlocked(Position position);

@@ -11,17 +11,17 @@ import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
-
 public class World {
     private final HashMap<String, Robot> robots;
     private final HashMap<Integer, HashMap<Integer, String>> map; //"X"," ",<RobotName>
+    private final Position mapSize;
 
     /**
      * Constructor for world
      * @param map : the map that has gives a list of obstacles for this world to use.
      */
     public World(Map map) {
-        Position mapSize = map.getMapSize();
+        mapSize = map.getMapSize();
 
         List<Obstacle> obstacleList = map.getObstacles();
 
@@ -35,11 +35,9 @@ public class World {
                         row.putIfAbsent(y, "X"); //closed space
                         break;
                     }
-
                     row.putIfAbsent(y, " "); //open space
                 }
             }
-
             this.map.putIfAbsent(x, row);
         }
         this.robots = new HashMap<>();
@@ -53,25 +51,20 @@ public class World {
         return robot;
     }
 
-    public HashMap<String, Robot> getRobots() {
-        return robots;
-    }
-
     public void add(Robot robot) {
         Position launchPosition;
         Random random = new Random();
         do {
-//            int x = random.nextInt(2 * map.size()) - map.size();
-//            int y = random.nextInt(2 * map.get(0).size()) - map.get(0).size();
-            int x = random.nextInt(20) - 10;
-            int y = random.nextInt(20) - 10;
+            int x = random.nextInt(mapSize.getX()+1) - mapSize.getX()/2;
+            int y = random.nextInt(mapSize.getY()+1) - mapSize.getY()/2;
             launchPosition = new Position(x,y);
-        } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
+        } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" ")); //TODO: don't spawn on other robots
         robot.setPosition(launchPosition);
         robot.setDirection(0);
         robots.put(robot.getRobotName(), robot);
-        System.out.println(robots);
-        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), robot.getRobotName());
+        int x = robot.getPosition().getX();
+        int y = robot.getPosition().getY();
+        map.get(x).put(y, robot.getRobotName());
     }
 
     public void remove(String robotName) {
@@ -118,9 +111,9 @@ public class World {
 
             if (position.getX() > newPosition.getX()) {
                 low = newPosition.getX();
-                high = position.getX();
+                high = position.getX() - 1;
             } else {
-                low = position.getX();
+                low = position.getX() + 1;
                 high = newPosition.getX();
             }
 
@@ -175,7 +168,7 @@ public class World {
      * @return : a grid of data representing the relative view from this position
      */
     public HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter) {
-        int distance = 10;//hardcoded for now
+        int distance = 600;//hardcoded for now 10
 
         int current_x = 0;
         HashMap<Integer, HashMap<Integer, String>> result = new HashMap<>();
@@ -221,16 +214,26 @@ public class World {
         robot.resetAmmo();
     }
 
-    public HashMap<String, Robot> getEnemies(HashMap<Integer, HashMap<Integer, String>> map){
+    public HashMap<String, Robot> getEnemies(Robot robot) {
         HashMap<String, Robot> enemies = new HashMap<>();
-        for ( HashMap<Integer, String> row : map.values()){
-            for (String object : row.values()) {
-                if (!object.equals(" ") && !object.equals("X")) try {
-                    Robot enemy = getRobot(object);
-                    enemies.put(object, enemy);
-                } catch (RobotNotFoundException ignored) {}
-            }
+        for (Robot robotObj : robots.values()) {
+            if (robotObj != robot) try {
+                enemies.put(robotObj.getRobotName(),robotObj);
+            } catch (RobotNotFoundException ignored) {}
         }
         return enemies;
     }
+
+//    public HashMap<String, Robot> getEnemies(){
+//        HashMap<String, Robot> enemies = new HashMap<>();
+//        for ( HashMap<Integer, String> row : map.values()){
+//            for (String object : row.values()) {
+//                if (!object.equals(" ") && !object.equals("X")) try {
+//                    Robot enemy = getRobot(object);
+//                    enemies.put(object, enemy);
+//                } catch (RobotNotFoundException ignored) {}
+//            }
+//        }
+//        return enemies;
+//    }
 }

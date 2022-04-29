@@ -80,7 +80,7 @@ public class Player extends Tank {
         //name
         g.setColor(Color.WHITE);
         g.setFont(new Font("Default", Font.BOLD, 14));
-        g.drawString(super.getSpriteName(), super.getX(), super.getY()-20);
+        g.drawString(super.getTankName(), super.getX(), super.getY()-20);
 
         //health bar
         g.setColor(Color.RED);
