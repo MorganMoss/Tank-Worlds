@@ -2,6 +2,7 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
 import za.co.wethinkcode.robotworlds.client.Client;
 import za.co.wethinkcode.robotworlds.client.GUI;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.BasicMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.*;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Projectile;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
@@ -17,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.awt.Color;
 
@@ -25,7 +27,7 @@ public class TankWorld extends JComponent implements GUI {
     private static final int REPAINT_INTERVAL = 50;
     private static Boolean launched = false;
     private static ArrayList<Enemy> enemyList = new ArrayList<>();
-    private static ArrayList<Brick> obstacleList = new ArrayList<>();
+    private static List<Obstacle> obstacleList = BasicMap.getObstacles();
     private static ArrayList<Projectile> projectileList = new ArrayList<>();
 
     //FIFO stack for requests
@@ -74,19 +76,24 @@ public class TankWorld extends JComponent implements GUI {
 
                     case KeyEvent.VK_UP:
                         System.out.println(player.getY());
-                        request = new Request(clientName,"forward");
-                        lastRequest.add(request);
+
                         player.moveForward();
+                        if(!collision(player)){
+                            request = new Request(clientName,"forward");
+                            lastRequest.add(request);}
                         if(collision(player)){
                             player.moveBack();
                         }
                         break;
 
                     case KeyEvent.VK_DOWN:
-                        request = new Request(clientName,"back");
-                        lastRequest.add(request);
+
                         System.out.println("request: "+request.serialize());
                         player.moveBack();
+                        if(!collision(player)){
+                            request = new Request(clientName,"back");
+                            lastRequest.add(request);
+                        }
                         if(collision(player)){
                             player.moveForward();
                         }
@@ -146,13 +153,16 @@ public class TankWorld extends JComponent implements GUI {
                 }
             }
         });
-        //TODO: CONNECT WITH UPDATED SERVER
-//        runServerCorrections(Client.getResponse());
+
     }
 
     //Sends user input to Server as request objects
     @Override
     public Request getInput() throws NoNewInput {
+        //TODO: CONNECT WITH UPDATED SERVER
+        if (Client.getResponse()!=null){
+            runServerCorrections(Client.getResponse());
+        }
         if (lastRequest.getLast() != queue1){
             return lastRequest.removeLast();
         }else{
@@ -169,7 +179,6 @@ public class TankWorld extends JComponent implements GUI {
     Player player = new Player("sniper","Morgan");
     Enemy enemy1 = new Enemy();
     Enemy enemy2 = new Enemy();
-    Pit onePit = new Pit(new Position(400,300));
 
     /*Swing component that paints onto the window*/
     @Override
@@ -182,25 +191,10 @@ public class TankWorld extends JComponent implements GUI {
         // draw obstacles *TODO find better design and implement map object
         g.setColor(Color.GRAY);
 
-        for(int i=0;i<600;i+=25){
-            Brick xBrick = new Brick(new Position(i,0));
-            xBrick.draw(g);
-            obstacleList.add(xBrick);
+        for (Obstacle obstacle:obstacleList){
+            obstacle.draw(g);
         }
-        for(int i=0;i<400;i+=25){
-            Brick yBrick = new Brick(new Position(300,i));
-            yBrick.draw(g);
-            obstacleList.add(yBrick);
-        }
-        Brick worldBrick = new Brick(new Position(100,200));
-        worldBrick.draw(g);
-        Brick worldBrick2 = new Brick(new Position(450,400));
-        worldBrick2.draw(g);
 
-        //TODO: JScrollPane()
-
-        // DRAW crater
-        onePit.draw(g);
         // draw HUD *TO DO: Hide and only show on state command
         if(showState){
             player.showState(g);
@@ -239,12 +233,8 @@ public class TankWorld extends JComponent implements GUI {
                     explosionX = projectile.getX();
                     explosionY = projectile.getY();
                     showFireAnimation = true;                }
-
-                //TODO: IMPLEMENT RANGE CHECK
-//                if(projectile.reachedRange(projectile.getDirection())){
-//                    hit=true;
-//                }
             }
+
             //REMOVE PROJECTILE FROM WORLD
             if(hit){
                 projectileList.remove(i-1);
@@ -260,35 +250,7 @@ public class TankWorld extends JComponent implements GUI {
 
             enemy2.draw(g);
 
-            //TODO: REMOVE DEBUG RECTANGLES
-            int playerX = player.getX();
-            int playerY = player.getY();
-            int width=0;
-            int height=0;
-
-            switch (player.getDirection()){
-                case Right:
-                    width+=player.getRange();
-                    height+=1;
-                    break;
-                case Left:
-                    width+=player.getRange();
-                    playerX-=player.getRange();
-                    height+=1;
-                    break;
-                case Up:
-                    width+=1;
-                    playerY-=player.getRange();
-                    height+=player.getRange();
-                    break;
-                case Down:
-                    width+=1;
-                    height+=player.getRange();
-                    break;
-            }
-
             g.setColor(Color.RED);
-            g.drawRect(playerX,playerY,width,height);
             g.drawRect(enemy1.getX(),enemy1.getY(),40,40);
             g.drawRect(enemy2.getX(),enemy2.getY(),40,40);
 
@@ -371,33 +333,52 @@ public class TankWorld extends JComponent implements GUI {
         HashMap<String, Robot> enemies = response.getEnemyRobots();
         Robot serverPlayer = response.getRobot();
 
-        player.setX(serverPlayer.getPosition().getX());
-        player.setY(serverPlayer.getPosition().getY());
+        player.setX(serverPlayer.getPosition().getX()+300);
+        player.setY(-serverPlayer.getPosition().getY()+300);
+        int x = serverPlayer.getPosition().getX()+300;
+        int y = -serverPlayer.getPosition().getY()+300;
+//        System.out.println("("+x+","+y+")");
         player.setName(serverPlayer.getRobotName());
-        player.setAmmo(serverPlayer.getCurrentAmmo());
-        player.setTankHealth(serverPlayer.getCurrentShield());
-        player.setRange(serverPlayer.getRange());
-        player.setSprite(serverPlayer.getClass().getName());
-        player.setKills(serverPlayer.getKills());
-        player.setDeaths(serverPlayer.getDeaths());
-//        player.setTankDirection(serverPlayer.getDirection());
+//        player.setAmmo(serverPlayer.getCurrentAmmo());
+//        player.setTankHealth(serverPlayer.getCurrentShield());
+//        player.setRange(serverPlayer.getRange());
+//        player.setSprite(serverPlayer.getClass().getName());
+//        player.setKills(serverPlayer.getKills());
+//        player.setDeaths(serverPlayer.getDeaths());
+
+
 
 
         int i=0;
         for(Robot serverEnemy:enemies.values()){
-                enemyList.get(i).setX(serverEnemy.getPosition().getX());
-                enemyList.get(i).setY(serverEnemy.getPosition().getY());
+                enemyList.get(i).setX(serverEnemy.getPosition().getX()+300);
+                enemyList.get(i).setY(-serverEnemy.getPosition().getY()+300);
                 enemyList.get(i).setName(serverEnemy.getRobotName());
                 enemyList.get(i).setAmmo(serverEnemy.getCurrentAmmo());
                 enemyList.get(i).setTankHealth(serverEnemy.getCurrentShield());
                 enemyList.get(i).setRange(serverEnemy.getRange());
-                enemyList.get(i).setSprite(serverEnemy.getClass().getName());
+//                enemyList.get(i).setSprite(serverEnemy.getClass().getName());
                 enemyList.get(i).setKills(serverEnemy.getKills());
                 enemyList.get(i).setDeaths(serverEnemy.getDeaths());
 //                enemyList.get(i).setTankDirection(serverEnemy.getDirection());
                 if(serverEnemy.isFiring()){
                     enemyList.get(i).fire();
                 }
+                switch(serverEnemy.getDirection()){
+                    case NORTH:
+                        enemyList.get(i).setTankDirection(Direction.Up);
+                        break;
+                    case EAST:
+                        enemyList.get(i).setTankDirection(Direction.Right);
+                        break;
+                    case SOUTH:
+                        enemyList.get(i).setTankDirection(Direction.Down);
+                        break;
+                    case WEST:
+                        enemyList.get(i).setTankDirection(Direction.Left);
+                        break;
+                }
+                i++;
             }
         }
 
