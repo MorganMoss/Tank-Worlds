@@ -51,6 +51,7 @@ public class Client {
          */
 //        GUI gui = new SwingGUI();
 //        ((SwingGUI) gui).startGUI();
+//        GUI gui = new TextGUI();
         System.out.println("Enter Tank name: \n");
         clientName = scanner.nextLine();
 
@@ -70,7 +71,7 @@ public class Client {
 
         try (
                 //10.200.109.17 //localhost //maggie 10.200.110.163
-            Socket socket = new Socket("localhost", port);
+            Socket socket = new Socket("10.200.110.163", port);
         ) {
             Out output = new Out(socket, gui);
             output.start();
@@ -116,33 +117,13 @@ public class Client {
                     try {
                         String serializedResponse = incoming.readLine(); //should be changed to a response object
                         guiResponse = Response.deSerialize(serializedResponse);
-                        System.out.println(guiResponse.getEnemyRobots().values());
+//                        System.out.println(guiResponse.getEnemyRobots().values());
+                        System.out.println("("+(guiResponse.getRobot().getPosition().getX()+300)+","+(-guiResponse.getRobot().getPosition().getY()+300)+")");
 
                         if (!serializedResponse.matches("")){
     //                        gui.showOutput(Response.deSerialize(serializedResponse));
                             System.out.println(serializedResponse);
                             System.out.println(gui.getClientName());
-
-                            if (serializedResponse.contains(gui.getClientName())){
-                                Response deserializedResponse = Response.deSerialize(serializedResponse);
-                                HashMap<String, Robot> enemies = deserializedResponse.getEnemyRobots();
-
-                                gui.setEnemyName(enemyName);
-    
-                                if(serializedResponse.contains("forward")){
-                                gui.enemyMovement("forward");
-                                }else if(serializedResponse.contains("back")){
-                                    gui.enemyMovement("forward");
-                                }else if(serializedResponse.contains("left")){
-                                    gui.enemyMovement("left");
-                                }else if(serializedResponse.contains("right")){
-                                    gui.enemyMovement("right");
-                                }
-                            }
-                        // String serializedResponse = incoming.readLine();
-                        // if (!serializedResponse.matches("")){
-                        //     //gui does everything from showOutput
-                        //     gui.showOutput(Response.deSerialize(serializedResponse));
                         }
                     } catch (IOException ignored) {}
 

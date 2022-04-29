@@ -36,6 +36,11 @@ public class Brick extends Obstacle{
 
     static Image brick = HelperMethods.getImage("brick.png");
     static Image resizedBrick = brick.getScaledInstance(25,25, Image.SCALE_DEFAULT);
-    public void draw(Graphics g) {g.drawImage(resizedBrick, x, y, null);}
+    public void draw(Graphics g) {
+        g.drawImage(resizedBrick, x, y, null);
+        g.setColor(Color.red);
+        g.drawRect(x, y, super.getSize(), super.getSize());
+
+    }
 
 }

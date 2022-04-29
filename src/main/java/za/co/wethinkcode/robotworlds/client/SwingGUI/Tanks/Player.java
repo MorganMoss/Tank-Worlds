@@ -86,9 +86,11 @@ public class Player extends Tank {
         g.setColor(Color.RED);
         g.fillRect(super.getX(), super.getY()-10, super.getTankHealth()*7, 10);
 
-        //position
+        //Range
         g.setColor(Color.GREEN);
         g.drawRect(super.getX()-(super.getRange()-1), super.getY()-(super.getRange()-1), super.getRange()*2, super.getRange()*2);
+        g.setColor(Color.RED);
+        g.drawRect(super.getX(), super.getY(), super.getSize(), super.getSize());
 
         boolean playerDead = super.getTankHealth()==0;
         Image tankImage = super.getDirection().getImage(super.getSpriteName());
