@@ -11,51 +11,34 @@ import java.util.List;
 public class FireCommand extends Command {
     //TODO: implement command
 
-
     public FireCommand(String robotName, String argument) {
         super(robotName, argument);
     }
 
-//    @Override
-//    public String execute(World world) {
-//        Robot robot = world.getRobot(robotName);
-//        if (robot.getCurrentAmmo() > 0) {
-//            robot.decreaseAmmo();
-//            for (Robot enemy : world.getRobots().values()) {
-//                if (isEnemyHit(robot, enemy)) {
-//                    enemy.decreaseShield();
-//                    return "Hit";
-//                }
-//            }
-//            return "Miss";
-//        } else {
-//            return "No ammo";
-//        }
-//    }
-
     @Override
     public String execute(World world) {
         Robot robot = world.getRobot(robotName);
-        robot.decreaseAmmo();
-        List<Position> bulletList = getBulletList(robot);
-        Position finalBullet = bulletList.get(bulletList.size()-1);
-        PathBlockedResponse result = world.pathBlocked(robot.getPosition(),finalBullet);
+        if (robot.getCurrentAmmo() > 0) {
+            robot.decreaseAmmo();
+            List<Position> bulletList = getBulletList(robot);
+            Position finalBullet = bulletList.get(bulletList.size() - 1);
+            PathBlockedResponse result = world.pathBlocked(robot.getPosition(), finalBullet);
 
-        switch (result) {
-            case OBSTACLE_HIT:
-                return "Hit obstacle";
-            case ENEMY_HIT:
-                for (Robot enemy : world.getEnemies(robot).values()) {
-                    if (isEnemyHit(robot,enemy)) {
-                        enemy.decreaseShield();
-                        return "Hit enemy : " + enemy;
+            switch (result) {
+                case MISS:
+                    return "Miss";
+                case OBSTACLE_HIT:
+                    return "Hit obstacle";
+                case ENEMY_HIT:
+                    for (Robot enemy : world.getEnemies(robot).values()) {
+                        if (isEnemyHit(robot, enemy)) {
+                            enemy.decreaseShield();
+                            return "Hit enemy : " + enemy;
+                        }
                     }
-                }
-            case MISS:
-                return "Miss";
-            default:
-                return "Error";
+            }
         }
+        return "No ammo";
     }
 
 
