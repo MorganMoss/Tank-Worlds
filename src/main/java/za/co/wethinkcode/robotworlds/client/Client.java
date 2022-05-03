@@ -71,7 +71,7 @@ public class Client {
 
         try (
                 //10.200.109.17 //localhost //maggie 10.200.110.163
-            Socket socket = new Socket("10.200.110.163", port);
+            Socket socket = new Socket("localhost", port);
         ) {
             Out output = new Out(socket, gui);
             output.start();

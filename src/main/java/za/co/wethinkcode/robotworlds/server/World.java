@@ -51,14 +51,19 @@ public class World {
         return robot;
     }
 
+    public HashMap<String, Robot> getRobots() {
+        return this.robots;
+    }
+
     public void add(Robot robot) {
         Position launchPosition;
         Random random = new Random();
         do {
-            int x = random.nextInt(mapSize.getX()+1) - mapSize.getX()/2;
-            int y = random.nextInt(mapSize.getY()+1) - mapSize.getY()/2;
+            // TODO: don't let robot spawn close to bottom or right edge
+            int x = random.nextInt(mapSize.getX()-50+1) - mapSize.getX()/2;
+            int y = random.nextInt(mapSize.getY()-50+1) - mapSize.getY()/2;
             launchPosition = new Position(x,y);
-        } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" ")); //TODO: don't spawn on other robots
+        } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
         robot.setPosition(launchPosition);
         robot.setDirection(0);
         robots.put(robot.getRobotName(), robot);

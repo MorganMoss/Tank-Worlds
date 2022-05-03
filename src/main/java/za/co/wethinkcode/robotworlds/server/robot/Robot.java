@@ -137,4 +137,14 @@ public class Robot {
     public boolean isFiring() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "name : " +robotName+
+                "\nposition : [" +position.getX()+ ", " +position.getY()+ "]" +
+                "\ndirection : " +direction.toString()+
+                "\nshields : " +currentShield+
+                "\nshots : " +currentAmmo+
+                "\nstatus : n/a";
+    }
 }

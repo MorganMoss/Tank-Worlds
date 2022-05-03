@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FireCommand extends Command {
-    //TODO: implement command
 
     public FireCommand(String robotName, String argument) {
         super(robotName, argument);

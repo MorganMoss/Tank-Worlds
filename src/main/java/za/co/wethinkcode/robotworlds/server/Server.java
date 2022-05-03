@@ -3,20 +3,16 @@ package za.co.wethinkcode.robotworlds.server;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
-import za.co.wethinkcode.robotworlds.server.command.IdleCommand;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.net.*;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * The server that will be run. Clients will connect to it. 
@@ -146,16 +142,37 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-//        do {}
-//        while true;
+//        Scanner scanner = new Scanner(System.in);
+//        while (scanner.nextLine() != null) {
+//            String command = scanner.nextLine().toLowerCase();
+//            switch (command) {
+//                case "quit":
+//                    quit();
+//                case "dump":
+//                    dump();
+//                case "robots":
+//                    robots();
+//                default:
+//                    throw new IllegalArgumentException("Unsupported command: " + command);
+//            }
+//        }
     }
 
     public void dump(){
-        //TODO : Set up the dump function. It should output a list of the robots, with their current states and the world and all it's info
+        //TODO : Display a representation of the world's state showing robots, obstacles, and anything else in the world.
     }
 
     public void robots(){
-        //TODO : Get a list of robots with their current info, and output it.
+        //TODO : List all robots in the world including the name and state, and output it
+        HashMap<String, Robot> robots = world.getRobots();
+        if (robots.values().size()>0) {
+            System.out.println("R O B O T S:");
+            for (Robot robot : robots.values()) {
+                System.out.println(robot.toString());
+            }
+        } else {
+            System.out.println("Robot not found");
+        }
     }
 
     public void quit(){

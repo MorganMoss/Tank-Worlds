@@ -332,7 +332,7 @@ public class TankWorld extends JComponent implements GUI {
         Robot serverPlayer = response.getRobot();
 
         player.setX(serverPlayer.getPosition().getX()+300);
-        player.setY(serverPlayer.getPosition().getY()+300);
+        player.setY(-serverPlayer.getPosition().getY()+300);
         player.setName(serverPlayer.getRobotName());
 //        player.setAmmo(serverPlayer.getCurrentAmmo());
 //        player.setTankHealth(serverPlayer.getCurrentShield());
@@ -346,7 +346,7 @@ public class TankWorld extends JComponent implements GUI {
         int i=0;
         for(Robot serverEnemy:enemies.values()){
                 enemyList.get(i).setX(serverEnemy.getPosition().getX()+300);
-                enemyList.get(i).setY(serverEnemy.getPosition().getY()+300);
+                enemyList.get(i).setY(-serverEnemy.getPosition().getY()+300);
                 enemyList.get(i).setName(serverEnemy.getRobotName());
                 enemyList.get(i).setAmmo(serverEnemy.getCurrentAmmo());
                 enemyList.get(i).setTankHealth(serverEnemy.getCurrentShield());
