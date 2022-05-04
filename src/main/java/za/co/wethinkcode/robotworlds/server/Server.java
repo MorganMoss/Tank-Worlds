@@ -5,6 +5,7 @@ import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
+import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.net.*;
@@ -124,8 +125,8 @@ public class Server implements Runnable {
         while(true) {
             //TODO : Setup a separate input thread, so that commands like 'quit', 'dump' and 'robots' can be handled in the main loop
             try {
-                Thread thread = new Thread(server);
-                thread.start();
+                Thread inputThread = new InputThread(server);
+                inputThread.start();
 
                 Socket socket = server.socket.accept();
                 String socketName = socket.getLocalAddress().toString();
@@ -142,24 +143,28 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-//        Scanner scanner = new Scanner(System.in);
-//        while (scanner.nextLine() != null) {
-//            String command = scanner.nextLine().toLowerCase();
-//            switch (command) {
-//                case "quit":
-//                    quit();
-//                case "dump":
-//                    dump();
-//                case "robots":
-//                    robots();
-//                default:
-//                    throw new IllegalArgumentException("Unsupported command: " + command);
-//            }
-//        }
+
     }
 
+
+
     public void dump(){
+
         //TODO : Display a representation of the world's state showing robots, obstacles, and anything else in the world.
+        List<Obstacle> obstacleList=getMap().getObstacles();
+        HashMap<String, Robot> robots = world.getRobots();
+        System.out.println("The are some obstacles");
+        for (Obstacle obstacle:obstacleList) {
+            System.out.println("At position "+obstacle.getPosition().getX()+","+obstacle.getPosition().getY());
+        }
+        if (robots.values().size()>0) {
+            System.out.println("R O B O T S:");
+            for (Robot robot : robots.values()) {
+                System.out.println(robot.toString());
+            }
+        } else {
+            System.out.println("Robot not found");
+        }
     }
 
     public void robots(){
@@ -175,7 +180,8 @@ public class Server implements Runnable {
         }
     }
 
-    public void quit(){
+    public void quit() {
+      System.exit(0);
         //TODO : Should send a response to all clients telling them that the server is shutting down, then close everything that needs closing on the server side
     }
 

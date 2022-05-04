@@ -18,10 +18,13 @@ public class InputThread extends Thread{
             switch (command) {
                 case "quit":
                     server.quit();
+                    break;
                 case "dump":
                     server.dump();
+                    break;
                 case "robots":
                     server.robots();
+                    break;
                 default:
                     throw new IllegalArgumentException("Unsupported command: " + command);
             }
