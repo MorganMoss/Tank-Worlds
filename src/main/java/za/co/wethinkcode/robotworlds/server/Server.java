@@ -1,5 +1,6 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
@@ -20,6 +21,8 @@ import java.net.UnknownHostException;
  * It has 2-way communication and support for many clients
  */
 public class Server implements Runnable {
+
+    private static int tickInterval = 50;
     /**
      * The world the server interacts with when handling requests and responses
      */
@@ -29,14 +32,28 @@ public class Server implements Runnable {
      */
     private final ServerSocket socket;
     //TODO : Perhaps unify these into a list of Strings (i.e. Serialize them as you store them)
+
+    /**
+     * The list of requests that will be run in the next server tick
+     */
+    private final HashMap<Integer, Request> currentRequests;
+
+    /**
+     * The list of responses that will be sent in the next server tick
+     */
+    private final HashMap<Integer, Response> currentResponses;
+
     /**
      * Stores history of requests made to the server
      */
     private List<Request> requestLog;
+
     /**
      * Stores history of responses made to the server
      */
     private List<Response> responseLog;
+
+    private int clientCount;
 
     /**
      * Makes an instance of a server. It uses the port given for the server socket
@@ -47,7 +64,11 @@ public class Server implements Runnable {
         this.requestLog = new ArrayList<>();
         this.responseLog = new ArrayList<>();
         this.socket = new ServerSocket(port);
-        world = new World(getMap());
+        this.clientCount = 0;
+        this.world = new World(getMap());
+        this.currentRequests = new HashMap<>();
+        this.currentResponses = new HashMap<>();
+
     }
 
     /**
@@ -69,26 +90,119 @@ public class Server implements Runnable {
     }
 
     /**
-     * Takes in a request, executes it as a command in the world, then returns a response
-     * @param request : The request the client sent
-     * @return the response to the request
+     * Starts up the server
+     * @throws IOException : raised when server object fails
      */
-    public Response executeRequest(Request request){
-        this.requestLog.add(request);
-        //TODO : Add all requests and responses to a log, that can dumped to a file later
-        if (!Objects.equals(request.getCommand(), "idle")) {
-            System.out.println(request.serialize());
+    public static void start() throws IOException {
+        final int port = 5000;
+        Server server = new Server(port);
+
+        System.out.println("Server running & waiting for client connections.");
+
+        while(true) {
+            //TODO : Setup a separate input thread, so that commands like 'quit', 'dump' and 'robots' can be handled in the main loop
+            try {
+                Thread executeThread = new Thread(server);
+                executeThread.start();
+
+                Thread inputThread = new InputThread(server);
+                inputThread.start();
+
+                Socket socket = server.socket.accept();
+                server.clientCount++;
+                String socketName = socket.getLocalAddress().toString();
+                System.out.println(socketName);
+
+                ServerThread serverThread = new ServerThread(server, socket, server.clientCount);
+                serverThread.start();
+                System.out.println("A client has been connected. Their name is : " + socket.getInetAddress().getHostName());
+            } catch(IOException ex) {
+                ex.printStackTrace();
+            }
         }
-        Command command;
-        String commandResponse;
-        try {
-            command = Command.create(request);
-            commandResponse = command.execute(world);
-        } catch (IllegalArgumentException badCommand) {
-            commandResponse = "failed! bad input";
-        }
-        return generateResponse(request, commandResponse);
     }
+
+    /**
+     * Allows a server thread to give the server a request for a client
+     * @param client : the client giving the request
+     * @param request : the request the client is giving
+     */
+    public void addRequest(int client, Request request){
+        currentRequests.putIfAbsent(client, request);
+    }
+
+    /**
+     * Should execute all requests and create a new response for each client
+     * It should clear the list as it goes
+     */
+    private void executeRequests() {
+        if (currentRequests.keySet().size() == 0) {
+            return;
+        }
+        for (int client : currentRequests.keySet()) {
+            Request request = currentRequests.get(client);
+            String commandResponse = "";
+            if (request == null){
+                // do something
+            } else try {
+                this.requestLog.add(request);
+                if (!Objects.equals(request.getCommand(), "idle")) {
+                    System.out.println(request.serialize()); // PRINT REQUEST
+                }
+                Command command = Command.create(request);
+                commandResponse = command.execute(world);
+            } catch (IllegalArgumentException e) {
+                commandResponse = "failed! bad input";
+            }
+
+            //TODO : Add all requests to a buffer before adding them to current requests (to prevent multiple responses per request)
+
+            //TODO : use the look command on each robot to get the grid of values it
+
+            //TODO properly. it's just sending back the request, should be a general info about robot and surroundings
+
+            currentResponses.putIfAbsent(client, generateResponse(request, commandResponse));
+            currentRequests.remove(client);
+        }
+    }
+
+    /**
+     * Looks for a response from the server to give the client.
+     * Used by a server thread.
+     * @param client : the client looking for a response
+     * @return a formatted response object
+     */
+    public Response getResponse(int client) throws NoChangeException {
+        Response response = currentResponses.get(client);
+        if (response == null) {
+            throw new NoChangeException();
+        }
+        currentResponses.remove(client);
+        return response;
+    }
+
+
+
+//    /**
+//     * Takes in a request, executes it as a command in the world, then returns a response
+//     * @param request : The request the client sent
+//     * @return the response to the request
+//     */
+//    public Response executeRequest(Request request){
+//        this.requestLog.add(request);
+//        if (!Objects.equals(request.getCommand(), "idle")) {
+//            System.out.println(request.serialize());
+//        }
+//        Command command;
+//        String commandResponse;
+//        try {
+//            command = Command.create(request);
+//            commandResponse = command.execute(world);
+//        } catch (IllegalArgumentException badCommand) {
+//            commandResponse = "failed! bad input";
+//        }
+//        return generateResponse(request, commandResponse);
+//    }
 
 
     public Response generateResponse(Request request, String commandResponse) {
@@ -106,15 +220,16 @@ public class Server implements Runnable {
         //TODO : use the look command robot position to get the grid of values it
 
         this.responseLog.add(response);
-        if (!Objects.equals(response.getCommandResponse(), "idle"))
-            System.out.println(response.serialize());
-
+        if (!Objects.equals(response.getCommandResponse(), "idle")) {
+            System.out.println(response.serialize()); // PRINT RESPONSE
+        }
         return response;
     }
 
+
     /**
-     * Starts up the server
-     * @throws IOException : raised when server object fails
+     * Executes current requests and makes responses for all the clients every time interval
+     * when run on a separate thread
      */
     public static void start() throws IOException {
         final int port = 5000;
@@ -128,11 +243,14 @@ public class Server implements Runnable {
                 Thread inputThread = new InputThread(server);
                 inputThread.start();
 
+                Thread executeThread = new Thread(server);
+                executeThread.start();
+
                 Socket socket = server.socket.accept();
                 String socketName = socket.getLocalAddress().toString();
                 System.out.println(socketName);
 
-                ServerThread serverThread = new ServerThread(server, socket);
+                ServerThread serverThread = new ServerThread(server, socket, clientNumber);
                 serverThread.start();
                 System.out.println("A client has been connected. Their name is : " + socket.getInetAddress().getHostName());
             } catch(IOException ex) {
@@ -143,9 +261,14 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-
+        do {
+            this.executeRequests();
+            try {
+                Thread.sleep(tickInterval);
+            } catch (InterruptedException ignored) {
+            }
+        } while (true);
     }
-
 
 
     public void dump(){
@@ -171,7 +294,7 @@ public class Server implements Runnable {
         //TODO : List all robots in the world including the name and state, and output it
         HashMap<String, Robot> robots = world.getRobots();
         if (robots.values().size()>0) {
-            System.out.println("R O B O T S:");
+            System.out.println("ROBOTS:");
             for (Robot robot : robots.values()) {
                 System.out.println(robot.toString());
             }
@@ -184,6 +307,7 @@ public class Server implements Runnable {
       System.exit(0);
         //TODO : Should send a response to all clients telling them that the server is shutting down, then close everything that needs closing on the server side
     }
+
 
     /**
      * The server is run from here.

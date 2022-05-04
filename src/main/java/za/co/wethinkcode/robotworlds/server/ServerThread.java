@@ -1,5 +1,6 @@
 package za.co.wethinkcode.robotworlds.server;
 
+import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 
@@ -13,7 +14,7 @@ import java.net.Socket;
  * A thread that allows 2-way communication 
  * between a client and the server.
  */
-public class ServerThread extends Thread{
+public class ServerThread extends Thread {
     /**
      * The server object this thread belongs to
      */
@@ -27,15 +28,19 @@ public class ServerThread extends Thread{
      */
     private final PrintStream out;
 
+    private final int clientNumber;
+
     /**
      * Makes a new thread for the server for a client that has just connected.
      * It will allow for communication between a client and the server when run
+     *
      * @param server : the server this is run from
      * @param socket : the socket used to connect the client to the server
      * @throws IOException : the connection failed
      */
-    public ServerThread(Server server, Socket socket) throws IOException{
+    public ServerThread(Server server, Socket socket, int clientNumber) throws IOException {
         this.server = server;
+        this.clientNumber = clientNumber;
 
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintStream(socket.getOutputStream());
@@ -49,25 +54,94 @@ public class ServerThread extends Thread{
      */
     @Override
     public void run() {
-        String request;
-        try {
-            while((request = in.readLine()) != null){
-                Response response = server.executeRequest(Request.deSerialize(request));
-                out.println(response.serialize());
-            }
-        } catch(IOException ex) {
-            System.out.println("Shutting down client");
+        Responder responder = new Responder(server, out, clientNumber);
+        responder.start();
+
+        Requester requester = new Requester(server, in, clientNumber);
+        requester.start();
+
+        while (requester.isAlive() && responder.isAlive()) {
         }
 
         closeQuietly();
     }
 
+
+//    @Override
+//    public void run() {
+//        String request;
+//        try {
+//            while((request = in.readLine()) != null){
+//                Response response = server.executeRequest(Request.deSerialize(request));
+//                out.println(response.serialize());
+//            }
+//        } catch(IOException ex) {
+//            System.out.println("Shutting down client");
+//        }
+//
+//        closeQuietly();
+//    }
+
     /**
      * Closes the communication without raising errors
      */
     private void closeQuietly() {
-        try { in.close(); out.close();
-        } catch(IOException ex) {}
+        try {
+            in.close();
+            out.close();
+        } catch (IOException ex) {
+        }
     }
 
+    /**
+     * The thread used to send responses from the server to the client
+     */
+    private static class Responder extends Thread {
+        private final int clientNumber;
+        private final Server server;
+        private final PrintStream out;
+
+        public Responder(Server server, PrintStream out, int number) {
+            clientNumber = number;
+            this.server = server;
+            this.out = out;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    out.println(server.getResponse(clientNumber).serialize());
+                } catch (NoChangeException ignored) {
+                }
+            }
+        }
+    }
+
+    /**
+     * The thread used to get requests from the client and give them to the server
+     */
+    private static class Requester extends Thread {
+        private final int clientNumber;
+        private final Server server;
+        private final BufferedReader in;
+
+        public Requester(Server server, BufferedReader in, int number) {
+            clientNumber = number;
+            this.server = server;
+            this.in = in;
+        }
+
+        @Override
+        public void run() {
+            String request;
+            try {
+                while ((request = in.readLine()) != null) {
+                    server.addRequest(clientNumber, Request.deSerialize(request));
+                }
+            } catch (IOException ex) {
+                System.out.println("Shutting down client");
+            }
+        }
+    }
 }
