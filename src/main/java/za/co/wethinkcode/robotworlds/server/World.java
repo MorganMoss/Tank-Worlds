@@ -60,8 +60,8 @@ public class World {
         Random random = new Random();
         do {
             // TODO: don't let robot spawn close to bottom or right edge
-            int x = random.nextInt(mapSize.getX()-50+1) - mapSize.getX()/2;
-            int y = random.nextInt(mapSize.getY()-50+1) - mapSize.getY()/2;
+            int x = random.nextInt(mapSize.getX()-100+1) - (mapSize.getX()-50)/2;
+            int y = random.nextInt(mapSize.getY()-100+1) - (mapSize.getY()-50)/2;
             launchPosition = new Position(x,y);
         } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
         robot.setPosition(launchPosition);
@@ -209,12 +209,10 @@ public class World {
     //TODO
     public void pause(Robot robot, int duration) {}
 
-    //TODO
     public void repair(Robot robot) {
         robot.resetShield();
     }
 
-    //TODO
     public void reload(Robot robot) {
         robot.resetAmmo();
     }
@@ -228,17 +226,4 @@ public class World {
         }
         return enemies;
     }
-
-//    public HashMap<String, Robot> getEnemies(){
-//        HashMap<String, Robot> enemies = new HashMap<>();
-//        for ( HashMap<Integer, String> row : map.values()){
-//            for (String object : row.values()) {
-//                if (!object.equals(" ") && !object.equals("X")) try {
-//                    Robot enemy = getRobot(object);
-//                    enemies.put(object, enemy);
-//                } catch (RobotNotFoundException ignored) {}
-//            }
-//        }
-//        return enemies;
-//    }
 }

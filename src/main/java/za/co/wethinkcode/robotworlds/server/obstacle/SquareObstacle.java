@@ -17,4 +17,9 @@ public class SquareObstacle extends Obstacle{
 
         return position.isIn(topLeft, bottomRight);
     }
+
+    @Override
+    public String toString() {
+        return "- At position " + super.getPosition().toString();
+    }
 }

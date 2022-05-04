@@ -36,12 +36,12 @@ public class Server implements Runnable {
     /**
      * The list of requests that will be run in the next server tick
      */
-    private final HashMap<Integer, Request> currentRequests;
+    private final HashMap<String, Request> currentRequests;
 
     /**
      * The list of responses that will be sent in the next server tick
      */
-    private final HashMap<Integer, Response> currentResponses;
+    private final HashMap<String, Response> currentResponses;
 
     /**
      * Stores history of requests made to the server
@@ -53,7 +53,6 @@ public class Server implements Runnable {
      */
     private List<Response> responseLog;
 
-    private int clientCount;
 
     /**
      * Makes an instance of a server. It uses the port given for the server socket
@@ -64,8 +63,8 @@ public class Server implements Runnable {
         this.requestLog = new ArrayList<>();
         this.responseLog = new ArrayList<>();
         this.socket = new ServerSocket(port);
-        this.clientCount = 0;
-        this.world = new World(getMap());
+        Map map = getMap();
+        this.world = new World(map);
         this.currentRequests = new HashMap<>();
         this.currentResponses = new HashMap<>();
 
@@ -109,11 +108,10 @@ public class Server implements Runnable {
                 inputThread.start();
 
                 Socket socket = server.socket.accept();
-                server.clientCount++;
                 String socketName = socket.getLocalAddress().toString();
                 System.out.println(socketName);
 
-                ServerThread serverThread = new ServerThread(server, socket, server.clientCount);
+                ServerThread serverThread = new ServerThread(server, socket);
                 serverThread.start();
                 System.out.println("A client has been connected. Their name is : " + socket.getInetAddress().getHostName());
             } catch(IOException ex) {
@@ -135,11 +133,11 @@ public class Server implements Runnable {
 
     /**
      * Allows a server thread to give the server a request for a client
-     * @param client : the client giving the request
+     * @param robotName : the client giving the request
      * @param request : the request the client is giving
      */
-    public void addRequest(int client, Request request){
-        currentRequests.putIfAbsent(client, request);
+    public void addRequest(String robotName, Request request){
+        currentRequests.putIfAbsent(robotName, request);
     }
 
     /**
@@ -150,18 +148,19 @@ public class Server implements Runnable {
         if (currentRequests.keySet().size() == 0) {
             return;
         }
-        for (int client : currentRequests.keySet()) {
-            Request request = currentRequests.get(client);
+        for (String robotName : currentRequests.keySet()) {
+            Request request = currentRequests.get(robotName);
             String commandResponse = "";
-            if (request == null){
-                // do something
-            } else try {
+            try {
                 this.requestLog.add(request);
                 if (!Objects.equals(request.getCommand(), "idle")) {
                     System.out.println(request.serialize()); // PRINT REQUEST
                 }
-                Command command = Command.create(request);
-                commandResponse = command.execute(world);
+                Robot robot = world.getRobot(robotName);
+                if (!robot.isPaused()) {
+                    Command command = Command.create(request);
+                    commandResponse = command.execute(world);
+                }
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }
@@ -172,46 +171,25 @@ public class Server implements Runnable {
 
             //TODO properly. it's just sending back the request, should be a general info about robot and surroundings
 
-            currentResponses.putIfAbsent(client, generateResponse(request, commandResponse));
-            currentRequests.remove(client);
+            currentResponses.putIfAbsent(robotName, generateResponse(request, commandResponse));
+            currentRequests.remove(robotName);
         }
     }
 
     /**
      * Looks for a response from the server to give the client.
      * Used by a server thread.
-     * @param client : the client looking for a response
+     * @param robotName : the client looking for a response
      * @return a formatted response object
      */
-    public Response getResponse(int client) throws NoChangeException {
-        Response response = currentResponses.get(client);
+    public Response getResponse(String robotName) throws NoChangeException {
+        Response response = currentResponses.get(robotName);
         if (response == null) {
             throw new NoChangeException();
         }
-        currentResponses.remove(client);
+        currentResponses.remove(robotName);
         return response;
     }
-
-//    /**
-//     * Takes in a request, executes it as a command in the world, then returns a response
-//     * @param request : The request the client sent
-//     * @return the response to the request
-//     */
-//    public Response executeRequest(Request request){
-//        this.requestLog.add(request);
-//        if (!Objects.equals(request.getCommand(), "idle")) {
-//            System.out.println(request.serialize());
-//        }
-//        Command command;
-//        String commandResponse;
-//        try {
-//            command = Command.create(request);
-//            commandResponse = command.execute(world);
-//        } catch (IllegalArgumentException badCommand) {
-//            commandResponse = "failed! bad input";
-//        }
-//        return generateResponse(request, commandResponse);
-//    }
 
 
     public Response generateResponse(Request request, String commandResponse) {
@@ -237,40 +215,50 @@ public class Server implements Runnable {
 
 
     public void dump(){
-
         //TODO : Display a representation of the world's state showing robots, obstacles, and anything else in the world.
-        List<Obstacle> obstacleList=getMap().getObstacles();
+        List<Obstacle> obstacleList = getMap().getObstacles();
         HashMap<String, Robot> robots = world.getRobots();
-        System.out.println("The are some obstacles");
-        for (Obstacle obstacle:obstacleList) {
-            System.out.println("At position "+obstacle.getPosition().getX()+","+obstacle.getPosition().getY());
+        if (obstacleList.size()>0) {
+            System.out.println("----------------------");
+            System.out.println("OBSTACLES:");
+            System.out.println("----------------------");
+            for (Obstacle obstacle:obstacleList) {
+                System.out.println(obstacle.toString());
+            }
+            System.out.println("----------------------");
         }
         if (robots.values().size()>0) {
-            System.out.println("R O B O T S:");
+            System.out.println("ROBOTS:");
             for (Robot robot : robots.values()) {
+                System.out.println("----------------------");
                 System.out.println(robot.toString());
             }
-        } else {
-            System.out.println("Robot not found");
+            System.out.println("----------------------");
         }
     }
 
     public void robots(){
-        //TODO : List all robots in the world including the name and state, and output it
         HashMap<String, Robot> robots = world.getRobots();
         if (robots.values().size()>0) {
+            System.out.println("----------------------");
             System.out.println("ROBOTS:");
             for (Robot robot : robots.values()) {
+                System.out.println("----------------------");
                 System.out.println(robot.toString());
             }
+            System.out.println("----------------------");
         } else {
-            System.out.println("Robot not found");
+            System.out.println("No robots available");
         }
     }
 
     public void quit() {
-      System.exit(0);
         //TODO : Should send a response to all clients telling them that the server is shutting down, then close everything that needs closing on the server side
+        for (Robot robot : world.getRobots().values()) {
+            Response response = new Response(robot, "quit", world.look(robot), world.getEnemies(robot));
+            currentResponses.putIfAbsent(robot.getRobotName(), response);
+        }
+        System.exit(0);
     }
 
 

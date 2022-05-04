@@ -15,6 +15,7 @@ import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import javax.swing.*;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -52,27 +53,16 @@ public class Client {
 //        GUI gui = new SwingGUI();
 //        ((SwingGUI) gui).startGUI();
 //        GUI gui = new TextGUI();
+
         System.out.println("Enter Tank name: \n");
         clientName = scanner.nextLine();
-
-        HelperMethods.setTheme();
-        JFrame frame = new JFrame("T A N K W O R L D S");
-        frame.setIconImage(HelperMethods.getImage("icon.png"));
-//        JLabel background = new JLabel(new ImageIcon(HelperMethods.getImage("/icon.png")));
-        frame.setSize(TankWorld.getScreenWidth(), TankWorld.getScreenHeight());
-        frame.setLocation(400, 100);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setResizable(false);
+        JFrame frame = setupGUI();
         TankWorld gui = new TankWorld();
         frame.add(gui);
         gui.setFocusable(true);
-        frame.setVisible(true);
         gui.start();
-
-        try (
-                //10.200.109.17 //localhost //maggie 10.200.110.163
-            Socket socket = new Socket("localhost", port);
-        ) {
+        //10.200.109.17 //localhost //maggie 10.200.110.163
+        try (Socket socket = new Socket("localhost", port)) {
             Out output = new Out(socket, gui);
             output.start();
 
@@ -86,6 +76,19 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static JFrame setupGUI() {
+        HelperMethods.setTheme();
+        JFrame frame = new JFrame("T A N K W O R L D S");
+        frame.setIconImage(HelperMethods.getImage("icon.png"));
+//        JLabel background = new JLabel(new ImageIcon(HelperMethods.getImage("/icon.png")));
+        frame.setSize(TankWorld.getScreenWidth(), TankWorld.getScreenHeight());
+        frame.setLocation(400, 100);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        frame.setVisible(true);
+        return frame;
     }
 
     /**
@@ -117,6 +120,10 @@ public class Client {
                     try {
                         String serializedResponse = incoming.readLine(); //should be changed to a response object
                         guiResponse = Response.deSerialize(serializedResponse);
+                        if (Objects.equals(guiResponse.getCommandResponse(), "quit")) {
+                            System.out.println("The server has shut down. Bye Bye!");
+                            System.exit(0);
+                        }
 //                        System.out.println(guiResponse.getEnemyRobots().values());
                         System.out.println("("+(guiResponse.getRobot().getPosition().getX()+300)+","+(-guiResponse.getRobot().getPosition().getY()+300)+")");
 
@@ -165,12 +172,12 @@ public class Client {
                 do {
                     try {
                         String input = gui.getInput().serialize();
-                        System.out.println("output:\n"+input);
+                        System.out.println("output:\n"+input); //PRINT REQUEST
 
                         Request request = new Request(gui.getClientName(), input);
                         String serializedRequest = request.serialize();
 
-                        outgoing.println(input);
+                        outgoing.println(input); //send request to server
                         outgoing.flush();
 
                         if (request.getCommand().matches("quit")) {
