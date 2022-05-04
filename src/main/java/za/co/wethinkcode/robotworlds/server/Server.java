@@ -122,6 +122,17 @@ public class Server implements Runnable {
         }
     }
 
+    @Override
+    public void run() {
+        do {
+            this.executeRequests();
+            try {
+                Thread.sleep(tickInterval);
+            } catch (InterruptedException ignored) {
+            }
+        } while (true);
+    }
+
     /**
      * Allows a server thread to give the server a request for a client
      * @param client : the client giving the request
@@ -181,8 +192,6 @@ public class Server implements Runnable {
         return response;
     }
 
-
-
 //    /**
 //     * Takes in a request, executes it as a command in the world, then returns a response
 //     * @param request : The request the client sent
@@ -224,50 +233,6 @@ public class Server implements Runnable {
             System.out.println(response.serialize()); // PRINT RESPONSE
         }
         return response;
-    }
-
-
-    /**
-     * Executes current requests and makes responses for all the clients every time interval
-     * when run on a separate thread
-     */
-    public static void start() throws IOException {
-        final int port = 5000;
-        Server server = new Server(port);
-
-        System.out.println("Server running & waiting for client connections.");
-
-        while(true) {
-            //TODO : Setup a separate input thread, so that commands like 'quit', 'dump' and 'robots' can be handled in the main loop
-            try {
-                Thread inputThread = new InputThread(server);
-                inputThread.start();
-
-                Thread executeThread = new Thread(server);
-                executeThread.start();
-
-                Socket socket = server.socket.accept();
-                String socketName = socket.getLocalAddress().toString();
-                System.out.println(socketName);
-
-                ServerThread serverThread = new ServerThread(server, socket, clientNumber);
-                serverThread.start();
-                System.out.println("A client has been connected. Their name is : " + socket.getInetAddress().getHostName());
-            } catch(IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void run() {
-        do {
-            this.executeRequests();
-            try {
-                Thread.sleep(tickInterval);
-            } catch (InterruptedException ignored) {
-            }
-        } while (true);
     }
 
 
