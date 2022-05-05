@@ -1,6 +1,7 @@
 package za.co.wethinkcode.robotworlds.server;
 
 import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
+import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
@@ -156,11 +157,9 @@ public class Server implements Runnable {
                 if (!Objects.equals(request.getCommand(), "idle")) {
                     System.out.println(request.serialize()); // PRINT REQUEST
                 }
-                Robot robot = world.getRobot(robotName);
-                if (!robot.isPaused()) {
-                    Command command = Command.create(request);
-                    commandResponse = command.execute(world);
-                }
+                //TODO: check if robot is paused, or command==launch
+                Command command = Command.create(request);
+                commandResponse = command.execute(world);
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }
@@ -168,8 +167,6 @@ public class Server implements Runnable {
             //TODO : Add all requests to a buffer before adding them to current requests (to prevent multiple responses per request)
 
             //TODO : use the look command on each robot to get the grid of values it
-
-            //TODO properly. it's just sending back the request, should be a general info about robot and surroundings
 
             currentResponses.putIfAbsent(robotName, generateResponse(request, commandResponse));
             currentRequests.remove(robotName);
