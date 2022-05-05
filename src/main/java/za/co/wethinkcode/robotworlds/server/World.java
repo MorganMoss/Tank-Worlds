@@ -1,9 +1,8 @@
 package za.co.wethinkcode.robotworlds.server;
 
 import static java.lang.Math.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+
+import java.util.*;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
@@ -59,7 +58,6 @@ public class World {
         Position launchPosition;
         Random random = new Random();
         do {
-            // TODO: don't let robot spawn close to bottom or right edge
             int x = random.nextInt(mapSize.getX()-100+1) - (mapSize.getX()-50)/2;
             int y = random.nextInt(mapSize.getY()-100+1) - (mapSize.getY()-50)/2;
             launchPosition = new Position(x,y);
@@ -210,11 +208,27 @@ public class World {
     public void pause(Robot robot, int duration) {}
 
     public void repair(Robot robot) {
-        robot.resetShield();
+        robot.setPaused(true);
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                robot.resetShield();
+                robot.setPaused(false);
+            }
+        }, robot.getReloadTime()* 1000L);
     }
 
     public void reload(Robot robot) {
-        robot.resetAmmo();
+        robot.setPaused(true);
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                robot.resetAmmo();
+                robot.setPaused(false);
+            }
+        }, robot.getReloadTime()*1000L);
     }
 
     public HashMap<String, Robot> getEnemies(Robot robot) {

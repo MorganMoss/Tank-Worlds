@@ -1,5 +1,3 @@
-// TODO : Waiting for Maggie and Sisipho to push their updated version
-//  This goes for all commands.
 package za.co.wethinkcode.robotworlds.server.command;
 
 import za.co.wethinkcode.robotworlds.protocol.Request;

@@ -1,7 +1,6 @@
 package za.co.wethinkcode.robotworlds.server;
 
 import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
-import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
@@ -84,9 +83,20 @@ public class Server implements Runnable {
      * @return a map that will be used to define the world's size and it's obstacles
      */
     private Map getMap() {
-        //TODO : Get the map to be used from the config file;
-        // Size for a map should be determined by the map, not the server.
-        return new BasicMap(new Position(600,600));
+        String[] data = {};
+        try {
+            File configFile = new File("src/main/java/za/co/wethinkcode/robotworlds/server/config.txt");
+            Scanner reader = new Scanner(configFile);
+            while (reader.hasNextLine()) {
+                data = reader.nextLine().split(",");
+            }
+            reader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");;
+        }
+        int width = Integer.parseInt(data[0]);
+        int height = Integer.parseInt(data[1]);
+        return new BasicMap(new Position(width, height));
     }
 
     /**
@@ -157,7 +167,7 @@ public class Server implements Runnable {
                 if (!Objects.equals(request.getCommand(), "idle")) {
                     System.out.println(request.serialize()); // PRINT REQUEST
                 }
-                //TODO: check if robot is paused, or command==launch
+                //TODO: check if robot is paused (remember freshly launched clients have no robots yet)
                 Command command = Command.create(request);
                 commandResponse = command.execute(world);
             } catch (IllegalArgumentException e) {

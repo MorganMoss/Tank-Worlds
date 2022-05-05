@@ -3,9 +3,6 @@ package za.co.wethinkcode.robotworlds.server.robot;
 import za.co.wethinkcode.robotworlds.server.Direction;
 import za.co.wethinkcode.robotworlds.server.Position;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class Robot {
 
     private final String robotName;
@@ -37,6 +34,10 @@ public class Robot {
         this.currentShield = maxShield;
         this.paused = false;
     }
+    public int getReloadTime() {
+        return this.reloadTime;
+    }
+
     public int getDeaths(){
         return this.deaths;
     }
@@ -90,6 +91,10 @@ public class Robot {
         this.position = position;
     }
 
+    public void setPaused(Boolean bool) {
+        this.paused = bool;
+    }
+
     public void decreaseShield() {
         this.currentShield--;
     }
@@ -99,27 +104,11 @@ public class Robot {
     }
 
     public void resetShield() {
-        this.paused = true;
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                currentShield = maxShield;
-                paused = false;
-            }
-        }, reloadTime*1000);
+        this.currentShield = this.maxShield;
     }
 
     public void resetAmmo() {
-        this.paused = true;
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                currentAmmo = maxAmmo;
-                paused = false;
-            }
-        }, reloadTime*1000);
+        this.currentAmmo = this.maxAmmo;
     }
 
     public boolean isPaused() {
