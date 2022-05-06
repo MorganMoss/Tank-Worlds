@@ -119,7 +119,7 @@ public class Server implements Runnable {
     }
 
     /**
-     * TODO
+     * Executes all requests every tick
      */
     @Override
     public void run() {
@@ -163,13 +163,20 @@ public class Server implements Runnable {
             try {
                 this.requestLog.add(request);
 
-                if (!Objects.equals(request.getCommand(), "idle")) {
+                if (!request.getCommand().equals("idle")) {
                     System.out.println(request.serialize()); // PRINT REQUEST
                 }
 
-                //TODO: check if robot is paused, or command==launch
-                Command command = Command.create(request);
-                commandResponse = command.execute(world);
+                if (request.getCommand().equals("launch")) {
+                    Command command = Command.create(request);
+                    commandResponse = command.execute(world);
+                } else {
+                    if (!world.getRobot(robotName).isPaused()) {
+                        Command command = Command.create(request);
+                        commandResponse = command.execute(world);
+                    }
+                }
+
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }
