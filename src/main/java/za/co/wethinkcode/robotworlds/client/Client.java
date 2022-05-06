@@ -29,11 +29,14 @@ public class Client {
      */
     private static int port = 5000;
     private static String clientName;
+    private static String robotType;
     static Scanner scanner = new Scanner(System.in);
     private static String enemyName="enemy";
     private static Response guiResponse;
 
     public static String getMyClientName(){return clientName;}
+
+    public static String getRobotType() {return robotType;}
 
     public static Response getResponse() {
         return guiResponse;
@@ -56,6 +59,8 @@ public class Client {
 
         System.out.println("Enter Tank name: \n");
         clientName = scanner.nextLine();
+        System.out.println("Enter the type of tank: \n");
+        robotType=scanner.nextLine();
         JFrame frame = setupGUI();
         TankWorld gui = new TankWorld();
         frame.add(gui);

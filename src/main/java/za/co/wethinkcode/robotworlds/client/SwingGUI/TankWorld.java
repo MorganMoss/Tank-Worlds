@@ -15,12 +15,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.awt.Color;
+import java.util.List;
 
 public class TankWorld extends JComponent implements GUI {
     private static final int WIDTH = 600, HEIGHT = 600;
@@ -45,11 +42,13 @@ public class TankWorld extends JComponent implements GUI {
     private int explosionY;
 
     private final String clientName;
-
+    private String robotType;
 
     public static int getScreenWidth(){return WIDTH;}
     public static int getScreenHeight(){return HEIGHT;}
     public String getClientName() {return Client.getMyClientName();}
+
+    public String getRobotType(){return Client.getRobotType();}
     public void setEnemyName(String enemyName) {enemy1.setName(enemyName);}
     public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
 
@@ -57,6 +56,7 @@ public class TankWorld extends JComponent implements GUI {
 
 
         this.clientName = this.getClientName();
+        this.robotType = this.getRobotType();
         player.setName(clientName);
         //Add first element of request stack
         lastRequest.add(queue1);
@@ -140,7 +140,7 @@ public class TankWorld extends JComponent implements GUI {
                         break;
 
                     case KeyEvent.VK_L:
-                        request = new Request(clientName,"launch");
+                        request = new Request(clientName,"launch", Collections.singletonList(robotType));
                         lastRequest.add(request);
                         launched=true;
                         break;
