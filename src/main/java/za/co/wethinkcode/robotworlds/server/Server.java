@@ -95,7 +95,6 @@ public class Server implements Runnable {
         final int port = 5000;
         Server server = new Server(port);
 
-
         Thread executeThread = new Thread(server);
         executeThread.start();
 
@@ -206,10 +205,10 @@ public class Server implements Runnable {
     }
 
     /**
-     * TODO
-     * @param request
-     * @param commandResponse
-     * @return
+     * Takes a request and generates a response object
+     * @param request : a request object received from the client
+     * @param commandResponse : the response to the client's request
+     * @return response
      */
     public Response generateResponse(Request request, String commandResponse) {
         Robot robot = world.getRobot(request.getRobotName());
@@ -258,7 +257,7 @@ public class Server implements Runnable {
     }
 
     /**
-     * TODO
+     * Display a summary of all robots and their states
      */
     public void robots(){
         HashMap<String, Robot> robots = world.getRobots();
@@ -271,7 +270,7 @@ public class Server implements Runnable {
             }
             System.out.println("----------------------");
         } else {
-            System.out.println("No robots available");
+            System.out.println("No robots in world");
         }
     }
 
@@ -311,5 +310,35 @@ public class Server implements Runnable {
             e.printStackTrace();
         }
         start();
+    }
+
+    public static class InputThread extends Thread{
+
+        private final Server server;
+
+        public InputThread(Server server) {
+            this.server = server;
+        }
+
+        @Override
+        public void run() {
+            Scanner scanner = new Scanner(System.in);
+            while (true) {
+                String command = scanner.nextLine().toLowerCase();
+                switch (command) {
+                    case "quit":
+                        server.quit();
+                        break;
+                    case "dump":
+                        server.dump();
+                        break;
+                    case "robots":
+                        server.robots();
+                        break;
+                    default:
+                        System.out.println("Unsupported command: " + command);
+                }
+            }
+        }
     }
 }

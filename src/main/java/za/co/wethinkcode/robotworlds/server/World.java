@@ -2,10 +2,7 @@ package za.co.wethinkcode.robotworlds.server;
 
 import static java.lang.Math.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
@@ -45,6 +42,10 @@ public class World {
         this.robots = new HashMap<>();
     }
 
+    /**
+     * Get a robot object from its name
+     * @param name : the robot's name
+     * */
     public Robot getRobot(String name) throws RobotNotFoundException {
         Robot robot = robots.get(name.toLowerCase());
         if (robot == null){
@@ -53,10 +54,15 @@ public class World {
         return robot;
     }
 
+
     public HashMap<String, Robot> getRobots() {
         return this.robots;
     }
 
+    /**
+     * Launch a robot at a random position in the world
+     * @param robot : the robot to be added
+     * */
     public void add(Robot robot) {
         Position launchPosition;
         Random random = new Random();
@@ -219,14 +225,43 @@ public class World {
     //TODO
     public void pause(Robot robot, int duration) {}
 
+    /**
+     * Pause the robot while doing repairs
+     * @param robot : the robot to repair
+     * */
     public void repair(Robot robot) {
-        robot.resetShield();
+        robot.setPaused(true);
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                robot.resetShield();
+                robot.setPaused(false);
+            }
+        }, robot.getReloadTime()*1000);
     }
 
+    /**
+     * Pause the robot while reloading
+     * @param robot : the robot to reload
+     * */
     public void reload(Robot robot) {
-        robot.resetAmmo();
+        robot.setPaused(true);
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                robot.resetAmmo();
+                robot.setPaused(false);
+            }
+        }, robot.getReloadTime()*1000);
     }
 
+
+    /**
+     * Returns all robots in the world except the given robot
+     * @param robot : the robot that wants info on its enemies
+     * */
     public HashMap<String, Robot> getEnemies(Robot robot) {
         HashMap<String, Robot> enemies = new HashMap<>();
         for (Robot robotObj : robots.values()) {
@@ -237,6 +272,11 @@ public class World {
         return enemies;
     }
 
+    /**
+     * Checks whether an enemy was hit by the robot
+     * @param robot : the robot that fired the shot
+     * @param enemy : the robot being shot at
+     * */
     private boolean isEnemyHit(Robot robot, Robot enemy) {
         List<Position> bulletList = getBulletList(robot);
         for (Position bulletPosition : bulletList) {
@@ -247,6 +287,13 @@ public class World {
         return false;
     }
 
+
+    /**
+     * Compiles a list consisting of all the positions the bullet will
+     * travel to if world objects are ignored
+     * @param robot : the robot that fired the shot
+     * @return list of bullet positions
+     * */
     public List<Position> getBulletList(Robot robot) {
 
         int distance = robot.getFiringDistance();
@@ -254,14 +301,16 @@ public class World {
         List<Position> bulletList = new ArrayList<>();
 
         for (int i = 1; i <= distance; i++) {
-            if (robot.getDirection().getAngle() == 0) {
-                bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() + i);
-            } else if (robot.getDirection().getAngle() == 90) {
-                bulletPosition = new Position(robot.getPosition().getX() + i, robot.getPosition().getY());
-            } else if (robot.getDirection().getAngle() == 180) {
-                bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() - i);
-            } else if (robot.getDirection().getAngle() == 270) {
-                bulletPosition = new Position(robot.getPosition().getX() - i, robot.getPosition().getY());
+            int angle = (int) robot.getDirection().getAngle();
+            switch (angle) {
+                case 0:
+                    bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() + i);
+                case 90:
+                    bulletPosition = new Position(robot.getPosition().getX() + i, robot.getPosition().getY());
+                case 180:
+                    bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() - i);
+                case 270:
+                    bulletPosition = new Position(robot.getPosition().getX() - i, robot.getPosition().getY());
             }
             bulletList.add(bulletPosition);
         }

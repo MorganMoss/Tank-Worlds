@@ -41,7 +41,7 @@ public abstract class Command {
             case "right":
                 return new RightCommand(robotName);
             case "fire":
-                return new FireCommand(robotName, "5");
+                return new FireCommand(robotName);
             case "repair":
                 return new RepairCommand(robotName);
             case "reload":

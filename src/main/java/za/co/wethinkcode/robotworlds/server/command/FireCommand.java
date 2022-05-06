@@ -8,8 +8,8 @@ import java.util.List;
 
 public class FireCommand extends Command{
 
-    public FireCommand(String robotName, String argument) {
-            super(robotName, argument);
+    public FireCommand(String robotName) {
+            super(robotName);
         }
 
         @Override
