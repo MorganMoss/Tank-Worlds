@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.util.Objects;
+import java.util.Locale;
 
 /**
  * A thread that allows 2-way communication 
@@ -53,13 +53,10 @@ public class ServerThread extends Thread {
     @Override
     public void run() {
         Responder responder = new Responder(server, out);
-        responder.start();
-
         Requester requester = new Requester(server, in, responder);
         requester.start();
 
-        while (requester.isAlive() && responder.isAlive()) {
-        }
+        while (requester.isAlive()) {}
 
         closeQuietly();
     }
@@ -101,6 +98,7 @@ public class ServerThread extends Thread {
                     Response response = server.getResponse(robotName);
                     out.println(response.serialize());
                 } catch (NoChangeException ignored) {
+                    out.println("");
                 }
             }
         }
@@ -134,9 +132,13 @@ public class ServerThread extends Thread {
             try {
                 while ((messageFromClient = in.readLine()) != null) {
                     Request request = Request.deSerialize(messageFromClient);
-                    if (Objects.equals(request.getCommand(), "launch")) {
+
+                    if (request.getCommand().equals("launch")) {
                         responder.setRobotName(request.getRobotName());
+                        robotName = request.getRobotName().toLowerCase();
+                        responder.start();
                     }
+
                     server.addRequest(robotName, request);
                 }
             } catch (IOException ex) {

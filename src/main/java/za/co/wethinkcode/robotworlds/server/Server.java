@@ -84,7 +84,7 @@ public class Server implements Runnable {
     private Map getMap() {
         //TODO : Get the map to be used from the config file;
         // Size for a map should be determined by the map, not the server.
-        return new BasicMap(new Position(600,600));
+        return new BasicMap(new Position(100,100));
     }
 
     /**
@@ -157,6 +157,8 @@ public class Server implements Runnable {
                 }
             }
         ) {
+            robotName = robotName.toLowerCase();
+
             Request request = currentRequests.getOrDefault(robotName, new Request(robotName, "idle"));
 
             try {
@@ -175,7 +177,6 @@ public class Server implements Runnable {
                         commandResponse = command.execute(world);
                     }
                 }
-
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }
@@ -183,25 +184,9 @@ public class Server implements Runnable {
             //TODO : Add all requests to a buffer before adding them to current requests (to prevent multiple responses per request)
 
             //TODO : use the look command on each robot to get the grid of values it
-
-            currentResponses.putIfAbsent(robotName, generateResponse(request, commandResponse));
+            generateResponse(request, commandResponse);
             currentRequests.remove(robotName);
         }
-    }
-
-    /**
-     * Looks for a response from the server to give the client.
-     * Used by a server thread.
-     * @param robotName : the client looking for a response
-     * @return a formatted response object
-     */
-    public Response getResponse(String robotName) throws NoChangeException {
-        Response response = currentResponses.get(robotName);
-        if (response == null) {
-            throw new NoChangeException();
-        }
-        currentResponses.remove(robotName);
-        return response;
     }
 
     /**
@@ -210,7 +195,7 @@ public class Server implements Runnable {
      * @param commandResponse : the response to the client's request
      * @return response
      */
-    public Response generateResponse(Request request, String commandResponse) {
+    public void generateResponse(Request request, String commandResponse) {
         Robot robot = world.getRobot(request.getRobotName());
         HashMap<Integer, HashMap<Integer, String>> map = world.look(robot);
         HashMap<String, Robot> enemies = world.getEnemies(robot);
@@ -222,12 +207,27 @@ public class Server implements Runnable {
                 enemies
         );
 
-        //TODO : use the look command robot position to get the grid of values it
-
         this.responseLog.add(response);
+
+        currentResponses.put(robot.getRobotName().toLowerCase(), response);
+
         if (!Objects.equals(response.getCommandResponse(), "idle")) {
-            System.out.println(response.serialize()); // PRINT RESPONSE
+            System.out.println("Out -> " +response.getRobot().getRobotName() + " : " + response.getCommandResponse());
         }
+    }
+
+    /**
+     * Looks for a response from the server to give the client.
+     * Used by a server thread.
+     * @param robotName : the client looking for a response
+     * @return a formatted response object
+     */
+    public Response getResponse(String robotName) throws NoChangeException {
+        Response response = currentResponses.get(robotName.toLowerCase());
+        if (response == null) {
+            throw new NoChangeException();
+        }
+        currentResponses.remove(robotName);
         return response;
     }
 
