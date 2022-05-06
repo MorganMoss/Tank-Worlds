@@ -1,20 +1,20 @@
 package za.co.wethinkcode.robotworlds.server;
 
 import static java.lang.Math.*;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
-import za.co.wethinkcode.robotworlds.server.collisionObjects.Bullet;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 public class World {
     private final HashMap<String, Robot> robots;
-//    private final List<Bullet> bullets;
     private final HashMap<Integer, HashMap<Integer, String>> map; //"X"," ",<RobotName>
     private final Position mapSize;
 
@@ -43,7 +43,6 @@ public class World {
             this.map.putIfAbsent(x, row);
         }
         this.robots = new HashMap<>();
-//        this.bullets = new ArrayList<>();
     }
 
     public Robot getRobot(String name) throws RobotNotFoundException {
@@ -75,12 +74,6 @@ public class World {
         map.get(x).put(y, robot.getRobotName());
     }
 
-//    public void add(Bullet bullet) {
-//        bullets.add(bullet);
-//        int x = bullet.getPosition().getX();
-//        int y = bullet.getPosition().getY();
-//        map.get(x).put(y, "-");
-//    }
 
     public void remove(String robotName) {
         this.remove(getRobot(robotName));
@@ -97,9 +90,10 @@ public class World {
      * @param newPosition : the new position
      * @return true if there's something in the way, false if movement is unimpeded
      */
-    public PathBlockedResponse pathBlocked(Position position, Position newPosition) {
+    public String pathBlocked(Robot robot, Position position, Position newPosition) {
         final int low;
         final int high;
+        String response = "";
 
         if (position.getX() == newPosition.getX()){
             final int x = newPosition.getX();
@@ -115,9 +109,13 @@ public class World {
             for (int y = low; y <= high; y++){
                 if (!map.get(x).get(y).equals(" ")){
                     if (map.get(x).get(y).equals("X")) {
-                        return PathBlockedResponse.OBSTACLE_HIT;
+                        return String.format("hit obstacle %d1 %d2",x,y);
                     } else {
-                        return PathBlockedResponse.ENEMY_HIT;
+                        for (Robot enemy : getEnemies(robot).values()) {
+                            if (isEnemyHit(robot, enemy)) {
+                                return String.format("hit enemy %s", enemy.getRobotName());
+                            }
+                        }
                     }
                 }
             }
@@ -135,15 +133,19 @@ public class World {
             for (int x = low; x <= high; x++){
                 if (!map.get(x).get(y).equals(" ")){
                     if (map.get(x).get(y).equals("X")) {
-                        return PathBlockedResponse.OBSTACLE_HIT;
+                        return String.format("hit obstacle %d1 %d2", x, y);
                     } else {
-                        return PathBlockedResponse.ENEMY_HIT;
+                        for (Robot enemy : getEnemies(robot).values()) {
+                            if (isEnemyHit(robot, enemy)) {
+                                return String.format("hit enemy %s", enemy.getRobotName());
+                            }
+                        }
+                        return response;
                     }
                 }
             }
         }
-
-        return PathBlockedResponse.MISS;
+        return "miss";
     }
 
     /**
@@ -158,7 +160,7 @@ public class World {
                 (int) (robot.getPosition().getX() + round(steps * sin(toRadians(robot.getDirection().getAngle())))),
                 (int) (robot.getPosition().getY() + round(steps * cos(toRadians(robot.getDirection().getAngle()))))
         );
-        if (pathBlocked(robot.getPosition(), newPosition) == PathBlockedResponse.MISS) {
+        if (pathBlocked(robot, robot.getPosition(), newPosition).equals("miss")) {
             map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
             map.get(newPosition.getX()).put(newPosition.getY(), robotName);
             robot.setPosition(newPosition);
@@ -235,5 +237,36 @@ public class World {
             } catch (RobotNotFoundException ignored) {}
         }
         return enemies;
+    }
+
+    private boolean isEnemyHit(Robot robot, Robot enemy) {
+        List<Position> bulletList = getBulletList(robot);
+        for (Position bulletPosition : bulletList) {
+            if (bulletPosition == enemy.getPosition()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Position> getBulletList(Robot robot) {
+
+        int distance = robot.getFiringDistance();
+        Position bulletPosition = new Position(0,0);
+        List<Position> bulletList = new ArrayList<>();
+
+        for (int i = 1; i <= distance; i++) {
+            if (robot.getDirection().getAngle() == 0) {
+                bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() + i);
+            } else if (robot.getDirection().getAngle() == 90) {
+                bulletPosition = new Position(robot.getPosition().getX() + i, robot.getPosition().getY());
+            } else if (robot.getDirection().getAngle() == 180) {
+                bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() - i);
+            } else if (robot.getDirection().getAngle() == 270) {
+                bulletPosition = new Position(robot.getPosition().getX() - i, robot.getPosition().getY());
+            }
+            bulletList.add(bulletPosition);
+        }
+        return bulletList;
     }
 }
