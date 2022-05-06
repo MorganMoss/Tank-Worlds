@@ -232,9 +232,9 @@ public class Server implements Runnable {
         List<Obstacle> obstacleList = getMap().getObstacles();
         HashMap<String, Robot> robots = world.getRobots();
         if (obstacleList.size()>0) {
-            System.out.println("----------------------");
-            System.out.println("OBSTACLES:");
-            System.out.println("----------------------");
+            System.out.println("----------------------\n" +
+                    "OBSTACLES:\n" +
+                    "----------------------");
             for (Obstacle obstacle:obstacleList) {
                 System.out.println(obstacle.toString());
             }
@@ -243,8 +243,8 @@ public class Server implements Runnable {
         if (robots.values().size()>0) {
             System.out.println("ROBOTS:");
             for (Robot robot : robots.values()) {
-                System.out.println("----------------------");
-                System.out.println(robot.toString());
+                System.out.println("----------------------\n" +
+                        robot.toString());
             }
             System.out.println("----------------------");
         }
@@ -256,11 +256,11 @@ public class Server implements Runnable {
     public void robots(){
         HashMap<String, Robot> robots = world.getRobots();
         if (robots.values().size()>0) {
-            System.out.println("----------------------");
-            System.out.println("ROBOTS:");
+            System.out.println("----------------------\n" +
+                    "ROBOTS:");
             for (Robot robot : robots.values()) {
-                System.out.println("----------------------");
-                System.out.println(robot.toString());
+                System.out.println("----------------------\n" +
+                        robot.toString());
             }
             System.out.println("----------------------");
         } else {

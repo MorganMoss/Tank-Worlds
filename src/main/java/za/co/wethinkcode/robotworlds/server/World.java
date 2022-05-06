@@ -61,7 +61,6 @@ public class World {
         Position launchPosition;
         Random random = new Random();
         do {
-            // TODO: don't let robot spawn close to bottom or right edge
             int x = random.nextInt(mapSize.getX()-100+1) - (mapSize.getX()-50)/2;
             int y = random.nextInt(mapSize.getY()-100+1) - (mapSize.getY()-50)/2;
             launchPosition = new Position(x,y);
@@ -73,7 +72,6 @@ public class World {
         int y = robot.getPosition().getY();
         map.get(x).put(y, robot.getRobotName());
     }
-
 
     public void remove(String robotName) {
         this.remove(getRobot(robotName));
