@@ -63,8 +63,9 @@ public class World {
         Random random = new Random();
         do {
             // TODO: don't let robot spawn close to bottom or right edge
-            int x = random.nextInt(mapSize.getX()+1) - (mapSize.getX())/2;
-            int y = random.nextInt(mapSize.getY()+1) - (mapSize.getY())/2;
+            int limit = -50;
+            int x = random.nextInt(mapSize.getX()+1+limit) - (mapSize.getX()+limit/2)/2;
+            int y = random.nextInt(mapSize.getY()+1+limit) - (mapSize.getY()+limit/2)/2;
             launchPosition = new Position(x,y);
         } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
         robot.setPosition(launchPosition);
@@ -182,9 +183,7 @@ public class World {
      * @param relativeCenter : The position to look from
      * @return : a grid of data representing the relative view from this position
      */
-    public HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter) {
-        int distance = 20;//hardcoded for now 10
-
+    public HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter, int distance) {
         int current_x = 0;
         HashMap<Integer, HashMap<Integer, String>> result = new HashMap<>();
 
@@ -213,7 +212,7 @@ public class World {
      * @return : a grid of data representing the relative view from this position
      */
     public HashMap<Integer, HashMap<Integer, String>> look(Robot robot) {
-       return look(robot.getPosition());
+       return look(robot.getPosition(), robot.getVisibilityDistance());
     }
 
     //TODO
