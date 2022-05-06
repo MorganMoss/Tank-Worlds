@@ -26,9 +26,6 @@ public class TankWorld extends JComponent implements GUI {
     private static ArrayList<Enemy> enemyList = new ArrayList<>();
     private static List<Obstacle> obstacleList = BasicMap.getObstacles();
     private static ArrayList<Projectile> projectileList = new ArrayList<>();
-
-    //FIFO stack for requests
-    private static Request request = new Request("Robot","idle");
     private static Request queue1 = new Request("Robot","launch");
     private static LinkedList<Request> lastRequest = new LinkedList<>();
 
@@ -43,20 +40,33 @@ public class TankWorld extends JComponent implements GUI {
 
     private final String clientName;
     private String robotType;
-
     public static int getScreenWidth(){return WIDTH;}
-    public static int getScreenHeight(){return HEIGHT;}
-    public String getClientName() {return Client.getMyClientName();}
 
-    public String getRobotType(){return Client.getRobotType();}
+    private Response currentResponse;
+
+    //FIFO stack for requests
+    private static Request request = new Request("Robot","idle");
+    public static int getScreenHeight(){return HEIGHT;}
+    public String getClientName() {return this.clientName;}
+    public String getRobotType(){return this.robotType;}
     public void setEnemyName(String enemyName) {enemy1.setName(enemyName);}
     public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
 
     public TankWorld()  {
+        try (Scanner scanner = new Scanner(System.in);) {
+            System.out.print("Enter Tank name : ");
+            this.clientName = scanner.nextLine();
+            System.out.print("Enter the type of tank : ");
+            this.robotType = scanner.nextLine();
+            this.robotType = "BasicRobot";
+        }
+
+        JFrame frame = setupGUI();
+        frame.add(this);
+        setFocusable(true);
+        start();
 
 
-        this.clientName = this.getClientName();
-        this.robotType = this.getRobotType();
         player.setName(clientName);
         //Add first element of request stack
         lastRequest.add(queue1);
@@ -156,22 +166,40 @@ public class TankWorld extends JComponent implements GUI {
         //TODO: CONNECT WITH UPDATED SERVER
     }
 
+    public static JFrame setupGUI() {
+        HelperMethods.setTheme();
+        JFrame frame = new JFrame("T A N K W O R L D S");
+        frame.setIconImage(HelperMethods.getImage("icon.png"));
+//        JLabel background = new JLabel(new ImageIcon(HelperMethods.getImage("/icon.png")));
+        frame.setSize(TankWorld.getScreenWidth(), TankWorld.getScreenHeight());
+        frame.setLocation(400, 100);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        frame.setVisible(true);
+        return frame;
+    }
+
     //Sends user input to Server as request objects
     @Override
     public Request getInput() throws NoNewInput {
-        if (Client.getResponse()!=null){
-        runServerCorrections(Client.getResponse());}
+        if (currentResponse!=null){
+            runServerCorrections(currentResponse);
+            currentResponse = null;
+        }
 
         if (lastRequest.getLast() != queue1){
-            return lastRequest.removeLast();
+            Request request = lastRequest.removeLast();
+            System.out.println("input from gui:\n"+request.serialize());
+            return request;
         }else{
-            throw new NoNewInput();}
+            throw new NoNewInput();
+        }
     }
 
     // PaintComponent is our real showOutput
     @Override
     public void showOutput(Response response) {
-        System.out.println(response);
+        currentResponse = response;
     }
 
     //TODO: SPAWN PLAYERS AND ENEMIES DYNAMICALLY FROM SERVER

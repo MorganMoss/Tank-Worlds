@@ -16,6 +16,7 @@ public class LaunchCommand extends Command{
     public String execute(World world) {
         if(argument.equalsIgnoreCase("BasicRobot")) {
             world.add(new BasicRobot(robotName.toLowerCase()));
+
         } else if (argument.equalsIgnoreCase("Sniper")) {
             world.add(new Sniper(robotName.toLowerCase()));
         }
@@ -27,6 +28,4 @@ public class LaunchCommand extends Command{
         }
         return "Success";
     }
-
-
 }

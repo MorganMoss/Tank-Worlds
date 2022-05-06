@@ -7,12 +7,14 @@ import java.util.Random;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
+import za.co.wethinkcode.robotworlds.server.collisionObjects.Bullet;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 public class World {
     private final HashMap<String, Robot> robots;
+//    private final List<Bullet> bullets;
     private final HashMap<Integer, HashMap<Integer, String>> map; //"X"," ",<RobotName>
     private final Position mapSize;
 
@@ -41,6 +43,7 @@ public class World {
             this.map.putIfAbsent(x, row);
         }
         this.robots = new HashMap<>();
+//        this.bullets = new ArrayList<>();
     }
 
     public Robot getRobot(String name) throws RobotNotFoundException {
@@ -71,6 +74,13 @@ public class World {
         int y = robot.getPosition().getY();
         map.get(x).put(y, robot.getRobotName());
     }
+
+//    public void add(Bullet bullet) {
+//        bullets.add(bullet);
+//        int x = bullet.getPosition().getX();
+//        int y = bullet.getPosition().getY();
+//        map.get(x).put(y, "-");
+//    }
 
     public void remove(String robotName) {
         this.remove(getRobot(robotName));

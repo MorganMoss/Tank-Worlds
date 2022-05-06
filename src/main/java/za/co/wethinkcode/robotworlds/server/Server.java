@@ -22,8 +22,10 @@ import java.net.UnknownHostException;
  * It has 2-way communication and support for many clients
  */
 public class Server implements Runnable {
-
-    private static int tickInterval = 50;
+    /**
+     * The speed at which the server sends out responses (in milliseconds)
+     */
+    private final int tickInterval = 50;
     /**
      * The world the server interacts with when handling requests and responses
      */
@@ -32,13 +34,10 @@ public class Server implements Runnable {
      * The socket clients will connect to
      */
     private final ServerSocket socket;
-    //TODO : Perhaps unify these into a list of Strings (i.e. Serialize them as you store them)
-
     /**
      * The list of requests that will be run in the next server tick
      */
     private final HashMap<String, Request> currentRequests;
-
     /**
      * The list of responses that will be sent in the next server tick
      */
@@ -48,7 +47,6 @@ public class Server implements Runnable {
      * Stores history of requests made to the server
      */
     private List<Request> requestLog;
-
     /**
      * Stores history of responses made to the server
      */
@@ -97,17 +95,16 @@ public class Server implements Runnable {
         final int port = 5000;
         Server server = new Server(port);
 
+
+        Thread executeThread = new Thread(server);
+        executeThread.start();
+
+        Thread inputThread = new InputThread(server);
+        inputThread.start();
+
         System.out.println("Server running & waiting for client connections.");
-
         while(true) {
-            //TODO : Setup a separate input thread, so that commands like 'quit', 'dump' and 'robots' can be handled in the main loop
             try {
-                Thread executeThread = new Thread(server);
-                executeThread.start();
-
-                Thread inputThread = new InputThread(server);
-                inputThread.start();
-
                 Socket socket = server.socket.accept();
                 String socketName = socket.getLocalAddress().toString();
                 System.out.println(socketName);
@@ -121,6 +118,9 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * TODO
+     */
     @Override
     public void run() {
         do {
@@ -149,14 +149,24 @@ public class Server implements Runnable {
         if (currentRequests.keySet().size() == 0) {
             return;
         }
-        for (String robotName : currentRequests.keySet()) {
-            Request request = currentRequests.get(robotName);
-            String commandResponse = "";
+
+        String commandResponse = "";
+        for (String robotName : new HashSet<String>(){
+                {
+                    addAll(world.getRobots().keySet());
+                    addAll(currentRequests.keySet());
+                }
+            }
+        ) {
+            Request request = currentRequests.getOrDefault(robotName, new Request(robotName, "idle"));
+
             try {
                 this.requestLog.add(request);
+
                 if (!Objects.equals(request.getCommand(), "idle")) {
                     System.out.println(request.serialize()); // PRINT REQUEST
                 }
+
                 //TODO: check if robot is paused, or command==launch
                 Command command = Command.create(request);
                 commandResponse = command.execute(world);
@@ -188,7 +198,12 @@ public class Server implements Runnable {
         return response;
     }
 
-
+    /**
+     * TODO
+     * @param request
+     * @param commandResponse
+     * @return
+     */
     public Response generateResponse(Request request, String commandResponse) {
         Robot robot = world.getRobot(request.getRobotName());
         HashMap<Integer, HashMap<Integer, String>> map = world.look(robot);
@@ -210,9 +225,10 @@ public class Server implements Runnable {
         return response;
     }
 
-
+    /**
+     * Display a representation of the world's state showing robots, obstacles, and anything else in the world.
+     */
     public void dump(){
-        //TODO : Display a representation of the world's state showing robots, obstacles, and anything else in the world.
         List<Obstacle> obstacleList = getMap().getObstacles();
         HashMap<String, Robot> robots = world.getRobots();
         if (obstacleList.size()>0) {
@@ -234,6 +250,9 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * TODO
+     */
     public void robots(){
         HashMap<String, Robot> robots = world.getRobots();
         if (robots.values().size()>0) {
@@ -249,15 +268,21 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * Should send a response to all clients telling them that the server is shutting down,
+     * then close everything that needs closing on the server side
+     */
     public void quit() {
-        //TODO : Should send a response to all clients telling them that the server is shutting down, then close everything that needs closing on the server side
         for (Robot robot : world.getRobots().values()) {
             Response response = new Response(robot, "quit", world.look(robot), world.getEnemies(robot));
-            currentResponses.putIfAbsent(robot.getRobotName(), response);
+            currentResponses.put(robot.getRobotName(), response);
+            try {
+                Thread.sleep(tickInterval*2);
+            } catch (InterruptedException ignored) {
+            }
         }
         System.exit(0);
     }
-
 
     /**
      * The server is run from here.

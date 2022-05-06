@@ -3,16 +3,28 @@ package za.co.wethinkcode.robotworlds.server.command;
 import za.co.wethinkcode.robotworlds.server.PathBlockedResponse;
 import za.co.wethinkcode.robotworlds.server.Position;
 import za.co.wethinkcode.robotworlds.server.World;
+import za.co.wethinkcode.robotworlds.server.collisionObjects.Bullet;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FireCommand extends Command {
+public class FireCommand extends Command{
 
     public FireCommand(String robotName, String argument) {
         super(robotName, argument);
     }
+
+//    @Override
+//    public String execute(World world) {
+//        Robot robot = world.getRobot(robotName);
+//        Bullet bullet = new Bullet(robot);
+//        world.add(bullet);
+//        return "Success";
+//    }
+
+
+
 
     @Override
     public String execute(World world) {

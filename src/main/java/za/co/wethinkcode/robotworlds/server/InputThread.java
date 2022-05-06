@@ -26,7 +26,7 @@ public class InputThread extends Thread{
                     server.robots();
                     break;
                 default:
-                    throw new IllegalArgumentException("Unsupported command: " + command);
+                    System.out.println("Unsupported command: " + command);
             }
         }
     }

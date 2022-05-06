@@ -1,6 +1,8 @@
-package za.co.wethinkcode.robotworlds.collisionObjects;
+package za.co.wethinkcode.robotworlds.server.collisionObjects;
 
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
+
+
+import za.co.wethinkcode.robotworlds.server.Direction;
 
 import java.awt.*;
 
