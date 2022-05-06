@@ -1,5 +1,3 @@
-// TODO : Waiting for Maggie and Sisipho to push their updated version
-//  This goes for all commands.
 package za.co.wethinkcode.robotworlds.server.command;
 
 import za.co.wethinkcode.robotworlds.protocol.Request;
@@ -33,9 +31,9 @@ public abstract class Command {
             case "idle":
                 return new IdleCommand(robotName);
             case "forward":
-                return new ForwardCommand(robotName, "5");
+                return new ForwardCommand(robotName, "1");
             case "back":
-                return new BackCommand(robotName, "5");
+                return new BackCommand(robotName, "1");
             case "left":
                 return new LeftCommand(robotName);
             case "right":
