@@ -14,17 +14,17 @@ public class LaunchCommand extends Command{
 
     @Override
     public String execute(World world) {
-        if(argument.equalsIgnoreCase("BasicRobot")) {
-            world.add(new BasicRobot(robotName.toLowerCase()));
-
-        } else if (argument.equalsIgnoreCase("Sniper")) {
-            world.add(new Sniper(robotName.toLowerCase()));
-        }
-        else if (argument.equalsIgnoreCase("Bomber")) {
-            world.add(new Bomber(robotName.toLowerCase()));
-        }
-        else if (argument.equalsIgnoreCase("Machine")) {
-            world.add(new Machine(robotName.toLowerCase()));
+        switch (argument.toLowerCase()){
+            case "basicrobot":
+                world.add(new BasicRobot(robotName.toLowerCase()));
+            case "sniper":
+                world.add(new Sniper(robotName.toLowerCase()));
+            case "bomber":
+                world.add(new Bomber(robotName.toLowerCase()));
+            case "machine":
+                world.add(new Machine(robotName.toLowerCase()));
+            default:
+                world.add(new BasicRobot(robotName.toLowerCase()));
         }
         return "Success";
     }

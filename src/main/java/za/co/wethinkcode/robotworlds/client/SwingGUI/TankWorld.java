@@ -58,7 +58,6 @@ public class TankWorld extends JComponent implements GUI {
             this.clientName = scanner.nextLine();
             System.out.print("Enter the type of tank : ");
             this.robotType = scanner.nextLine();
-            this.robotType = "BasicRobot";
         }
 
         JFrame frame = setupGUI();
