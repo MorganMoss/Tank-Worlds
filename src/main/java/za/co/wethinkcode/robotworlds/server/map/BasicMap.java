@@ -39,6 +39,7 @@ public class BasicMap implements Map{
         //     Obstacle obstacle = new SquareObstacle(10, new Position(x,y));
         //     obstacleList.add(obstacle);
         // }
+        obstacleList.add(new SquareObstacle(3, new Position(0,0)));
 
         return obstacleList;
     }

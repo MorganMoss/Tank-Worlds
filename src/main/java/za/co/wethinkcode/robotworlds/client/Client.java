@@ -29,7 +29,7 @@ public class Client {
     /**
      * The GUI being used by the client
      */
-    private static class CurrentGUI extends TankWorld {}
+    private static class CurrentGUI extends TextGUI {}
 
     /**
      * Starts the gui and the threads that handle input/output
@@ -76,7 +76,7 @@ public class Client {
         @Override
         public void run() {
             try(
-                    BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             ) {
                 do {
                     try {
@@ -84,16 +84,10 @@ public class Client {
 
                         Response response = Response.deSerialize(serializedResponse);
 
-                        if (response.getCommandResponse().equals("quit")) {
-                            System.out.println("The server has shut down. Bye Bye!");
-                            System.exit(0);
+                        if (response != null) {
+                            gui.showOutput(response);
                         }
 
-                        if (!serializedResponse.matches("")){
-                            gui.showOutput(Response.deSerialize(serializedResponse));
-                            System.out.println(serializedResponse);
-                            System.out.println(gui.getClientName());
-                        }
                     } catch (IOException ignored) {}
 
                 } while (true);
@@ -133,6 +127,7 @@ public class Client {
                     try {
                         Request request = gui.getInput();
 
+//                        System.out.println("Out -> " + request.getRobotName() + " : " + request.getCommand() + " ; " + request.getArguments());
 
                         outgoing.println(request.serialize()); //send request to server
                         outgoing.flush();

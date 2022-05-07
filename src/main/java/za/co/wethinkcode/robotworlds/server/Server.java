@@ -84,7 +84,7 @@ public class Server implements Runnable {
     private Map getMap() {
         //TODO : Get the map to be used from the config file;
         // Size for a map should be determined by the map, not the server.
-        return new BasicMap(new Position(600,600));
+        return new BasicMap(new Position(100,100));
     }
 
     /**
@@ -94,7 +94,6 @@ public class Server implements Runnable {
     public static void start() throws IOException {
         final int port = 5000;
         Server server = new Server(port);
-
 
         Thread executeThread = new Thread(server);
         executeThread.start();
@@ -119,7 +118,7 @@ public class Server implements Runnable {
     }
 
     /**
-     * TODO
+     * Executes all requests every tick
      */
     @Override
     public void run() {
@@ -158,18 +157,26 @@ public class Server implements Runnable {
                 }
             }
         ) {
+            robotName = robotName.toLowerCase();
+
             Request request = currentRequests.getOrDefault(robotName, new Request(robotName, "idle"));
 
             try {
                 this.requestLog.add(request);
 
-                if (!Objects.equals(request.getCommand(), "idle")) {
+                if (!request.getCommand().equals("idle")) {
                     System.out.println(request.serialize()); // PRINT REQUEST
                 }
 
-                //TODO: check if robot is paused, or command==launch
-                Command command = Command.create(request);
-                commandResponse = command.execute(world);
+                if (request.getCommand().equals("launch")) {
+                    Command command = Command.create(request);
+                    commandResponse = command.execute(world);
+                } else {
+                    if (!world.getRobot(robotName).isPaused()) {
+                        Command command = Command.create(request);
+                        commandResponse = command.execute(world);
+                    }
+                }
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }
@@ -177,34 +184,18 @@ public class Server implements Runnable {
             //TODO : Add all requests to a buffer before adding them to current requests (to prevent multiple responses per request)
 
             //TODO : use the look command on each robot to get the grid of values it
-
-            currentResponses.putIfAbsent(robotName, generateResponse(request, commandResponse));
+            generateResponse(request, commandResponse);
             currentRequests.remove(robotName);
         }
     }
 
     /**
-     * Looks for a response from the server to give the client.
-     * Used by a server thread.
-     * @param robotName : the client looking for a response
-     * @return a formatted response object
+     * Takes a request and generates a response object
+     * @param request : a request object received from the client
+     * @param commandResponse : the response to the client's request
+     * @return response
      */
-    public Response getResponse(String robotName) throws NoChangeException {
-        Response response = currentResponses.get(robotName);
-        if (response == null) {
-            throw new NoChangeException();
-        }
-        currentResponses.remove(robotName);
-        return response;
-    }
-
-    /**
-     * TODO
-     * @param request
-     * @param commandResponse
-     * @return
-     */
-    public Response generateResponse(Request request, String commandResponse) {
+    public void generateResponse(Request request, String commandResponse) {
         Robot robot = world.getRobot(request.getRobotName());
         HashMap<Integer, HashMap<Integer, String>> map = world.look(robot);
         HashMap<String, Robot> enemies = world.getEnemies(robot);
@@ -216,12 +207,27 @@ public class Server implements Runnable {
                 enemies
         );
 
-        //TODO : use the look command robot position to get the grid of values it
-
         this.responseLog.add(response);
+
+        currentResponses.put(robot.getRobotName().toLowerCase(), response);
+
         if (!Objects.equals(response.getCommandResponse(), "idle")) {
-            System.out.println(response.serialize()); // PRINT RESPONSE
+            System.out.println("Out -> " +response.getRobot().getRobotName() + " : " + response.getCommandResponse());
         }
+    }
+
+    /**
+     * Looks for a response from the server to give the client.
+     * Used by a server thread.
+     * @param robotName : the client looking for a response
+     * @return a formatted response object
+     */
+    public Response getResponse(String robotName) throws NoChangeException {
+        Response response = currentResponses.get(robotName.toLowerCase());
+        if (response == null) {
+            throw new NoChangeException();
+        }
+        currentResponses.remove(robotName);
         return response;
     }
 
@@ -232,9 +238,9 @@ public class Server implements Runnable {
         List<Obstacle> obstacleList = getMap().getObstacles();
         HashMap<String, Robot> robots = world.getRobots();
         if (obstacleList.size()>0) {
-            System.out.println("----------------------");
-            System.out.println("OBSTACLES:");
-            System.out.println("----------------------");
+            System.out.println("----------------------\n" +
+                    "OBSTACLES:\n" +
+                    "----------------------");
             for (Obstacle obstacle:obstacleList) {
                 System.out.println(obstacle.toString());
             }
@@ -243,28 +249,28 @@ public class Server implements Runnable {
         if (robots.values().size()>0) {
             System.out.println("ROBOTS:");
             for (Robot robot : robots.values()) {
-                System.out.println("----------------------");
-                System.out.println(robot.toString());
+                System.out.println("----------------------\n" +
+                        robot.toString());
             }
             System.out.println("----------------------");
         }
     }
 
     /**
-     * TODO
+     * Display a summary of all robots and their states
      */
     public void robots(){
         HashMap<String, Robot> robots = world.getRobots();
         if (robots.values().size()>0) {
-            System.out.println("----------------------");
-            System.out.println("ROBOTS:");
+            System.out.println("----------------------\n" +
+                    "ROBOTS:");
             for (Robot robot : robots.values()) {
-                System.out.println("----------------------");
-                System.out.println(robot.toString());
+                System.out.println("----------------------\n" +
+                        robot.toString());
             }
             System.out.println("----------------------");
         } else {
-            System.out.println("No robots available");
+            System.out.println("No robots in world");
         }
     }
 
@@ -304,5 +310,35 @@ public class Server implements Runnable {
             e.printStackTrace();
         }
         start();
+    }
+
+    public static class InputThread extends Thread{
+
+        private final Server server;
+
+        public InputThread(Server server) {
+            this.server = server;
+        }
+
+        @Override
+        public void run() {
+            Scanner scanner = new Scanner(System.in);
+            while (true) {
+                String command = scanner.nextLine().toLowerCase();
+                switch (command) {
+                    case "quit":
+                        server.quit();
+                        break;
+                    case "dump":
+                        server.dump();
+                        break;
+                    case "robots":
+                        server.robots();
+                        break;
+                    default:
+                        System.out.println("Unsupported command: " + command);
+                }
+            }
+        }
     }
 }
