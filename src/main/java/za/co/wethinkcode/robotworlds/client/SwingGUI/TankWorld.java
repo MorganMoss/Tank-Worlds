@@ -19,7 +19,7 @@ import java.awt.Color;
 import java.util.List;
 
 public class TankWorld extends JComponent implements GUI {
-    private static final int WIDTH = 600, HEIGHT = 600;
+    private static final int WIDTH = 588, HEIGHT = 616;
     private static final int REPAINT_INTERVAL = 50;
     private static final ArrayList<Enemy> enemyList = new ArrayList<>();
     private static final List<Obstacle> obstacleList = new ArrayList<>();
@@ -42,9 +42,21 @@ public class TankWorld extends JComponent implements GUI {
     private String robotType;
     //FIFO stack for requests
     private static Request request;
+    private JFrame frame;
+
+    private static int x_scale;
+    private static int y_scale;
+
 
     public static int getScreenWidth(){return WIDTH;}
     public static int getScreenHeight(){return HEIGHT;}
+
+    public static int getX_scale() {
+        return x_scale;
+    }
+    public static int getY_scale() {
+        return y_scale;
+    }
 
     public static Boolean getShowBoundaries() {
         return showBoundaries;
@@ -53,7 +65,7 @@ public class TankWorld extends JComponent implements GUI {
     public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
 
     public TankWorld()  {
-        JFrame frame = setupGUI();
+        frame = setupGUI();
         frame.add(this);
         setFocusable(true);
         start();
@@ -340,9 +352,15 @@ public class TankWorld extends JComponent implements GUI {
         int y_size = map.get(0).size();
         int x_size = map.size();
 
-        int x_step_multiplier = getScreenWidth() / x_size;
-        int y_step_multiplier = getScreenHeight() / y_size;
+        x_scale = getScreenWidth() / x_size;
+        y_scale = getScreenHeight() / y_size;
 
+        int y_offset = /*getScreenHeight()%y_scale/2+*/2;
+        int x_offset = /*getScreenWidth()%x_scale/2*/0;
+
+        frame.setSize((TankWorld.getScreenWidth()/x_scale)*x_scale, (TankWorld.getScreenHeight()/y_scale)*y_scale);
+
+        enemyList.clear();
         obstacleList.clear();
 
         for (int y = 0; y < y_size; y++) {
@@ -351,7 +369,7 @@ public class TankWorld extends JComponent implements GUI {
                 switch (valueAtPosition.toLowerCase()) {
                     //obstacle
                     case "x":
-                        obstacleList.add(new Brick(new Position(x * x_step_multiplier, getScreenHeight() - (y+1) * y_step_multiplier)));
+                        obstacleList.add(new Brick(new Position((x+x_offset) * x_scale, getScreenHeight() - (y+y_offset) * y_scale)));
                         break;
                     //open
                     case " ":
@@ -360,19 +378,17 @@ public class TankWorld extends JComponent implements GUI {
                     default:
                         //TODO: break up into separate methods
                         if (valueAtPosition.equalsIgnoreCase(player.getTankName())){
-                            if (player.getX() != x * x_step_multiplier || player.getY() != getScreenHeight() - (y+1) * y_step_multiplier){
-                                player.setX(x * x_step_multiplier);
-                                player.setY(getScreenHeight() - (y+1) * y_step_multiplier);
+                            if (player.getX() != (x+x_offset) * x_scale || player.getY() != getScreenHeight() - (y+y_offset) * y_scale){
+                                player.setX((x+x_offset) * x_scale);
+                                player.setY(getScreenHeight() - (y+y_offset) * y_scale);
                             }
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
-                            player.setRange(response.getRobot().getRange()*x_step_multiplier);
-//                            player.setSprite(response.getRobot().getClass().getName());
+                            player.setRange(response.getRobot().getRange()*x_scale);
                             player.setKills(response.getRobot().getKills());
                             player.setDeaths(response.getRobot().getDeaths());
-
 
                             switch(response.getRobot().getDirection()) {
                                 case NORTH:
@@ -388,77 +404,42 @@ public class TankWorld extends JComponent implements GUI {
                                     player.setTankDirection(Direction.Left);
                                     break;
                             }
-
                             break;
                         }
 
                         Robot robot = response.getEnemyRobots().get(valueAtPosition);
 
-                        boolean enemyFound = false;
-                        for (Enemy enemy : enemyList) {
-                            if (enemy.getTankName().equals(robot.getRobotName())) {
-                                enemyFound = true;
+                        Enemy enemy = new Enemy();
 
-                                enemy.setX(x * x_step_multiplier);
-                                enemy.setY(getScreenHeight() - (y+1) * y_step_multiplier);
-                                enemy.setAmmo(robot.getCurrentAmmo());
-                                enemy.setTankHealth(robot.getCurrentShield());
-                                enemy.setKills(robot.getKills());
+                        enemy.setX((x+x_offset) * x_scale);
+                        enemy.setY(getScreenHeight() - (y+y_offset) * y_scale);
+                        enemy.setName(robot.getRobotName());
+                        enemy.setAmmo(robot.getCurrentAmmo());
+                        enemy.setTankHealth(robot.getCurrentShield());
+                        enemy.setRange(robot.getRange());
+                        enemy.setKills(robot.getKills());
 
-                                switch (robot.getDirection()) {
-                                    case NORTH:
-                                        enemy.setTankDirection(Direction.Up);
-                                        break;
-                                    case EAST:
-                                        enemy.setTankDirection(Direction.Right);
-                                        break;
-                                    case SOUTH:
-                                        enemy.setTankDirection(Direction.Down);
-                                        break;
-                                    case WEST:
-                                        enemy.setTankDirection(Direction.Left);
-                                        break;
-                                }
-
-                                if (robot.isFiring()) {
-                                    enemy.fire();
-                                }
+                        switch (robot.getDirection()) {
+                            case NORTH:
+                                enemy.setTankDirection(Direction.Up);
                                 break;
-                            }
+                            case EAST:
+                                enemy.setTankDirection(Direction.Right);
+                                break;
+                            case SOUTH:
+                                enemy.setTankDirection(Direction.Down);
+                                break;
+                            case WEST:
+                                enemy.setTankDirection(Direction.Left);
+                                break;
                         }
 
-                        if (!enemyFound) {
-                            Enemy enemy = new Enemy();
-
-                            enemy.setX(x * x_step_multiplier);
-                            enemy.setY(y * y_step_multiplier);
-                            enemy.setName(robot.getRobotName());
-                            enemy.setAmmo(robot.getCurrentAmmo());
-                            enemy.setTankHealth(robot.getCurrentShield());
-                            enemy.setRange(robot.getRange());
-                            enemy.setKills(robot.getKills());
-
-                            switch (robot.getDirection()) {
-                                case NORTH:
-                                    enemy.setTankDirection(Direction.Up);
-                                    break;
-                                case EAST:
-                                    enemy.setTankDirection(Direction.Right);
-                                    break;
-                                case SOUTH:
-                                    enemy.setTankDirection(Direction.Down);
-                                    break;
-                                case WEST:
-                                    enemy.setTankDirection(Direction.Left);
-                                    break;
-                            }
-
-                            if (robot.isFiring()) {
-                                enemy.fire();
-                            }
-
-                            enemyList.add(enemy);
+                        if (robot.isFiring()) {
+                            enemy.fire();
                         }
+
+                        enemyList.add(enemy);
+
                         break;
                 }
             }

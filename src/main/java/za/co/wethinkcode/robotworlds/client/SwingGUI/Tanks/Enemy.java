@@ -71,6 +71,7 @@ public class Enemy extends Tank {
 
     //draw tank on swing graphics
     public void draw(Graphics g){
+
         g.drawString(name, this.x, this.y-20);
         if (TankWorld.getShowBoundaries()){
             g.setColor(Color.RED);
@@ -78,10 +79,10 @@ public class Enemy extends Tank {
         }
         boolean enemyDead = health==0;
 
-        if(enemyDead){g.drawImage(HelperMethods.getImage(this.getDeadImage()), this.x, this.y, null);
+        if(enemyDead){g.drawImage(HelperMethods.getImage(this.getDeadImage()), this.x-TankWorld.getX_scale()/2, this.y-TankWorld.getY_scale()/2, null);
         }else{
             g.drawImage(this.getDirection().getImage(this.getSpriteName()),
-                     this.x, this.y, null);}
+                    this.x, this.y, null);}
 
         //respawn enemy
         if(health==-1){

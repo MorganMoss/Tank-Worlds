@@ -85,7 +85,7 @@ public class Player extends Tank {
             g.fillRect(super.getX(), super.getY() - 10, super.getTankHealth() * 7, 10);
             //Range
             g.setColor(Color.GREEN);
-            g.drawRect(super.getX() - (super.getRange() - 1), super.getY() - (super.getRange() - 1), super.getRange() * 2, super.getRange() * 2);
+            g.drawRect(super.getX() - (super.getRange() - 1)+20, super.getY() - (super.getRange() - 1)+20, super.getRange() * 2, super.getRange() * 2);
             g.setColor(Color.RED);
             g.drawRect(super.getX(), super.getY(), super.getSize(), super.getSize());
         }
@@ -98,7 +98,7 @@ public class Player extends Tank {
                     super.getX(), super.getY(), null);
         }
         else{
-            g.drawImage(tankImage, super.getX()-20, super.getY()-20, null);
+            g.drawImage(tankImage, super.getX(), super.getY(), null);
         }
     }
 
