@@ -2,6 +2,7 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks;
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Shell;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 
 import java.awt.*;
 import java.util.Locale;
@@ -78,15 +79,16 @@ public class Player extends Tank {
         g.setFont(new Font("Default", Font.BOLD, 14));
         g.drawString(super.getTankName(), super.getX(), super.getY()-20);
 
-        //health bar
-        g.setColor(Color.RED);
-        g.fillRect(super.getX(), super.getY()-10, super.getTankHealth()*7, 10);
-
-        //Range
-        g.setColor(Color.GREEN);
-        g.drawRect(super.getX()-(super.getRange()-1), super.getY()-(super.getRange()-1), super.getRange()*2, super.getRange()*2);
-        g.setColor(Color.RED);
-        g.drawRect(super.getX(), super.getY(), super.getSize(), super.getSize());
+        if (TankWorld.getShowBoundaries()) {
+            //health bar
+            g.setColor(Color.RED);
+            g.fillRect(super.getX(), super.getY() - 10, super.getTankHealth() * 7, 10);
+            //Range
+            g.setColor(Color.GREEN);
+            g.drawRect(super.getX() - (super.getRange() - 1), super.getY() - (super.getRange() - 1), super.getRange() * 2, super.getRange() * 2);
+            g.setColor(Color.RED);
+            g.drawRect(super.getX(), super.getY(), super.getSize(), super.getSize());
+        }
 
         boolean playerDead = super.getTankHealth()==0;
         Image tankImage = super.getDirection().getImage(super.getSpriteName());
@@ -96,7 +98,7 @@ public class Player extends Tank {
                     super.getX(), super.getY(), null);
         }
         else{
-            g.drawImage(tankImage, super.getX(), super.getY(), null);
+            g.drawImage(tankImage, super.getX()-20, super.getY()-20, null);
         }
     }
 

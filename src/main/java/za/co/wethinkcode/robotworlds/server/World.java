@@ -110,8 +110,8 @@ public class World {
             }
 
             for (int y = low; y <= high; y++){
-                if (!worldMap.get(x).get(y).equals(" ")){
-                    if (worldMap.get(x).get(y).equals("X")) {
+                if (!map.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals(" ")){
+                    if (map.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals("X")) {
                         return String.format("hit obstacle %d1 %d2",x,y);
                     } else {
                         for (Robot enemy : getEnemies(robot).values()) {
@@ -134,8 +134,8 @@ public class World {
             }
 
             for (int x = low; x <= high; x++){
-                if (!worldMap.get(x).get(y).equals(" ")){
-                    if (worldMap.get(x).get(y).equals("X")) {
+                if (!map.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals(" ")){
+                    if (map.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals("X")) {
                         return String.format("hit obstacle %d1 %d2", x, y);
                     } else {
                         for (Robot enemy : getEnemies(robot).values()) {
