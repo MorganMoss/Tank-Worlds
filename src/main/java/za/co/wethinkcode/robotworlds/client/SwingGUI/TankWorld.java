@@ -27,6 +27,8 @@ public class TankWorld extends JComponent implements GUI {
     private static final LinkedList<Request> lastRequest = new LinkedList<>();
 
     private static Boolean launched = false;
+    private static Boolean showBoundaries = false;
+
     //shows state HUD/ExplosionAnimation on repaint if set to true
     private boolean showState = false;
     private boolean showFireAnimation = false;
@@ -44,6 +46,10 @@ public class TankWorld extends JComponent implements GUI {
     public static int getScreenWidth(){return WIDTH;}
     public static int getScreenHeight(){return HEIGHT;}
 
+    public static Boolean getShowBoundaries() {
+        return showBoundaries;
+    }
+
     public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
 
     public TankWorld()  {
@@ -51,8 +57,6 @@ public class TankWorld extends JComponent implements GUI {
         frame.add(this);
         setFocusable(true);
         start();
-
-
 
         // KEY LISTENER FOR USER INPUT
         this.addKeyListener(new KeyAdapter() {
@@ -155,6 +159,12 @@ public class TankWorld extends JComponent implements GUI {
                         }
                         System.exit(0);
                         break;
+
+                    case KeyEvent.VK_B:
+                        if (launched){
+                            showBoundaries = !showBoundaries;
+                        }
+                        break;
                 }
             }
         });
@@ -210,7 +220,6 @@ public class TankWorld extends JComponent implements GUI {
         for (Enemy enemy : enemyList){
             enemy.draw(g);
         }
-
         // draw HUD *TO DO: Hide and only show on state command
         if(showState){
             player.showState(g);
@@ -342,7 +351,7 @@ public class TankWorld extends JComponent implements GUI {
                 switch (valueAtPosition.toLowerCase()) {
                     //obstacle
                     case "x":
-                        obstacleList.add(new Brick(new Position(x * x_step_multiplier, getScreenHeight() - y * y_step_multiplier)));
+                        obstacleList.add(new Brick(new Position(x * x_step_multiplier, getScreenHeight() - (y+1) * y_step_multiplier)));
                         break;
                     //open
                     case " ":
@@ -351,13 +360,15 @@ public class TankWorld extends JComponent implements GUI {
                     default:
                         //TODO: break up into separate methods
                         if (valueAtPosition.equalsIgnoreCase(player.getTankName())){
-                            player.setX(x * x_step_multiplier);
-                            player.setY(getScreenHeight() - y * y_step_multiplier);
+                            if (player.getX() != x * x_step_multiplier || player.getY() != getScreenHeight() - (y+1) * y_step_multiplier){
+                                player.setX(x * x_step_multiplier);
+                                player.setY(getScreenHeight() - (y+1) * y_step_multiplier);
+                            }
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
-                            player.setRange(response.getRobot().getRange());
+                            player.setRange(response.getRobot().getRange()*x_step_multiplier);
 //                            player.setSprite(response.getRobot().getClass().getName());
                             player.setKills(response.getRobot().getKills());
                             player.setDeaths(response.getRobot().getDeaths());
@@ -389,7 +400,7 @@ public class TankWorld extends JComponent implements GUI {
                                 enemyFound = true;
 
                                 enemy.setX(x * x_step_multiplier);
-                                enemy.setY(getScreenHeight() - y * y_step_multiplier);
+                                enemy.setY(getScreenHeight() - (y+1) * y_step_multiplier);
                                 enemy.setAmmo(robot.getCurrentAmmo());
                                 enemy.setTankHealth(robot.getCurrentShield());
                                 enemy.setKills(robot.getKills());
@@ -452,6 +463,7 @@ public class TankWorld extends JComponent implements GUI {
                 }
             }
         }
+
     }
 
     public void start() {
