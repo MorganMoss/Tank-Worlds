@@ -4,18 +4,14 @@ import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Shell;
 
 import java.awt.*;
+import java.util.Locale;
 
 public class Player extends Tank {
 
 
-    //TODO: SERVER GET ENEMY COUNT
-    private int enemiesLeft = 1;
-//    private int x=100;
-//    private int y=200;
-
     public Player(String tankType,String name){
 
-        switch (tankType){
+        switch (tankType.toLowerCase()){
             case "sniper":
                 super.setSprite("sniper");
                 super.setName(name);
@@ -110,7 +106,7 @@ public class Player extends Tank {
         g.setFont(new Font("Default", Font.BOLD, 14));
         g.drawString("Missiles: " + super.getAmmo(), 10, 50);
         g.drawString("Health: " + super.getTankHealth(), 10, 70);
-        g.drawString("Enemies Left: " + enemiesLeft, 10, 90);
+//        g.drawString("Enemies Left: " + enemiesLeft, 10, 90);
         g.drawString("Kills: " + super.getKills(), 10, 110);
         g.drawString("Deaths: " + super.getDeaths(), 10, 130);
 //        double kdRatio = kills/deaths;

@@ -29,7 +29,7 @@ public class Client {
     /**
      * The GUI being used by the client
      */
-    private static class CurrentGUI extends TextGUI {}
+    private static class CurrentGUI extends TankWorld {}
 
     /**
      * Starts the gui and the threads that handle input/output
