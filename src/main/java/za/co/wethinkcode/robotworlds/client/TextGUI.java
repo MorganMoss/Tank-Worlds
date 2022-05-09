@@ -28,6 +28,7 @@ public class TextGUI implements GUI {
      * Stores the name of the robot that is currently controlled by this user
      */
     String robotName;
+    String robotType;
     /**
      * Flag to check if a robot has been launched into the server successfully
      */
@@ -69,9 +70,9 @@ public class TextGUI implements GUI {
                 this.robotName = in.nextLine();
 
                 System.out.print("Enter Type of Robot : ");
-                String robotType = in.nextLine();
+                this.robotType = in.nextLine();
                 // TODO : Hard coded for now.
-                robotType = "BasicRobot";
+                //robotType = "BasicRobot";
 
                 return new Request(
                         robotName,
