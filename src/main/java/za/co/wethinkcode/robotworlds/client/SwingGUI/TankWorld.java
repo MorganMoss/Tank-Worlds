@@ -43,8 +43,19 @@ public class TankWorld extends JComponent implements GUI {
     //FIFO stack for requests
     private static Request request;
 
+    private static int x_scale;
+    private static int y_scale;
+
+
     public static int getScreenWidth(){return WIDTH;}
     public static int getScreenHeight(){return HEIGHT;}
+
+    public static int getX_scale() {
+        return x_scale;
+    }
+    public static int getY_scale() {
+        return y_scale;
+    }
 
     public static Boolean getShowBoundaries() {
         return showBoundaries;
@@ -340,8 +351,8 @@ public class TankWorld extends JComponent implements GUI {
         int y_size = map.get(0).size();
         int x_size = map.size();
 
-        int x_step_multiplier = getScreenWidth() / x_size;
-        int y_step_multiplier = getScreenHeight() / y_size;
+        x_scale = getScreenWidth() / x_size;
+        y_scale = getScreenHeight() / y_size;
 
         obstacleList.clear();
 
@@ -351,7 +362,7 @@ public class TankWorld extends JComponent implements GUI {
                 switch (valueAtPosition.toLowerCase()) {
                     //obstacle
                     case "x":
-                        obstacleList.add(new Brick(new Position(x * x_step_multiplier, getScreenHeight() - (y+1) * y_step_multiplier)));
+                        obstacleList.add(new Brick(new Position(x * x_scale, getScreenHeight() - (y) * y_scale)));
                         break;
                     //open
                     case " ":
@@ -360,15 +371,15 @@ public class TankWorld extends JComponent implements GUI {
                     default:
                         //TODO: break up into separate methods
                         if (valueAtPosition.equalsIgnoreCase(player.getTankName())){
-                            if (player.getX() != x * x_step_multiplier || player.getY() != getScreenHeight() - (y+1) * y_step_multiplier){
-                                player.setX(x * x_step_multiplier);
-                                player.setY(getScreenHeight() - (y+1) * y_step_multiplier);
+                            if (player.getX() != x * x_scale || player.getY() != getScreenHeight() - (y) * y_scale){
+                                player.setX(x * x_scale);
+                                player.setY(getScreenHeight() - (y) * y_scale);
                             }
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
-                            player.setRange(response.getRobot().getRange()*x_step_multiplier);
+                            player.setRange(response.getRobot().getRange()*x_scale);
 //                            player.setSprite(response.getRobot().getClass().getName());
                             player.setKills(response.getRobot().getKills());
                             player.setDeaths(response.getRobot().getDeaths());
@@ -399,8 +410,8 @@ public class TankWorld extends JComponent implements GUI {
                             if (enemy.getTankName().equals(robot.getRobotName())) {
                                 enemyFound = true;
 
-                                enemy.setX(x * x_step_multiplier);
-                                enemy.setY(getScreenHeight() - (y+1) * y_step_multiplier);
+                                enemy.setX(x * x_scale);
+                                enemy.setY(getScreenHeight() - (y) * y_scale);
                                 enemy.setAmmo(robot.getCurrentAmmo());
                                 enemy.setTankHealth(robot.getCurrentShield());
                                 enemy.setKills(robot.getKills());
@@ -430,8 +441,8 @@ public class TankWorld extends JComponent implements GUI {
                         if (!enemyFound) {
                             Enemy enemy = new Enemy();
 
-                            enemy.setX(x * x_step_multiplier);
-                            enemy.setY(y * y_step_multiplier);
+                            enemy.setX(x * x_scale);
+                            enemy.setY(getScreenHeight() - (y) * y_scale);
                             enemy.setName(robot.getRobotName());
                             enemy.setAmmo(robot.getCurrentAmmo());
                             enemy.setTankHealth(robot.getCurrentShield());

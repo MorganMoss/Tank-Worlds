@@ -75,7 +75,7 @@ public class Shell extends Projectile{
     //DISPLAY MISSILE ON GUI
     @Override
     public void draw(Graphics g) {
-        g.drawImage(tank.getDirection().getImage("missile"), x, y, null);
+        g.drawImage(tank.getDirection().getImage("missile"), x+11, y+11, null);
     }
 
     //ANIMATE MISSILE ON WORLD

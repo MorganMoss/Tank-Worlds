@@ -36,7 +36,7 @@ public class Brick extends Obstacle{
     }
 
     static Image brick = HelperMethods.getImage("brick.png");
-    static Image resizedBrick = brick.getScaledInstance(25,25, Image.SCALE_DEFAULT);
+    static Image resizedBrick = brick.getScaledInstance(TankWorld.getX_scale(),TankWorld.getY_scale(), Image.SCALE_DEFAULT);
     public void draw(Graphics g) {
         g.drawImage(resizedBrick, x, y, null);
         if (TankWorld.getShowBoundaries()) {
