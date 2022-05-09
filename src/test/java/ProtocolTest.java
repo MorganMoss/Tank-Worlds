@@ -1,11 +1,9 @@
-package ProtocolTest;
-
 import org.junit.jupiter.api.Test;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RequestTest{
+public class ProtocolTest {
  @Test
  public void testSerializationForward() {
   Request request = new Request("sisipho","forward");

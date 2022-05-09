@@ -1,4 +1,4 @@
-package ServerTest.RobotTest;
+package ServerTest;
 
 import org.junit.jupiter.api.Test;
 import za.co.wethinkcode.robotworlds.server.Position;
@@ -8,7 +8,7 @@ import za.co.wethinkcode.robotworlds.server.robot.BasicRobot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BasicRobotTest {
+public class RobotTest {
     @Test
     public void testBasicRobot(){
         World world = new World(new BasicMap(new Position(100,100)));
