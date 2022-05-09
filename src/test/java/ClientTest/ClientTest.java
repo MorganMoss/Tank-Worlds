@@ -1,4 +1,4 @@
-package Client;
+package ClientTest;
 
 public class ClientTest {
 }

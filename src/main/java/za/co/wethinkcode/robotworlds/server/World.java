@@ -13,14 +13,14 @@ import za.co.wethinkcode.robotworlds.server.robot.Robot;
 public class World {
     private final HashMap<String, Robot> robots;
     private final HashMap<Integer, HashMap<Integer, String>> worldMap; //"X"," ",<RobotName>
-    private final Map map;
+    private final Map loadedMap;
 
     /**
      * Constructor for world
      * @param map : the map that has gives a list of obstacles for this world to use.
      */
     public World(Map map) {
-        this.map = map;
+        this.loadedMap = map;
 
         List<Obstacle> obstacleList = map.getObstacles();
 
@@ -64,7 +64,7 @@ public class World {
     }
 
     public Position getMapSize() {
-        return map.getMapSize();
+        return loadedMap.getMapSize();
     }
 
     /**

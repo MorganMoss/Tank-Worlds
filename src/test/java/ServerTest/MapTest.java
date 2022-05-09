@@ -1,4 +1,4 @@
-package ServerTest.MapTest;
+package ServerTest;
 
 import org.junit.jupiter.api.Test;
 import za.co.wethinkcode.robotworlds.server.Position;
@@ -7,7 +7,7 @@ import za.co.wethinkcode.robotworlds.server.map.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BasicMapTest {
+public class MapTest {
     @Test
     public void testBasicMap(){
         Map basicMap = new BasicMap(new Position(2,3));
