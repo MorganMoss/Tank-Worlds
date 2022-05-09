@@ -23,12 +23,12 @@ import java.util.List;
 public class TankWorld extends JComponent implements GUI {
     private static final int WIDTH = 600, HEIGHT = 600;
     private static final int REPAINT_INTERVAL = 50;
-    private static Boolean launched = false;
     private static final ArrayList<Enemy> enemyList = new ArrayList<>();
     private static final List<Obstacle> obstacleList = BasicMap.getObstacles();
     private static final ArrayList<Projectile> projectileList = new ArrayList<>();
     private static final LinkedList<Request> lastRequest = new LinkedList<>();
 
+    private static Boolean launched = false;
     //shows state HUD/ExplosionAnimation on repaint if set to true
     private boolean showState = false;
     private boolean showFireAnimation = false;
@@ -38,37 +38,25 @@ public class TankWorld extends JComponent implements GUI {
     private int explosionX;
     private int explosionY;
 
-    private final String clientName;
+    private Player player;
+    private String clientName;
     private String robotType;
+
     public static int getScreenWidth(){return WIDTH;}
 
-    private Response currentResponse;
-
-    private Player player;
-
     //FIFO stack for requests
-    private static Request request = new Request("Robot","idle");
+    private static Request request;
+
     public static int getScreenHeight(){return HEIGHT;}
-    public String getClientName() {return this.clientName;}
-    public String getRobotType(){return this.robotType;}
     public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
 
     public TankWorld()  {
-        //TODO: Please put this in a pop up rather than the terminal.
-        try (Scanner scanner = new Scanner(System.in);) {
-            System.out.print("Enter Tank name : ");
-            this.clientName = scanner.nextLine();
-            System.out.print("Enter the type of tank : ");
-            this.robotType = scanner.nextLine();
-            this.robotType = "sniper";
-        }
-
         JFrame frame = setupGUI();
         frame.add(this);
         setFocusable(true);
         start();
 
-        player = new Player(robotType, clientName);
+
 
         // KEY LISTENER FOR USER INPUT
         this.addKeyListener(new KeyAdapter() {
@@ -76,87 +64,104 @@ public class TankWorld extends JComponent implements GUI {
             public void keyPressed(KeyEvent e) {
                 showState=false;
                 switch (e.getKeyCode()) {
-
                     case KeyEvent.VK_UP:
-                        System.out.println(player.getY());
-
-                        player.moveForward();
-                        if(!collision(player)){
+                        if (launched) {
                             request = new Request(clientName,"forward");
-                            lastRequest.add(request);}
-                        if(collision(player)){
-                            player.moveBack();
+                            lastRequest.add(request);
                         }
                         break;
 
                     case KeyEvent.VK_DOWN:
-
-                        System.out.println("request: "+request.serialize());
-                        player.moveBack();
-                        if(!collision(player)){
+                        if (launched) {
                             request = new Request(clientName,"back");
-                            lastRequest.add(request);
                         }
-                        if(collision(player)){
-                            player.moveForward();
-                        }
+                        lastRequest.add(request);
                         break;
 
                     case KeyEvent.VK_LEFT:
-                        request = new Request(clientName,"left");
-                        lastRequest.add(request);
-                        player.turnLeft();
+                        if (launched) {
+                            request = new Request(clientName,"left");
+                            lastRequest.add(request);
+
+                            player.turnLeft();
+                        }
                         break;
 
                     case KeyEvent.VK_RIGHT:
-                        request = new Request(clientName,"right");
-                        lastRequest.add(request);
+                        if (launched) {
+                            request = new Request(clientName,"right");
+                            lastRequest.add(request);
 
-                        player.turnRight();
+                            player.turnRight();
+                        }
                         break;
 
                     case KeyEvent.VK_SPACE:
-                        request = new Request(clientName,"fire");
-                        lastRequest.add(request);
+                        if (launched) {
+                            request = new Request(clientName, "fire");
+                            lastRequest.add(request);
+
 //                        client.HelperMethods.playAudio("shoot.wav");
-                        if (player.getAmmo()!=0){
-                            player.fire();
+
+                            if (player.getAmmo() != 0) {
+                                player.fire();
+                            }
                         }
                         break;
 
                     case KeyEvent.VK_R:
-                        request = new Request(clientName,"reload");
-                        lastRequest.add(request);
-                        player.reload();
+                        if (launched) {
+                            request = new Request(clientName, "reload");
+                            lastRequest.add(request);
+
+                            player.reload();
+                        }
                         break;
 
                     case KeyEvent.VK_M:
 //                        client.HelperMethods.playAudio(Tools.nextBoolean() ? "supershoot.wav" : "supershoot.aiff");
-                        request = new Request(clientName,"repair");
-                        lastRequest.add(request);
-                        player.repair();
+                        if (launched) {
+                            request = new Request(clientName, "repair");
+                            lastRequest.add(request);
+
+                            player.repair();
+                        }
                         break;
 
                     case KeyEvent.VK_S:
-                        request = new Request(clientName,"state");
-                        showState=true;
+                        if (launched) {
+                            request = new Request(clientName,"state");
+                            showState=true;
+                        }
                         break;
 
                     case KeyEvent.VK_L:
-                        request = new Request(clientName,"launch", Collections.singletonList(robotType));
-                        lastRequest.add(request);
-                        launched=true;
+                        if (!launched){
+                            //TODO: Please put this in a pop up rather than the terminal.
+                            try (Scanner scanner = new Scanner(System.in);) {
+                                System.out.print("Enter Tank name : ");
+                                clientName = scanner.nextLine();
+                                System.out.print("Enter the type of tank : ");
+                                robotType = scanner.nextLine();
+
+                                robotType = "sniper";
+
+                                request = new Request(clientName,"launch", Collections.singletonList(robotType));
+                                lastRequest.add(request);
+                            }
+                        }
                         break;
 
                     case KeyEvent.VK_ESCAPE:
-                        request = new Request(clientName,"quit");
-                        lastRequest.add(request);
+                        if (launched) {
+                            request = new Request(clientName,"quit");
+                            lastRequest.add(request);
+                        }
                         System.exit(0);
                         break;
                 }
             }
         });
-        //TODO: CONNECT WITH UPDATED SERVER
     }
 
     public static JFrame setupGUI() {
@@ -175,15 +180,9 @@ public class TankWorld extends JComponent implements GUI {
     //Sends user input to Server as request objects
     @Override
     public Request getInput() throws NoNewInput {
-        if (currentResponse!=null){
-            runServerCorrections(currentResponse);
-            currentResponse = null;
-        }
         try {
-            Request request = lastRequest.removeLast();
-            System.out.println("input from gui:\n"+request.serialize());
-            return request;
-        }catch (NoSuchElementException noInput){
+            return lastRequest.removeLast();
+        } catch (NoSuchElementException noInput){
             throw new NoNewInput();
         }
     }
@@ -191,7 +190,12 @@ public class TankWorld extends JComponent implements GUI {
     // PaintComponent is our real showOutput
     @Override
     public void showOutput(Response response) {
-        currentResponse = response;
+        if (!launched && response.getCommandResponse().equalsIgnoreCase("success")){
+            player = new Player(robotType, clientName);
+            launched = true;
+        }
+
+        runServerCorrections(response);
     }
 
     /*Swing component that paints onto the window*/
@@ -201,8 +205,6 @@ public class TankWorld extends JComponent implements GUI {
         System.setProperty("myColor", "0XCE8540");
         g.setColor(new Color(205,133, 63));
         g.fillRect(0, 0, WIDTH, HEIGHT);
-
-        // draw obstacles *TODO find better design and implement map object
         g.setColor(Color.GRAY);
 
         for (Obstacle obstacle:obstacleList){
@@ -212,6 +214,7 @@ public class TankWorld extends JComponent implements GUI {
         for (Enemy enemy : enemyList){
             enemy.draw(g);
         }
+
         // draw HUD *TO DO: Hide and only show on state command
         if(showState){
             player.showState(g);
@@ -337,7 +340,7 @@ public class TankWorld extends JComponent implements GUI {
 
         obstacleList.clear();
 
-        for (int y = y_size-1; y >= 0; y--) {
+        for (int y = 0; y < y_size; y++) {
             for (int x = 0; x < x_size; x++) {
                 String valueAtPosition = map.get(x).get(y);
                 switch (valueAtPosition.toLowerCase()) {
@@ -462,7 +465,9 @@ public class TankWorld extends JComponent implements GUI {
             protected Void doInBackground() {
                 while (true) {
                     try {
-                        repaint();
+                        if (launched) {
+                            repaint();
+                        }
                         HelperMethods.sleepSilently(REPAINT_INTERVAL);
                     } catch (Exception e) {
                         e.printStackTrace();
