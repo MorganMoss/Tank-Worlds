@@ -1,6 +1,5 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
-import za.co.wethinkcode.robotworlds.client.Client;
 import za.co.wethinkcode.robotworlds.client.GUI;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.BasicMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.*;
@@ -9,7 +8,6 @@ import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
 import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.*;
 import za.co.wethinkcode.robotworlds.server.Position;
-import za.co.wethinkcode.robotworlds.server.obstacle.SquareObstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import javax.swing.*;
@@ -24,7 +22,7 @@ public class TankWorld extends JComponent implements GUI {
     private static final int WIDTH = 600, HEIGHT = 600;
     private static final int REPAINT_INTERVAL = 50;
     private static final ArrayList<Enemy> enemyList = new ArrayList<>();
-    private static final List<Obstacle> obstacleList = BasicMap.getObstacles();
+    private static final List<Obstacle> obstacleList = new ArrayList<>();
     private static final ArrayList<Projectile> projectileList = new ArrayList<>();
     private static final LinkedList<Request> lastRequest = new LinkedList<>();
 
@@ -32,7 +30,6 @@ public class TankWorld extends JComponent implements GUI {
     //shows state HUD/ExplosionAnimation on repaint if set to true
     private boolean showState = false;
     private boolean showFireAnimation = false;
-
     //animation control integers
     private int explodeCount = 1;
     private int explosionX;
@@ -41,13 +38,12 @@ public class TankWorld extends JComponent implements GUI {
     private Player player;
     private String clientName;
     private String robotType;
-
-    public static int getScreenWidth(){return WIDTH;}
-
     //FIFO stack for requests
     private static Request request;
 
+    public static int getScreenWidth(){return WIDTH;}
     public static int getScreenHeight(){return HEIGHT;}
+
     public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
 
     public TankWorld()  {
@@ -262,7 +258,7 @@ public class TankWorld extends JComponent implements GUI {
         }
 
         // spawn player tank TODO: implement designs for other tanks
-        if(launched){
+        if (launched){
             player.draw(g);
             g.setColor(Color.RED);
             //Explode fire command animation
@@ -346,8 +342,7 @@ public class TankWorld extends JComponent implements GUI {
                 switch (valueAtPosition.toLowerCase()) {
                     //obstacle
                     case "x":
-                        //check if it's there already, others change it to be
-                        obstacleList.add(new Brick(new Position(x * x_step_multiplier, y * y_step_multiplier)));
+                        obstacleList.add(new Brick(new Position(x * x_step_multiplier, getScreenHeight() - y * y_step_multiplier)));
                         break;
                     //open
                     case " ":
@@ -357,13 +352,13 @@ public class TankWorld extends JComponent implements GUI {
                         //TODO: break up into separate methods
                         if (valueAtPosition.equalsIgnoreCase(player.getTankName())){
                             player.setX(x * x_step_multiplier);
-                            player.setY(y * y_step_multiplier);
+                            player.setY(getScreenHeight() - y * y_step_multiplier);
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
                             player.setRange(response.getRobot().getRange());
-                            player.setSprite(response.getRobot().getClass().getName());
+//                            player.setSprite(response.getRobot().getClass().getName());
                             player.setKills(response.getRobot().getKills());
                             player.setDeaths(response.getRobot().getDeaths());
 
@@ -394,7 +389,7 @@ public class TankWorld extends JComponent implements GUI {
                                 enemyFound = true;
 
                                 enemy.setX(x * x_step_multiplier);
-                                enemy.setY(y * y_step_multiplier);
+                                enemy.setY(getScreenHeight() - y * y_step_multiplier);
                                 enemy.setAmmo(robot.getCurrentAmmo());
                                 enemy.setTankHealth(robot.getCurrentShield());
                                 enemy.setKills(robot.getKills());
