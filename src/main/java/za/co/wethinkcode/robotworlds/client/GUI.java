@@ -46,6 +46,7 @@ public interface GUI{
     // Then the flag can be checked in getInput()
 
     String getClientName();
+    String getRobotType();
     void setEnemyName(String enemyName);
     void enemyMovement(String command);
 

@@ -14,6 +14,7 @@ public class SwingGUI implements GUI {
     private String latestInput = "";
     TankWorld gui;
     private static String clientName;
+    private static String robotType;
     static Scanner scanner = new Scanner(System.in);
 
     public SwingGUI(){
@@ -45,6 +46,9 @@ public class SwingGUI implements GUI {
     public String getClientName() {
         return clientName;
     }
+
+    @Override
+    public String getRobotType() {return robotType;}
 
     @Override
     public void setEnemyName(String enemyName) {
