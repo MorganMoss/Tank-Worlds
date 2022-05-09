@@ -36,6 +36,8 @@ public class Robot {
         this.currentAmmo = maxAmmo;
         this.currentShield = maxShield;
         this.paused = false;
+        this.direction = Direction.NORTH;
+        this.position = setLaunchPosition(world);
     }
     public int getDeaths(){
         return this.deaths;
@@ -96,6 +98,18 @@ public class Robot {
                 this.direction = Direction.NORTH;
                 break;
         }
+    }
+
+    public Position setLaunchPosition(World world) {
+        Position launchPosition;
+        Random random = new Random();
+        do {
+            int limit = -50;
+            int x = random.nextInt(world.getMapSize().getX()+1+limit) - (world.getMapSize().getX()+limit/2)/2;
+            int y = random.nextInt(world.getMapSize().getY()+1+limit) - (world.getMapSize().getY()+limit/2)/2;
+            launchPosition = new Position(x,y);
+        } while(!world.getWorldMap().get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
+        return launchPosition;
     }
 
     public void setPosition(Position position) {

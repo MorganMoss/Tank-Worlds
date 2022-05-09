@@ -12,23 +12,23 @@ import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 public class World {
     private final HashMap<String, Robot> robots;
-    private final HashMap<Integer, HashMap<Integer, String>> map; //"X"," ",<RobotName>
-    private final Position mapSize;
+    private final HashMap<Integer, HashMap<Integer, String>> worldMap; //"X"," ",<RobotName>
+    private final Map map;
 
     /**
      * Constructor for world
      * @param map : the map that has gives a list of obstacles for this world to use.
      */
     public World(Map map) {
-        mapSize = map.getMapSize();
+        this.map = map;
 
         List<Obstacle> obstacleList = map.getObstacles();
 
-        this.map = new HashMap<>();
-        for (int x = round(-mapSize.getX()/2.0f); x <= round(mapSize.getX()/2.0f); x++) { //ROWS
+        this.worldMap = new HashMap<>();
+        for (int x = round(-map.getMapSize().getX()/2.0f); x <= round(map.getMapSize().getX()/2.0f); x++) { //ROWS
             HashMap<Integer, String> row = new HashMap<>();
 
-            for (int y = round(-mapSize.getY()/2.0f); y <= round(mapSize.getY()/2.0f); y++) { //COLUMNS
+            for (int y = round(-map.getMapSize().getY()/2.0f); y <= round(map.getMapSize().getY()/2.0f); y++) { //COLUMNS
                 for (Obstacle obstacle : obstacleList){
                     if (obstacle.isPositionBlocked(new Position(x,y))){
                         row.putIfAbsent(y, "X"); //closed space
@@ -37,7 +37,7 @@ public class World {
                     row.putIfAbsent(y, " "); //open space
                 }
             }
-            this.map.putIfAbsent(x, row);
+            this.worldMap.putIfAbsent(x, row);
         }
         this.robots = new HashMap<>();
     }
@@ -59,26 +59,23 @@ public class World {
         return this.robots;
     }
 
+    public HashMap<Integer, HashMap<Integer, String>> getWorldMap() {
+        return this.worldMap;
+    }
+
+    public Position getMapSize() {
+        return map.getMapSize();
+    }
+
     /**
      * Launch a robot at a random position in the world
      * @param robot : the robot to be added
      * */
     public void add(Robot robot) {
-        Position launchPosition;
-        Random random = new Random();
-        do {
-            // TODO: don't let robot spawn close to bottom or right edge
-            int limit = -50;
-            int x = random.nextInt(mapSize.getX()+1+limit) - (mapSize.getX()+limit/2)/2;
-            int y = random.nextInt(mapSize.getY()+1+limit) - (mapSize.getY()+limit/2)/2;
-            launchPosition = new Position(x,y);
-        } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
-        robot.setPosition(launchPosition);
-        robot.setDirection(0);
         robots.put(robot.getRobotName(), robot);
         int x = robot.getPosition().getX();
         int y = robot.getPosition().getY();
-        map.get(x).put(y, robot.getRobotName());
+        worldMap.get(x).put(y, robot.getRobotName());
     }
 
     public void remove(String robotName) {
@@ -86,7 +83,7 @@ public class World {
     }
 
     public void remove(Robot robot) {
-        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
+        worldMap.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
         robots.remove(robot.getRobotName());
     }
 
@@ -113,8 +110,8 @@ public class World {
             }
 
             for (int y = low; y <= high; y++){
-                if (!map.get(x).get(y).equals(" ")){
-                    if (map.get(x).get(y).equals("X")) {
+                if (!worldMap.get(x).get(y).equals(" ")){
+                    if (worldMap.get(x).get(y).equals("X")) {
                         return String.format("hit obstacle %d1 %d2",x,y);
                     } else {
                         for (Robot enemy : getEnemies(robot).values()) {
@@ -137,8 +134,8 @@ public class World {
             }
 
             for (int x = low; x <= high; x++){
-                if (!map.get(x).get(y).equals(" ")){
-                    if (map.get(x).get(y).equals("X")) {
+                if (!worldMap.get(x).get(y).equals(" ")){
+                    if (worldMap.get(x).get(y).equals("X")) {
                         return String.format("hit obstacle %d1 %d2", x, y);
                     } else {
                         for (Robot enemy : getEnemies(robot).values()) {
@@ -167,8 +164,8 @@ public class World {
                 (int) (robot.getPosition().getY() + round(steps * cos(toRadians(robot.getDirection().getAngle()))))
         );
         if (pathBlocked(robot, robot.getPosition(), newPosition).equals("miss")) {
-            map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
-            map.get(newPosition.getX()).put(newPosition.getY(), robotName);
+            worldMap.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
+            worldMap.get(newPosition.getX()).put(newPosition.getY(), robotName);
             robot.setPosition(newPosition);
         } else {
             throw new PathBlockedException();
@@ -199,7 +196,7 @@ public class World {
             int current_y = 0;
 
             for (int y = relativeCenter.getY() - distance; y <= relativeCenter.getY() + distance; y++) {
-                row.putIfAbsent(current_y, map.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X"));
+                row.putIfAbsent(current_y, worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X"));
                 current_y ++;
             }
 
