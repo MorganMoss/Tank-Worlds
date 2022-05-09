@@ -21,11 +21,13 @@ public class FireCommand extends Command{
                 Position finalBullet = bulletList.get(bulletList.size() - 1);
                 String result = world.pathBlocked(robot, robot.getPosition(), finalBullet);
                 String[] resultList = result.split(" ");
-                if (resultList[1].equals("enemy")) {
-                    Robot enemy = world.getRobot(resultList[2]);
-                    enemy.decreaseShield();
+                if (resultList.length > 1){
+                    if (resultList[1].equals("enemy")) {
+                        Robot enemy = world.getRobot(resultList[2]);
+                        enemy.decreaseShield();
+                    }
+                    return result;
                 }
-                return result;
             }
             return "no_ammo";
         }
