@@ -16,6 +16,8 @@ import java.util.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import static java.lang.Math.round;
+
 /**
  * The server that will be run. Clients will connect to it. 
  * It has 2-way communication and support for many clients
@@ -252,6 +254,20 @@ public class Server implements Runnable {
                         robot.toString());
             }
             System.out.println("----------------------");
+        }
+        System.out.println("----------------------\n" +
+                "WORLD MAP:\n" +
+                "----------------------");
+        HashMap<Integer, HashMap<Integer, String>> map = world.look(new Position(0,0), world.getMapSize().getX()/2+2);
+        for (int y = map.get(0).size()-1; y >= 0;  y--){
+            for (int x =0; x < map.size(); x++){
+                try{
+                    System.out.print("" + map.get(x).get(y).charAt(0) /*+ map.get(x).get(y).charAt(0)*/);
+                } catch (NullPointerException odd) {
+                    System.out.println(x + "," + y);
+                }
+            }
+            System.out.print('\n');
         }
     }
 

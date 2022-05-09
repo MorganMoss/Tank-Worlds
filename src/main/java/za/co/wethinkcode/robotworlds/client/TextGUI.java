@@ -135,12 +135,7 @@ public class TextGUI implements GUI {
 
         HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
 
-        for (int y = map.get(0).size()-1; y >= 0;  y--){
-            for (int x =0; x < map.size(); x++){
-                System.out.print("" + map.get(x).get(y).charAt(0) /*+ map.get(x).get(y).charAt(0)*/);
-            }
-            System.out.print('\n');
-        }
+
 
         System.out.println("Your Position : " + response.getRobot().getPosition());
 

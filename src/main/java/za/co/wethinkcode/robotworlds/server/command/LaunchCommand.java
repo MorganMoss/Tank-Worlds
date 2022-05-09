@@ -15,16 +15,18 @@ public class LaunchCommand extends Command{
     @Override
     public String execute(World world) {
         switch (argument.toLowerCase()){
-            case "basicrobot":
-                world.add(new BasicRobot(world, robotName.toLowerCase()));
             case "sniper":
                 world.add(new Sniper(world, robotName.toLowerCase()));
+                break;
             case "bomber":
                 world.add(new Bomber(world, robotName.toLowerCase()));
+                break;
             case "machine":
                 world.add(new Machine(world, robotName.toLowerCase()));
+                break;
             default:
                 world.add(new BasicRobot(world, robotName.toLowerCase()));
+                break;
         }
         return "Success";
     }
