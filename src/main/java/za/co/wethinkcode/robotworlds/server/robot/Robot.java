@@ -2,6 +2,9 @@ package za.co.wethinkcode.robotworlds.server.robot;
 
 import za.co.wethinkcode.robotworlds.server.Direction;
 import za.co.wethinkcode.robotworlds.server.Position;
+import za.co.wethinkcode.robotworlds.server.World;
+
+import java.util.Random;
 
 public class Robot {
 
@@ -21,7 +24,7 @@ public class Robot {
     private int deaths=0;
     private boolean paused;
 
-    public Robot(String robotName, int visibilityDistance, int maxShield, int maxAmmo, int reloadTime, int fireDistance) {
+    public Robot(World world, String robotName, int visibilityDistance, int maxShield, int maxAmmo, int reloadTime, int fireDistance) {
         //These are immutable
         this.robotName = robotName;
         this.maxShield = maxShield;

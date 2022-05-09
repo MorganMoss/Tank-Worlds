@@ -1,7 +1,6 @@
 package za.co.wethinkcode.robotworlds.server;
 
 import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
-import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
@@ -157,7 +156,7 @@ public class Server implements Runnable {
                 }
             }
         ) {
-            robotName = robotName.toLowerCase();
+            robotName = robotName.trim().toLowerCase();
 
             Request request = currentRequests.getOrDefault(robotName, new Request(robotName, "idle"));
 
