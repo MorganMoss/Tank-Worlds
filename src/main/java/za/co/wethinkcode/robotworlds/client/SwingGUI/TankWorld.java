@@ -9,6 +9,7 @@ import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
 import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.*;
 import za.co.wethinkcode.robotworlds.server.Position;
+import za.co.wethinkcode.robotworlds.server.obstacle.SquareObstacle;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import javax.swing.*;
@@ -23,11 +24,10 @@ public class TankWorld extends JComponent implements GUI {
     private static final int WIDTH = 600, HEIGHT = 600;
     private static final int REPAINT_INTERVAL = 50;
     private static Boolean launched = false;
-    private static ArrayList<Enemy> enemyList = new ArrayList<>();
-    private static List<Obstacle> obstacleList = BasicMap.getObstacles();
-    private static ArrayList<Projectile> projectileList = new ArrayList<>();
-    private static Request queue1 = new Request("Robot","launch");
-    private static LinkedList<Request> lastRequest = new LinkedList<>();
+    private static final ArrayList<Enemy> enemyList = new ArrayList<>();
+    private static final List<Obstacle> obstacleList = BasicMap.getObstacles();
+    private static final ArrayList<Projectile> projectileList = new ArrayList<>();
+    private static final LinkedList<Request> lastRequest = new LinkedList<>();
 
     //shows state HUD/ExplosionAnimation on repaint if set to true
     private boolean showState = false;
@@ -44,20 +44,23 @@ public class TankWorld extends JComponent implements GUI {
 
     private Response currentResponse;
 
+    private Player player;
+
     //FIFO stack for requests
     private static Request request = new Request("Robot","idle");
     public static int getScreenHeight(){return HEIGHT;}
     public String getClientName() {return this.clientName;}
     public String getRobotType(){return this.robotType;}
-    public void setEnemyName(String enemyName) {enemy1.setName(enemyName);}
     public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
 
     public TankWorld()  {
+        //TODO: Please put this in a pop up rather than the terminal.
         try (Scanner scanner = new Scanner(System.in);) {
             System.out.print("Enter Tank name : ");
             this.clientName = scanner.nextLine();
             System.out.print("Enter the type of tank : ");
             this.robotType = scanner.nextLine();
+            this.robotType = "sniper";
         }
 
         JFrame frame = setupGUI();
@@ -65,16 +68,7 @@ public class TankWorld extends JComponent implements GUI {
         setFocusable(true);
         start();
 
-
-        player.setName(clientName);
-        //Add first element of request stack
-        lastRequest.add(queue1);
-        //TODO: ADD ENEMIES FROM SERVER REQUEST
-        if (!enemyList.contains(enemy1)){
-            enemyList.add(enemy1);
-        }
-        if (!enemyList.contains(enemy2)){
-            enemyList.add(enemy2);}
+        player = new Player(robotType, clientName);
 
         // KEY LISTENER FOR USER INPUT
         this.addKeyListener(new KeyAdapter() {
@@ -185,12 +179,11 @@ public class TankWorld extends JComponent implements GUI {
             runServerCorrections(currentResponse);
             currentResponse = null;
         }
-
-        if (lastRequest.getLast() != queue1){
+        try {
             Request request = lastRequest.removeLast();
             System.out.println("input from gui:\n"+request.serialize());
             return request;
-        }else{
+        }catch (NoSuchElementException noInput){
             throw new NoNewInput();
         }
     }
@@ -200,11 +193,6 @@ public class TankWorld extends JComponent implements GUI {
     public void showOutput(Response response) {
         currentResponse = response;
     }
-
-    //TODO: SPAWN PLAYERS AND ENEMIES DYNAMICALLY FROM SERVER
-    Player player = new Player("sniper","Morgan");
-    Enemy enemy1 = new Enemy();
-    Enemy enemy2 = new Enemy();
 
     /*Swing component that paints onto the window*/
     @Override
@@ -221,6 +209,9 @@ public class TankWorld extends JComponent implements GUI {
             obstacle.draw(g);
         }
 
+        for (Enemy enemy : enemyList){
+            enemy.draw(g);
+        }
         // draw HUD *TO DO: Hide and only show on state command
         if(showState){
             player.showState(g);
@@ -270,16 +261,7 @@ public class TankWorld extends JComponent implements GUI {
         // spawn player tank TODO: implement designs for other tanks
         if(launched){
             player.draw(g);
-
-            // spawn enemy tank
-            enemy1.draw(g);
-
-            enemy2.draw(g);
-
             g.setColor(Color.RED);
-            g.drawRect(enemy1.getX(),enemy1.getY(),40,40);
-            g.drawRect(enemy2.getX(),enemy2.getY(),40,40);
-
             //Explode fire command animation
             if (showFireAnimation){
                 fireAnimation(g,player,enemyList,explodeCount);
@@ -339,71 +321,140 @@ public class TankWorld extends JComponent implements GUI {
     }
 
 
-    //TODO: CONNECT WITH RUNSERVERCORRECTIONS
-    //Handles enemy movement using input from server
-    public void enemyMovement(String command) {
-        if (Objects.equals(command, "forward")){
-            enemy1.moveForward();
-        }else if (Objects.equals(command, "back")){
-            enemy1.moveBack();
-        }else if (Objects.equals(command, "left")){
-            enemy1.turnLeft();
-        }else if (Objects.equals(command, "right")){
-            enemy1.turnRight();
-        }
-    }
-
     //TODO: BUILD INTERFACE () TO CONVERT SERVER OBJECTS
-    public void runServerCorrections(Response response){
+    public void runServerCorrections(Response response) {
         HashMap<String, Robot> enemies = response.getEnemyRobots();
-        Robot serverPlayer = response.getRobot();
 
-        player.setX(serverPlayer.getPosition().getX()+300);
-        player.setY(-serverPlayer.getPosition().getY()+300);
-        player.setName(serverPlayer.getRobotName());
-//        player.setAmmo(serverPlayer.getCurrentAmmo());
-//        player.setTankHealth(serverPlayer.getCurrentShield());
-//        player.setRange(serverPlayer.getRange());
-//        player.setSprite(serverPlayer.getClass().getName());
-//        player.setKills(serverPlayer.getKills());
-//        player.setDeaths(serverPlayer.getDeaths());
-//        player.setTankDirection(serverPlayer.getDirection());
+        player.setName(response.getRobot().getRobotName());
+
+        HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
+        //Goes through all the positions you can see
+        int y_size = map.get(0).size();
+        int x_size = map.size();
+
+        int x_step_multiplier = getScreenWidth() / x_size;
+        int y_step_multiplier = getScreenHeight() / y_size;
+
+        obstacleList.clear();
+
+        for (int y = y_size-1; y >= 0; y--) {
+            for (int x = 0; x < x_size; x++) {
+                String valueAtPosition = map.get(x).get(y);
+                switch (valueAtPosition.toLowerCase()) {
+                    //obstacle
+                    case "x":
+                        //check if it's there already, others change it to be
+                        obstacleList.add(new Brick(new Position(x * x_step_multiplier, y * y_step_multiplier)));
+                        break;
+                    //open
+                    case " ":
+                        break;
+                    //robot
+                    default:
+                        //TODO: break up into separate methods
+                        if (valueAtPosition.equalsIgnoreCase(player.getTankName())){
+                            player.setX(x * x_step_multiplier);
+                            player.setY(y * y_step_multiplier);
+                            player.setAmmo(response.getRobot().getCurrentAmmo());
+                            player.setTankHealth(response.getRobot().getCurrentShield());
+                            player.setAmmo(response.getRobot().getCurrentAmmo());
+                            player.setTankHealth(response.getRobot().getCurrentShield());
+                            player.setRange(response.getRobot().getRange());
+                            player.setSprite(response.getRobot().getClass().getName());
+                            player.setKills(response.getRobot().getKills());
+                            player.setDeaths(response.getRobot().getDeaths());
 
 
-        int i=0;
-        for(Robot serverEnemy:enemies.values()){
-                enemyList.get(i).setX(serverEnemy.getPosition().getX()+300);
-                enemyList.get(i).setY(-serverEnemy.getPosition().getY()+300);
-                enemyList.get(i).setName(serverEnemy.getRobotName());
-                enemyList.get(i).setAmmo(serverEnemy.getCurrentAmmo());
-                enemyList.get(i).setTankHealth(serverEnemy.getCurrentShield());
-                enemyList.get(i).setRange(serverEnemy.getRange());
-//                enemyList.get(i).setSprite(serverEnemy.getClass().getName());
-                enemyList.get(i).setKills(serverEnemy.getKills());
-                enemyList.get(i).setDeaths(serverEnemy.getDeaths());
-//                enemyList.get(i).setTankDirection(serverEnemy.getDirection());
-                if(serverEnemy.isFiring()){
-                    enemyList.get(i).fire();
+                            switch(response.getRobot().getDirection()) {
+                                case NORTH:
+                                    player.setTankDirection(Direction.Up);
+                                    break;
+                                case EAST:
+                                    player.setTankDirection(Direction.Right);
+                                    break;
+                                case SOUTH:
+                                    player.setTankDirection(Direction.Down);
+                                    break;
+                                case WEST:
+                                    player.setTankDirection(Direction.Left);
+                                    break;
+                            }
+
+                            break;
+                        }
+
+                        Robot robot = response.getEnemyRobots().get(valueAtPosition);
+
+                        boolean enemyFound = false;
+                        for (Enemy enemy : enemyList) {
+                            if (enemy.getTankName().equals(robot.getRobotName())) {
+                                enemyFound = true;
+
+                                enemy.setX(x * x_step_multiplier);
+                                enemy.setY(y * y_step_multiplier);
+                                enemy.setAmmo(robot.getCurrentAmmo());
+                                enemy.setTankHealth(robot.getCurrentShield());
+                                enemy.setKills(robot.getKills());
+
+                                switch (robot.getDirection()) {
+                                    case NORTH:
+                                        enemy.setTankDirection(Direction.Up);
+                                        break;
+                                    case EAST:
+                                        enemy.setTankDirection(Direction.Right);
+                                        break;
+                                    case SOUTH:
+                                        enemy.setTankDirection(Direction.Down);
+                                        break;
+                                    case WEST:
+                                        enemy.setTankDirection(Direction.Left);
+                                        break;
+                                }
+
+                                if (robot.isFiring()) {
+                                    enemy.fire();
+                                }
+                                break;
+                            }
+                        }
+
+                        if (!enemyFound) {
+                            Enemy enemy = new Enemy();
+
+                            enemy.setX(x * x_step_multiplier);
+                            enemy.setY(y * y_step_multiplier);
+                            enemy.setName(robot.getRobotName());
+                            enemy.setAmmo(robot.getCurrentAmmo());
+                            enemy.setTankHealth(robot.getCurrentShield());
+                            enemy.setRange(robot.getRange());
+                            enemy.setKills(robot.getKills());
+
+                            switch (robot.getDirection()) {
+                                case NORTH:
+                                    enemy.setTankDirection(Direction.Up);
+                                    break;
+                                case EAST:
+                                    enemy.setTankDirection(Direction.Right);
+                                    break;
+                                case SOUTH:
+                                    enemy.setTankDirection(Direction.Down);
+                                    break;
+                                case WEST:
+                                    enemy.setTankDirection(Direction.Left);
+                                    break;
+                            }
+
+                            if (robot.isFiring()) {
+                                enemy.fire();
+                            }
+
+                            enemyList.add(enemy);
+                        }
+                        break;
                 }
-                switch(serverEnemy.getDirection()){
-                    case NORTH:
-                        enemyList.get(i).setTankDirection(Direction.Up);
-                        break;
-                    case EAST:
-                        enemyList.get(i).setTankDirection(Direction.Right);
-                        break;
-                    case SOUTH:
-                        enemyList.get(i).setTankDirection(Direction.Down);
-                        break;
-                    case WEST:
-                        enemyList.get(i).setTankDirection(Direction.Left);
-                        break;
-                }
-                i++;
             }
         }
-
-
+    }
 
     public void start() {
         new SwingWorker<Void, Void>() {
@@ -422,24 +473,5 @@ public class TankWorld extends JComponent implements GUI {
     }
 
 }
-
-//TODO: MAKE INTO A FUNCTION TO RUN ON CLIENT
-
-//    public static void run(String[] args) {
-//        HelperMethods.setTheme();
-//        JFrame frame = new JFrame("T A N K W O R L D S");
-//        frame.setIconImage(HelperMethods.getImage("icon.png"));
-////        JLabel background = new JLabel(new ImageIcon(HelperMethods.getImage("/icon.png")));
-//        frame.setSize(WIDTH, HEIGHT);
-//        frame.setLocation(400, 100);
-//        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        frame.setResizable(false);
-//
-//        TankWorld tankWar = new TankWorld();
-//        frame.add(tankWar);
-//        tankWar.setFocusable(true);
-//        frame.setVisible(true);
-//        tankWar.start();
-//    }
 
 

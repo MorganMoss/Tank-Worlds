@@ -266,7 +266,7 @@ public class World {
         HashMap<String, Robot> enemies = new HashMap<>();
         for (Robot robotObj : robots.values()) {
             if (robotObj != robot) try {
-                enemies.put(robotObj.getRobotName(),robotObj);
+                enemies.put(robotObj.getRobotName().toLowerCase(),robotObj);
             } catch (RobotNotFoundException ignored) {}
         }
         return enemies;

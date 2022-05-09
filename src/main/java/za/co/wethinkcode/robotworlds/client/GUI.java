@@ -45,10 +45,5 @@ public interface GUI{
     // This could be changed according to its next command response from showOutput().
     // Then the flag can be checked in getInput()
 
-    String getClientName();
-    void setEnemyName(String enemyName);
-    void enemyMovement(String command);
-
-
 }
 

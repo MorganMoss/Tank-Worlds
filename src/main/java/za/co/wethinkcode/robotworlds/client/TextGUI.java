@@ -41,16 +41,6 @@ public class TextGUI implements GUI {
         return robotName;
     }
 
-    @Override
-    public void setEnemyName(String enemyName) {
-
-    }
-
-    @Override
-    public void enemyMovement(String command) {
-
-    }
-
     /**
      * Sets the text GUI up to be ready to launch a robot.
      */
