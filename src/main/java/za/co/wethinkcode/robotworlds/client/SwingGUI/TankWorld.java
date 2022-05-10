@@ -1,8 +1,10 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
 import za.co.wethinkcode.robotworlds.client.GUI;
+
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.BasicMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
+
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.*;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Projectile;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
@@ -409,7 +411,7 @@ public class TankWorld extends JComponent implements GUI {
                             player.setTankHealth(response.getRobot().getCurrentShield());
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
-                            player.setRange(response.getRobot().getRange()*x_scale);
+                            player.setRange(response.getRobot().getFiringDistance()*x_scale);
                             player.setKills(response.getRobot().getKills());
                             player.setDeaths(response.getRobot().getDeaths());
 
@@ -440,7 +442,7 @@ public class TankWorld extends JComponent implements GUI {
                         enemy.setSprite(robot.getRobotType());
                         enemy.setAmmo(robot.getCurrentAmmo());
                         enemy.setTankHealth(robot.getCurrentShield());
-                        enemy.setRange(robot.getRange());
+                        enemy.setRange(robot.getFiringDistance());
                         enemy.setKills(robot.getKills());
 
                         switch (robot.getDirection()) {
