@@ -66,6 +66,7 @@ public class TankWorld extends JComponent implements GUI {
     public TankWorld()  {
         frame = setupGUI();
         frame.add(this);
+        frame.setVisible(true);
         setFocusable(true);
         start();
 
@@ -149,17 +150,17 @@ public class TankWorld extends JComponent implements GUI {
                     case KeyEvent.VK_L:
                         if (!launched){
                             //TODO: Please put this in a pop up rather than the terminal.
-                            try (Scanner scanner = new Scanner(System.in);) {
+                                Scanner scanner = new Scanner(System.in);
                                 System.out.print("Enter Tank name : ");
                                 clientName = scanner.nextLine();
+                                Scanner scanner2 = new Scanner(System.in);
                                 System.out.print("Enter the type of tank : ");
-                                robotType = scanner.nextLine();
+                                robotType = scanner2.nextLine();
 
-                                robotType = "sniper";
+//                                robotType = "sniper";
 
                                 request = new Request(clientName,"launch", Collections.singletonList(robotType));
                                 lastRequest.add(request);
-                            }
                         }
                         break;
 

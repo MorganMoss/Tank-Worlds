@@ -78,11 +78,11 @@ public class Player extends Tank {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Default", Font.BOLD, 14));
         g.drawString(super.getTankName(), super.getX(), super.getY()-20);
+        //health bar
+        g.setColor(Color.RED);
+        g.fillRect(super.getX(), super.getY() - 10, super.getTankHealth() * 7, 10);
 
         if (TankWorld.getShowBoundaries()) {
-            //health bar
-            g.setColor(Color.RED);
-            g.fillRect(super.getX(), super.getY() - 10, super.getTankHealth() * 7, 10);
             //Range
             g.setColor(Color.GREEN);
             g.drawRect(super.getX() - (super.getRange() - 1)+20, super.getY() - (super.getRange() - 1)+20, super.getRange() * 2, super.getRange() * 2);
