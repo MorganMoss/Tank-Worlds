@@ -33,19 +33,19 @@ public class World {
         this.reloadTime = 0;
         this.maxShield = 0;
 
-        try {
-            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
-            Properties properties = new Properties();
-            properties.load(fileInputStream);
-            this.visibilityDistance = Integer.parseInt(properties.getProperty("visibility"));
-            this.repairTime = Integer.parseInt(properties.getProperty("repair"));
-            this.reloadTime = Integer.parseInt(properties.getProperty("reload"));
-            this.maxShield = Integer.parseInt(properties.getProperty("maxShield"));
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-        } catch (IOException e) {
-            System.out.println("Error");;
-        }
+//        try {
+//            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+//            Properties properties = new Properties();
+//            properties.load(fileInputStream);
+//            this.visibilityDistance = Integer.parseInt(properties.getProperty("visibility"));
+//            this.repairTime = Integer.parseInt(properties.getProperty("repair"));
+//            this.reloadTime = Integer.parseInt(properties.getProperty("reload"));
+//            this.maxShield = Integer.parseInt(properties.getProperty("maxShield"));
+//        } catch (FileNotFoundException e) {
+//            System.out.println("File not found");
+//        } catch (IOException e) {
+//            System.out.println("Error");;
+//        }
 
         List<Obstacle> obstacleList = map.getObstacles();
 

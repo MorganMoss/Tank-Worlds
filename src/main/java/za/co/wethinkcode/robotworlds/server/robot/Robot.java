@@ -18,7 +18,7 @@ public class Robot {
 
     private Position position;
     private Direction direction;
-    private String lastCommand;
+//    private String lastCommand;
     private int currentShield;
     private int currentAmmo;
     private int range=5;
@@ -32,7 +32,7 @@ public class Robot {
         this.position = setLaunchPosition(world);
         this.direction = Direction.NORTH;
         this.paused = false;
-        this.lastCommand = "launch";
+//        this.lastCommand = "launch";
 
         switch (robotType.toLowerCase()){
             case "sniper":
@@ -145,9 +145,9 @@ public class Robot {
         this.currentShield--;
     }
 
-    public void setLastCommand(String lastCommand) {
-        this.lastCommand = lastCommand;
-    }
+//    public void setLastCommand(String lastCommand) {
+//        this.lastCommand = lastCommand;
+//    }
 
     public void decreaseAmmo() {
         this.currentAmmo--;
