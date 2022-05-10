@@ -185,6 +185,7 @@ public class Server implements Runnable {
                         commandResponse = command.execute(world);
                     }
                 }
+                world.getRobot(robotName).setLastCommand(request.getCommand());
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }
