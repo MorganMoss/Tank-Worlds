@@ -75,10 +75,6 @@ public class Robot {
         return reloadTime;
     }
 
-    public boolean getPaused() {
-        return this.paused;
-    }
-
     public void setPaused(Boolean bool) {
         this.paused = bool;
     }
@@ -134,10 +130,6 @@ public class Robot {
 
     public boolean isPaused() {
         return this.paused;
-    }
-
-    public int getRange() {
-        return this.range;
     }
 
     public int getKills() {

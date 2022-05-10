@@ -15,7 +15,7 @@ public class RobotTest {
         World world = new World(new BasicMap(new Position(100,100)));
         BasicRobot basicRobot = new BasicRobot(world, "Hal");
         assertEquals("Hal",basicRobot.getRobotName());
-        assertEquals(5,basicRobot.getRange());
+        assertEquals(5,basicRobot.getFiringDistance());
         assertEquals(3,basicRobot.getCurrentAmmo());
         assertEquals(3,basicRobot.getCurrentShield());
         assertEquals(0,basicRobot.getDeaths());
@@ -31,7 +31,7 @@ public class RobotTest {
         World world = new World(new BasicMap(new Position(100,100)));
         Sniper sniper = new Sniper(world, "Hal");
         assertEquals("Hal",sniper.getRobotName());
-        assertEquals(5,sniper.getRange());
+        assertEquals(5,sniper.getFiringDistance());
         assertEquals(1,sniper.getCurrentAmmo());
         assertEquals(3,sniper.getCurrentShield());
         assertEquals(0,sniper.getDeaths());

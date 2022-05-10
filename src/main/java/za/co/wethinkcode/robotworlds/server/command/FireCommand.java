@@ -19,7 +19,7 @@ public class FireCommand extends Command{
                 robot.decreaseAmmo();
                 List<Position> bulletList = world.getBulletList(robot);
                 Position finalBullet = bulletList.get(bulletList.size() - 1);
-                String result = world.pathBlocked(robot, robot.getPosition(), finalBullet);
+                String result = world.pathBlocked(robot, finalBullet);
                 String[] resultList = result.split(" ");
                 if (resultList.length > 1){
                     if (resultList[1].equals("enemy")) {

@@ -89,14 +89,17 @@ public class World {
 
     /**
      * Looks at the path and sees if it's all an open path
-     * @param position : the old position
+     * @param robot : the robot that wants to move
      * @param newPosition : the new position
-     * @return true if there's something in the way, false if movement is unimpeded
+     * @return  "miss" : if no obstacles in the way
+     *          "hit obstacle {x} {y}" : if an obstacle is hit
+     *          "hit enemy {enemyName}" : if an enemy is hit
      */
-    public String pathBlocked(Robot robot, Position position, Position newPosition) {
+    public String pathBlocked(Robot robot, Position newPosition) {
         final int low;
         final int high;
         String response = "";
+        Position position = robot.getPosition();
 
         if (position.getX() == newPosition.getX()){
             final int x = newPosition.getX();
@@ -112,7 +115,7 @@ public class World {
             for (int y = low; y <= high; y++){
                 if (!worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals(" ")){
                     if (worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals("X")) {
-                        return String.format("hit obstacle %d1 %d2",x,y);
+                        return String.format("hit obstacle %d %d",x,y);
                     } else {
                         for (Robot enemy : getEnemies(robot).values()) {
                             if (isEnemyHit(robot, enemy)) {
@@ -136,7 +139,7 @@ public class World {
             for (int x = low; x <= high; x++){
                 if (!worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals(" ")){
                     if (worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals("X")) {
-                        return String.format("hit obstacle %d1 %d2", x, y);
+                        return String.format("hit obstacle %d %d", x, y);
                     } else {
                         for (Robot enemy : getEnemies(robot).values()) {
                             if (isEnemyHit(robot, enemy)) {
@@ -163,13 +166,22 @@ public class World {
                 (int) (robot.getPosition().getX() + round(steps * sin(toRadians(robot.getDirection().getAngle())))),
                 (int) (robot.getPosition().getY() + round(steps * cos(toRadians(robot.getDirection().getAngle()))))
         );
-        if (pathBlocked(robot, robot.getPosition(), newPosition).equals("miss")) {
-            worldMap.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
-            worldMap.get(newPosition.getX()).put(newPosition.getY(), robotName);
-            robot.setPosition(newPosition);
+        if (pathBlocked(robot, newPosition).equals("miss")) {
+            setRobotPosition(robot, newPosition);
         } else {
             throw new PathBlockedException();
         }
+    }
+
+    /**
+     * Sets a robot's position without first checking whether the position or path is blocked.
+     * @param robot : the robot whose position will be set
+     * @param newPosition : new Position of robot
+     * */
+    public void setRobotPosition(Robot robot, Position newPosition) {
+        worldMap.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
+        worldMap.get(newPosition.getX()).put(newPosition.getY(), robot.getRobotName());
+        robot.setPosition(newPosition);
     }
 
     public void updateDirection(String robotName, int degrees) {
@@ -277,7 +289,7 @@ public class World {
     private boolean isEnemyHit(Robot robot, Robot enemy) {
         List<Position> bulletList = getBulletList(robot);
         for (Position bulletPosition : bulletList) {
-            if (bulletPosition == enemy.getPosition()) {
+            if (bulletPosition.equals(enemy.getPosition())) {
                 return true;
             }
         }
@@ -302,12 +314,16 @@ public class World {
             switch (angle) {
                 case 0:
                     bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() + i);
+                    break;
                 case 90:
                     bulletPosition = new Position(robot.getPosition().getX() + i, robot.getPosition().getY());
+                    break;
                 case 180:
                     bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() - i);
+                    break;
                 case 270:
                     bulletPosition = new Position(robot.getPosition().getX() - i, robot.getPosition().getY());
+                    break;
             }
             bulletList.add(bulletPosition);
         }
