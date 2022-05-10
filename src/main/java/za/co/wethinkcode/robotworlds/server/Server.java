@@ -16,8 +16,6 @@ import java.util.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import static java.lang.Math.round;
-
 /**
  * The server that will be run. Clients will connect to it. 
  * It has 2-way communication and support for many clients
@@ -83,9 +81,18 @@ public class Server implements Runnable {
      * @return a map that will be used to define the world's size and it's obstacles
      */
     private Map getMap() {
-        //TODO : Get the map to be used from the config file;
-        // Size for a map should be determined by the map, not the server.
-        return new BasicMap(new Position(100,100));
+        String[] mapSize = {};
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            mapSize = properties.getProperty("mapSize").split(",");
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+        return new BasicMap(new Position(Integer.parseInt(mapSize[0]), Integer.parseInt(mapSize[1])));
     }
 
     /**

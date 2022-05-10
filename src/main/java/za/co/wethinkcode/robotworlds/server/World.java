@@ -2,6 +2,9 @@ package za.co.wethinkcode.robotworlds.server;
 
 import static java.lang.Math.*;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
@@ -14,6 +17,10 @@ public class World {
     private final HashMap<String, Robot> robots;
     private final HashMap<Integer, HashMap<Integer, String>> worldMap; //"X"," ",<RobotName>
     private final Map loadedMap;
+    private int visibilityDistance;
+    private int repairTime;
+    private int reloadTime;
+    private int maxShield;
 
     /**
      * Constructor for world
@@ -21,6 +28,24 @@ public class World {
      */
     public World(Map map) {
         this.loadedMap = map;
+        this.visibilityDistance = 0;
+        this.repairTime = 0;
+        this.reloadTime = 0;
+        this.maxShield = 0;
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            this.visibilityDistance = Integer.parseInt(properties.getProperty("visibility"));
+            this.repairTime = Integer.parseInt(properties.getProperty("repair"));
+            this.reloadTime = Integer.parseInt(properties.getProperty("reload"));
+            this.maxShield = Integer.parseInt(properties.getProperty("maxShield"));
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");;
+        }
 
         List<Obstacle> obstacleList = map.getObstacles();
 
@@ -65,6 +90,14 @@ public class World {
 
     public Position getMapSize() {
         return loadedMap.getMapSize();
+    }
+
+    public int getVisibilityDistance() {
+        return visibilityDistance;
+    }
+
+    public int getMaxShield() {
+        return this.maxShield;
     }
 
     /**
@@ -247,7 +280,7 @@ public class World {
                 robot.resetShield();
                 robot.setPaused(false);
             }
-        }, robot.getReloadTime()*1000);
+        }, repairTime*1000L);
     }
 
     /**
@@ -263,7 +296,7 @@ public class World {
                 robot.resetAmmo();
                 robot.setPaused(false);
             }
-        }, robot.getReloadTime()*1000);
+        }, reloadTime*1000L);
     }
 
 

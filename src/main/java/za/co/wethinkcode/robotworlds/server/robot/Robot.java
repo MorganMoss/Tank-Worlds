@@ -10,11 +10,9 @@ public class Robot {
 
     private final String robotName;
     private final String robotType;
-    private final int maxShield;
+    private final World world;
     private final int maxAmmo;
-    private final int visibilityDistance;
     private final int fireDistance;
-    private final int reloadTime;
     private final int size;
 
     private Position position;
@@ -27,78 +25,48 @@ public class Robot {
     private boolean paused;
 
     public Robot(World world, String robotName, String robotType) {
+        this.robotName = robotName;
+        this.world = world;
+        this.position = setLaunchPosition(world);
+        this.direction = Direction.NORTH;
+        this.paused = false;
 
         switch (robotType.toLowerCase()){
             case "sniper":
-                //These are immutable
-                this.robotName = robotName;
                 this.robotType = "sniper";
-                this.maxShield = 3;
                 this.maxAmmo = 5;
                 this.fireDistance = 125;
-                this.reloadTime = 3;
                 this.size=40;
-                //These are initialized, but are mutable
-                this.visibilityDistance = 11;
                 this.currentShield = 3;
                 this.currentAmmo = 5;
-                this.position = setLaunchPosition(world);
-                this.paused = false;
-                this.direction = Direction.NORTH;
                 break;
             case "machine":
-                //These are immutable
-                this.robotName = robotName;
                 this.robotType = "machine";
-                this.maxShield = 1;
                 this.maxAmmo = 20;
                 this.fireDistance = 50;
-                this.reloadTime = 3;
                 this.size=40;
-                //These are initialized, but are mutable
-                this.visibilityDistance = 9;
                 this.currentShield = 1;
                 this.currentAmmo = 20;
-                this.position = setLaunchPosition(world);
-                this.paused = false;
-                this.direction = Direction.NORTH;
                 break;
             case "bomber":
-                //These are immutable
-                this.robotName = robotName;
                 this.robotType = "bomber";
-                this.maxShield = 10;
                 this.maxAmmo = 10;
                 this.fireDistance = 75;
-                this.reloadTime = 3;
                 this.size=40;
-                //These are initialized, but are mutable
-                this.visibilityDistance = 9;
                 this.currentShield = 10;
                 this.currentAmmo = 10;
-                this.position = setLaunchPosition(world);
-                this.paused = false;
-                this.direction = Direction.NORTH;
                 break;
             default:
-                //These are immutable
-                this.robotName = robotName;
                 this.robotType = "tank";
-                this.maxShield = 3;
                 this.maxAmmo = 15;
                 this.fireDistance = 50;
-                this.reloadTime = 3;
                 this.size=40;
-                //These are initialized, but are mutable
-                this.visibilityDistance = 9;
                 this.currentShield = 3;
                 this.currentAmmo = 15;
-                this.position = setLaunchPosition(world);
-                this.paused = false;
-                this.direction = Direction.NORTH;
                 break;
         }
     }
+
     public int getDeaths(){
         return this.deaths;
     }
@@ -118,7 +86,7 @@ public class Robot {
     }
 
     public int getVisibilityDistance() {
-        return this.visibilityDistance;
+        return world.getVisibilityDistance();
     }
 
     public int getFiringDistance() {
@@ -131,10 +99,6 @@ public class Robot {
 
     public int getCurrentShield() {
         return this.currentShield;
-    }
-
-    public int getReloadTime() {
-        return reloadTime;
     }
 
     public void setPaused(Boolean bool) {
@@ -183,7 +147,7 @@ public class Robot {
     }
 
     public void resetShield() {
-        this.currentShield = this.maxShield;
+        this.currentShield = world.getMaxShield();
     }
 
     public void resetAmmo() {
