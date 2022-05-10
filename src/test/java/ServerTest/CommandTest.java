@@ -24,7 +24,7 @@ public class CommandTest {
         World world = new World(new BasicMap(new Position(100,100)));
         Robot robot = new Robot(world, "halk","sniper");
         world.add(robot);
-        LaunchCommand launch = new LaunchCommand(robot.getRobotName(),"BasicRobot");
+        LaunchCommand launch = new LaunchCommand(robot.getRobotName(),"testRobot");
         assertEquals("Success",launch.execute(world));
     }
     @Test
