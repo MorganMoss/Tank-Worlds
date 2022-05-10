@@ -9,6 +9,8 @@ import za.co.wethinkcode.robotworlds.server.robot.BasicRobot;
 import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CommandTest {
@@ -47,16 +49,16 @@ public class CommandTest {
     @Test
     public void testFireCommand(){
         World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new BasicRobot(world, "Peter");
+        Robot robot = new BasicRobot(world, "peter");
         world.add(robot);
         FireCommand fireCommand = new FireCommand(robot.getRobotName());
-        assertEquals("Success",fireCommand.execute(world));
+        assertEquals("no_ammo",fireCommand.execute(world));
     }
 
     @Test
     public void testLeftCommand(){
         World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new BasicRobot(world, "Roger");
+        Robot robot = new BasicRobot(world, "roger");
         LeftCommand leftCommand = new LeftCommand(robot.getRobotName());
         world.add(robot);
         assertEquals("Success",leftCommand.execute(world));
@@ -64,7 +66,7 @@ public class CommandTest {
     @Test
     public void testRightCommand(){
         World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new BasicRobot(world, "Larry");
+        Robot robot = new BasicRobot(world, "larry");
         RightCommand rightCommand = new RightCommand(robot.getRobotName());
         world.add(robot);
         assertEquals("Success",rightCommand.execute(world));
@@ -72,7 +74,7 @@ public class CommandTest {
     @Test
     public void testBackCommand(){
         World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new BasicRobot(world, "Moss");
+        Robot robot = new BasicRobot(world, "moss");
         world.add(robot);
         Command backCommand = new BackCommand(robot.getRobotName(),"5");
         assertEquals("Success",backCommand.execute(world));
@@ -80,7 +82,7 @@ public class CommandTest {
     @Test
     public void testForwardCommand(){
         World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new BasicRobot(world, "Moss");
+        Robot robot = new BasicRobot(world, "moss");
         ForwardCommand forwardCommand = new ForwardCommand(robot.getRobotName(),"5");
         world.add(robot);
         assertEquals("Success",forwardCommand.execute(world));
