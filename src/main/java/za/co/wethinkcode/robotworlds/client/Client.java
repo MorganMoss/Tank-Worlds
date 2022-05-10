@@ -23,7 +23,7 @@ public class Client {
     /**
      * The address of the server that the client is connecting to
      */
-    private static String address = "10.200.110.163";
+    private static String address = "localhost";
 
     //TODO : Have a config file for client that sets which GUI you use
     /**

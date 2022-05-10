@@ -1,6 +1,7 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks;
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Shell;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 
@@ -69,7 +70,8 @@ public class Player extends Tank {
 
 
     public String getDeadImage(){
-        return "deademoji.png";}
+        return "deademoji.png";
+    }
 
 
     //Display
@@ -103,16 +105,15 @@ public class Player extends Tank {
     }
 
     public void showState(Graphics g) {
-
         g.setColor(Color.BLACK);
         g.setFont(new Font("Default", Font.BOLD, 14));
-        g.drawString("Missiles: " + super.getAmmo(), 10, 50);
-        g.drawString("Health: " + super.getTankHealth(), 10, 70);
-//        g.drawString("Enemies Left: " + enemiesLeft, 10, 90);
-        g.drawString("Kills: " + super.getKills(), 10, 110);
-        g.drawString("Deaths: " + super.getDeaths(), 10, 130);
+        g.drawString("Missiles: " + super.getAmmo(), 10, 150);
+        g.drawString("Health: " + super.getTankHealth(), 10, 170);
+//        g.drawString("Enemies Left: " + enemiesLeft, 10, 190);
+        g.drawString("Kills: " + super.getKills(), 10, 210);
+        g.drawString("Deaths: " + super.getDeaths(), 10, 230);
 //        double kdRatio = kills/deaths;
-//        g.drawString("K/D: " + kdRatio, 10, 150);
+//        g.drawString("K/D: " + kdRatio, 10, 250);
 
     }
 }

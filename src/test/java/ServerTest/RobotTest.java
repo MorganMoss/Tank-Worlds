@@ -49,7 +49,7 @@ public class RobotTest {
     @Test
     public void testBomber(){
         World world = new World(new BasicMap(new Position(100,100)));
-        Robot basicRobot = new Robot(world, "Hal","bleh");
+        Robot basicRobot = new Robot(world, "Hal","bomber");
         assertEquals("Hal",basicRobot.getRobotName());
         assertEquals(15,basicRobot.getCurrentAmmo());
         assertEquals(3,basicRobot.getCurrentShield());

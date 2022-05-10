@@ -2,6 +2,7 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
 import za.co.wethinkcode.robotworlds.client.GUI;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.BasicMap;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.*;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Projectile;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
@@ -22,6 +23,7 @@ public class TankWorld extends JComponent implements GUI {
     private static final int WIDTH = 588, HEIGHT = 616;
     private static final int REPAINT_INTERVAL = 50;
     private static final ArrayList<Enemy> enemyList = new ArrayList<>();
+    private static final ArrayList<Position> enemyPositions = new ArrayList<>();
     private static final List<Obstacle> obstacleList = new ArrayList<>();
     private static final ArrayList<Projectile> projectileList = new ArrayList<>();
     private static final LinkedList<Request> lastRequest = new LinkedList<>();
@@ -60,6 +62,10 @@ public class TankWorld extends JComponent implements GUI {
 
     public static Boolean getShowBoundaries() {
         return showBoundaries;
+    }
+
+    public static ArrayList<Position> getEnemyPositions() {
+        return enemyPositions;
     }
 
     public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
@@ -179,6 +185,7 @@ public class TankWorld extends JComponent implements GUI {
                         }
                         break;
                 }
+                enemyPositions.clear();
             }
         });
     }
@@ -236,6 +243,7 @@ public class TankWorld extends JComponent implements GUI {
         // draw HUD *TO DO: Hide and only show on state command
         if(showState){
             player.showState(g);
+            MiniMap.draw(g,player);
         }
 
         //spawn projectiles check collisions
@@ -282,6 +290,10 @@ public class TankWorld extends JComponent implements GUI {
         // spawn player tank TODO: implement designs for other tanks
         if (launched){
             player.draw(g);
+            if(showBoundaries){
+            g.setColor(Color.BLACK);
+            g.drawString("("+player.getX() +","+ player.getY()+")", player.getX(), player.getY()-35);
+            }
             g.setColor(Color.RED);
             //Explode fire command animation
             if (showFireAnimation){
@@ -346,7 +358,17 @@ public class TankWorld extends JComponent implements GUI {
     public void runServerCorrections(Response response) {
         HashMap<String, Robot> enemies = response.getEnemyRobots();
 
+        for(Robot enemy : enemies.values()){
+            enemyPositions.add(enemy.getPosition());
+        }
+
         player.setName(response.getRobot().getRobotName());
+
+        //Minimap positions
+        player.setAbsoluteX(response.getRobot().getPosition().getX()+50);
+        System.out.println((response.getRobot().getPosition().getX()+50)+","+((-(response.getRobot().getPosition().getY())+50)));
+        player.setAbsoluteY(-(response.getRobot().getPosition().getY())+50);
+
 
         HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
         //Goes through all the positions you can see
@@ -415,6 +437,7 @@ public class TankWorld extends JComponent implements GUI {
                         enemy.setX((x+x_offset) * x_scale);
                         enemy.setY(getScreenHeight() - (y+y_offset) * y_scale);
                         enemy.setName(robot.getRobotName());
+                        enemy.setSprite(robot.getRobotType());
                         enemy.setAmmo(robot.getCurrentAmmo());
                         enemy.setTankHealth(robot.getCurrentShield());
                         enemy.setRange(robot.getRange());
@@ -440,7 +463,6 @@ public class TankWorld extends JComponent implements GUI {
                         }
 
                         enemyList.add(enemy);
-
                         break;
                 }
             }

@@ -16,6 +16,7 @@ public class Robot {
     private final int fireDistance;
     private final int reloadTime;
     private final int size;
+    private boolean isFiring = false;
 
     private Position position;
     private Direction direction;
