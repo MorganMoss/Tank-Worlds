@@ -10,6 +10,8 @@ public abstract class Tank implements WorldObject {
     private int health;
     private int x;
     private int y;
+    private int absoluteX;
+    private int absoluteY;
     private int range;
     private int ammo;
     private int maxAmmo;
@@ -26,6 +28,8 @@ public abstract class Tank implements WorldObject {
     public int getTankHealth(){return this.health;}
     public String getDeadImage(){return this.deadImage;}
     public Direction getDirection(){return this.direction;}
+    public int getAbsoluteX() {return absoluteX;}
+    public int getAbsoluteY() {return absoluteY;}
     public int getSize() {
         return this.size;
     }
@@ -40,6 +44,8 @@ public abstract class Tank implements WorldObject {
     public void setName(String name) {this.name=name;}
     public void setX(int x){this.x=x;}
     public void setY(int y){this.y=y;}
+    public void setAbsoluteX(int x){this.absoluteX=x;}
+    public void setAbsoluteY(int y){this.absoluteY=y;}
     public void addX(){x+=5;}
     public void minusX(){x-=5;}
     public void addY(){y+=5;}
