@@ -10,9 +10,9 @@ public class Robot {
     private final int fireDistance;
     private final int size;
 
+    private String lastCommand;
     private Position position;
     private Direction direction;
-    private String lastCommand;
     private int currentShield;
     private int currentAmmo;
     private int kills=0;
@@ -29,35 +29,35 @@ public class Robot {
         switch (robotType.toLowerCase()){
             case "sniper":
                 this.robotType = "sniper";
-                this.maxAmmo = 5;
+                this.size = 20;
                 this.fireDistance = 15;
-                this.size=20;
-                this.currentShield = 3;
-                this.currentAmmo = 5;
+                this.maxAmmo = 5;
+                this.currentAmmo = this.maxAmmo;
+                this.currentShield = World.getMaxShield();
                 break;
             case "machine":
                 this.robotType = "machine";
-                this.maxAmmo = 20;
+                this.size = 10;
                 this.fireDistance = 8;
-                this.size=10;
-                this.currentShield = 1;
-                this.currentAmmo = 20;
+                this.maxAmmo = 20;
+                this.currentAmmo = this.maxAmmo;
+                this.currentShield = World.getMaxShield();
                 break;
             case "bomber":
                 this.robotType = "bomber";
-                this.maxAmmo = 10;
+                this.size = 10;
                 this.fireDistance = 5;
-                this.size=10;
-                this.currentShield = 10;
-                this.currentAmmo = 10;
+                this.maxAmmo = 10;
+                this.currentAmmo = this.maxAmmo;
+                this.currentShield = World.getMaxShield();
                 break;
             default:
                 this.robotType = "tank";
-                this.maxAmmo = 15;
+                this.size = 10;
                 this.fireDistance = 10;
-                this.size=10;
-                this.currentShield = 3;
-                this.currentAmmo = 15;
+                this.maxAmmo = 15;
+                this.currentAmmo = this.maxAmmo;
+                this.currentShield = World.getMaxShield();
                 break;
         }
     }
