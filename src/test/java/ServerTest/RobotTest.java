@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import za.co.wethinkcode.robotworlds.server.Position;
 import za.co.wethinkcode.robotworlds.server.World;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.server.Robot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

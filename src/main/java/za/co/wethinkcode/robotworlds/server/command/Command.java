@@ -44,8 +44,6 @@ public abstract class Command {
                 return new RepairCommand(robotName);
             case "reload":
                 return new ReloadCommand(robotName);
-            case "look":
-                return new LookCommand(robotName);
             default:
                 throw new IllegalArgumentException("Unsupported command: " + request);
         }

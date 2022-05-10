@@ -5,7 +5,7 @@ import java.util.*;
 import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.server.Robot;
 
 // TODO :
 //  I have not implemented any way for the output to update

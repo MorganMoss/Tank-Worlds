@@ -1,8 +1,4 @@
-package za.co.wethinkcode.robotworlds.server.robot;
-
-import za.co.wethinkcode.robotworlds.server.Direction;
-import za.co.wethinkcode.robotworlds.server.Position;
-import za.co.wethinkcode.robotworlds.server.World;
+package za.co.wethinkcode.robotworlds.server;
 
 import java.util.Random;
 
@@ -10,60 +6,56 @@ public class Robot {
 
     private final String robotName;
     private final String robotType;
-    private final World world;
     private final int maxAmmo;
     private final int fireDistance;
     private final int size;
-    private boolean isFiring = false;
 
     private Position position;
     private Direction direction;
-//    private String lastCommand;
+    private String lastCommand;
     private int currentShield;
     private int currentAmmo;
-    private int range=5;
     private int kills=0;
     private int deaths=0;
     private boolean paused;
 
     public Robot(World world, String robotName, String robotType) {
         this.robotName = robotName;
-        this.world = world;
         this.position = setLaunchPosition(world);
         this.direction = Direction.NORTH;
         this.paused = false;
-//        this.lastCommand = "launch";
+        this.lastCommand = "launch";
 
         switch (robotType.toLowerCase()){
             case "sniper":
                 this.robotType = "sniper";
                 this.maxAmmo = 5;
-                this.fireDistance = 125;
-                this.size=40;
+                this.fireDistance = 15;
+                this.size=20;
                 this.currentShield = 3;
                 this.currentAmmo = 5;
                 break;
             case "machine":
                 this.robotType = "machine";
                 this.maxAmmo = 20;
-                this.fireDistance = 50;
-                this.size=40;
+                this.fireDistance = 8;
+                this.size=10;
                 this.currentShield = 1;
                 this.currentAmmo = 20;
                 break;
             case "bomber":
                 this.robotType = "bomber";
                 this.maxAmmo = 10;
-                this.fireDistance = 75;
-                this.size=40;
+                this.fireDistance = 5;
+                this.size=10;
                 this.currentShield = 10;
                 this.currentAmmo = 10;
                 break;
             default:
                 this.robotType = "tank";
                 this.maxAmmo = 15;
-                this.fireDistance = 50;
-                this.size=40;
+                this.fireDistance = 10;
+                this.size=10;
                 this.currentShield = 3;
                 this.currentAmmo = 15;
                 break;
@@ -89,7 +81,7 @@ public class Robot {
     }
 
     public int getVisibilityDistance() {
-        return world.getVisibilityDistance();
+        return World.getVisibilityDistance();
     }
 
     public int getFiringDistance() {
@@ -145,16 +137,16 @@ public class Robot {
         this.currentShield--;
     }
 
-//    public void setLastCommand(String lastCommand) {
-//        this.lastCommand = lastCommand;
-//    }
+    public void setLastCommand(String lastCommand) {
+        this.lastCommand = lastCommand;
+    }
 
     public void decreaseAmmo() {
         this.currentAmmo--;
     }
 
     public void resetShield() {
-        this.currentShield = world.getMaxShield();
+        this.currentShield = World.getMaxShield();
     }
 
     public void resetAmmo() {

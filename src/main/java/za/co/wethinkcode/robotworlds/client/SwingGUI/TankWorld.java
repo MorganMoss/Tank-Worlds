@@ -2,7 +2,6 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
 import za.co.wethinkcode.robotworlds.client.GUI;
 
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.BasicMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.*;
@@ -11,7 +10,7 @@ import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
 import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.*;
 import za.co.wethinkcode.robotworlds.server.Position;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.server.Robot;
 
 import javax.swing.*;
 import java.awt.*;

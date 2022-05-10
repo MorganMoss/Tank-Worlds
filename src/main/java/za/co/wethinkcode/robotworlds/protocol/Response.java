@@ -2,7 +2,7 @@ package za.co.wethinkcode.robotworlds.protocol;
 
 import com.google.gson.Gson;
 
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.server.Robot;
 
 import java.util.HashMap;
 

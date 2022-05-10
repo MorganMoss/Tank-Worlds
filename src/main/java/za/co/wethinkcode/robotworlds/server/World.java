@@ -11,42 +11,38 @@ import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 public class World {
+    private static int visibilityDistance;
+    private static int repairTime;
+    private static int reloadTime;
+    private static int maxShield;
+
     private final HashMap<String, Robot> robots;
     private final HashMap<Integer, HashMap<Integer, String>> worldMap; //"X"," ",<RobotName>
     private final Map loadedMap;
-    private int visibilityDistance;
-    private int repairTime;
-    private int reloadTime;
-    private int maxShield;
 
     /**
      * Constructor for world
      * @param map : the map that has gives a list of obstacles for this world to use.
      */
     public World(Map map) {
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            visibilityDistance = Integer.parseInt(properties.getProperty("visibility"));
+            repairTime = Integer.parseInt(properties.getProperty("repairTime"));
+            reloadTime = Integer.parseInt(properties.getProperty("reloadTime"));
+            maxShield = Integer.parseInt(properties.getProperty("maxShield"));
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");;
+        }
+
         this.loadedMap = map;
-        this.visibilityDistance = 0;
-        this.repairTime = 0;
-        this.reloadTime = 0;
-        this.maxShield = 0;
-
-//        try {
-//            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
-//            Properties properties = new Properties();
-//            properties.load(fileInputStream);
-//            this.visibilityDistance = Integer.parseInt(properties.getProperty("visibility"));
-//            this.repairTime = Integer.parseInt(properties.getProperty("repair"));
-//            this.reloadTime = Integer.parseInt(properties.getProperty("reload"));
-//            this.maxShield = Integer.parseInt(properties.getProperty("maxShield"));
-//        } catch (FileNotFoundException e) {
-//            System.out.println("File not found");
-//        } catch (IOException e) {
-//            System.out.println("Error");;
-//        }
-
         List<Obstacle> obstacleList = map.getObstacles();
 
         this.worldMap = new HashMap<>();
@@ -92,12 +88,12 @@ public class World {
         return loadedMap.getMapSize();
     }
 
-    public int getVisibilityDistance() {
+    public static int getVisibilityDistance() {
         return visibilityDistance;
     }
 
-    public int getMaxShield() {
-        return this.maxShield;
+    public static int getMaxShield() {
+        return maxShield;
     }
 
     /**

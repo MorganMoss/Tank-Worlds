@@ -7,7 +7,6 @@ import za.co.wethinkcode.robotworlds.server.command.Command;
 import za.co.wethinkcode.robotworlds.server.map.BasicMap;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 import java.net.*;
 import java.io.*;
@@ -81,19 +80,18 @@ public class Server implements Runnable {
      * @return a map that will be used to define the world's size and it's obstacles
      */
     private Map getMap() {
-//        String[] mapSize = {};
-//        try {
-//            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
-//            Properties properties = new Properties();
-//            properties.load(fileInputStream);
-//            mapSize = properties.getProperty("mapSize").split(",");
-//        } catch (FileNotFoundException e) {
-//            System.out.println("File not found");
-//        } catch (IOException e) {
-//            System.out.println("Error");
-//        }
-//        return new BasicMap(new Position(Integer.parseInt(mapSize[0]), Integer.parseInt(mapSize[1])));
-        return new BasicMap(new Position(100,100));
+        String[] mapSize = {};
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            mapSize = properties.getProperty("mapSize").split(",");
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+        return new BasicMap(new Position(Integer.parseInt(mapSize[0]), Integer.parseInt(mapSize[1])));
     }
 
     /**
@@ -186,7 +184,7 @@ public class Server implements Runnable {
                         commandResponse = command.execute(world);
                     }
                 }
-//                world.getRobot(robotName).setLastCommand(request.getCommand());
+                world.getRobot(robotName).setLastCommand(request.getCommand());
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }
