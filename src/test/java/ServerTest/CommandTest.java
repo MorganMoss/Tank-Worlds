@@ -44,13 +44,15 @@ public class CommandTest {
         assertEquals("Reload in progress",reloadCommand.execute(world));
     }
     @Test
-    public void testFireCommand(){
+    public void testFireCommandSuccess(){
         World world = new World(new BasicMap(new Position(100,100)));
         Robot robot = new Robot(world, "peter","sniper");
         world.add(robot);
         FireCommand fireCommand = new FireCommand(robot.getRobotName());
-        assertEquals("no_ammo",fireCommand.execute(world));
+        assertEquals("Success",fireCommand.execute(world));
     }
+
+
 
     @Test
     public void testLeftCommand(){
