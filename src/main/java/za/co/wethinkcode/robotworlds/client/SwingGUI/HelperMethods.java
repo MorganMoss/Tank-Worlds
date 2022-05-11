@@ -1,11 +1,12 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI;//import javafx.scene.media.MediaPlayer;
 
+import com.google.gson.Gson;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.google.gson.Gson;
 
 
 public class HelperMethods {

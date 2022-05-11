@@ -1,15 +1,16 @@
-package za.co.wethinkcode.robotworlds.server;
-
-import java.util.Random;
+package za.co.wethinkcode.robotworlds.shared;
 
 public class Robot {
     public static final String[] ROBOT_TYPES = new String[]{"Sniper", "Machine", "Bomber", "Tank"};
+
     private final String robotName;
     private final String robotType;
     private final int maxAmmo;
     private final int fireDistance;
     private final int size;
 
+    private int visibilityDistance;
+    private int maxShield;
     private String lastCommand;
     private Position position;
     private Direction direction;
@@ -19,9 +20,9 @@ public class Robot {
     private int deaths=0;
     private boolean paused;
 
-    public Robot(World world, String robotName, String robotType) {
+
+    public Robot(String robotName, String robotType) {
         this.robotName = robotName;
-        this.position = setLaunchPosition(world);
         this.direction = Direction.NORTH;
         this.paused = false;
         this.lastCommand = "launch";
@@ -31,35 +32,37 @@ public class Robot {
                 this.robotType = "sniper";
                 this.size = 20;
                 this.fireDistance = 15;
-                this.maxAmmo = 5;
-                this.currentAmmo = this.maxAmmo;
-                this.currentShield = World.getMaxShield();
+                this.maxAmmo = 3;
+                this.maxShield = 1;
+                this.visibilityDistance = 20;
                 break;
             case "machine":
                 this.robotType = "machine";
                 this.size = 10;
-                this.fireDistance = 8;
+                this.fireDistance = 10;
                 this.maxAmmo = 20;
-                this.currentAmmo = this.maxAmmo;
-                this.currentShield = World.getMaxShield();
+                this.maxShield = 2;
+                this.visibilityDistance = 10;
                 break;
             case "bomber":
                 this.robotType = "bomber";
                 this.size = 10;
                 this.fireDistance = 5;
                 this.maxAmmo = 10;
-                this.currentAmmo = this.maxAmmo;
-                this.currentShield = World.getMaxShield();
+                this.maxShield = 3;
+                this.visibilityDistance = 10;
                 break;
             default:
                 this.robotType = "tank";
                 this.size = 10;
                 this.fireDistance = 10;
-                this.maxAmmo = 15;
-                this.currentAmmo = this.maxAmmo;
-                this.currentShield = World.getMaxShield();
+                this.maxAmmo = 5;
+                this.maxShield = 3;
+                this.visibilityDistance = 10;
                 break;
         }
+        this.currentShield = this.maxShield;
+        this.currentAmmo = this.maxAmmo;
     }
 
     public int getDeaths(){
@@ -81,7 +84,7 @@ public class Robot {
     }
 
     public int getVisibilityDistance() {
-        return World.getVisibilityDistance();
+        return visibilityDistance;
     }
 
     public int getFiringDistance() {
@@ -117,18 +120,6 @@ public class Robot {
         }
     }
 
-    public Position setLaunchPosition(World world) {
-        Position launchPosition;
-        Random random = new Random();
-        do {
-            int limit = -50;
-            int x = random.nextInt(world.getMapSize().getX()+1+limit) - (world.getMapSize().getX()+limit/2)/2;
-            int y = random.nextInt(world.getMapSize().getY()+1+limit) - (world.getMapSize().getY()+limit/2)/2;
-            launchPosition = new Position(x,y);
-        } while(!world.getWorldMap().get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
-        return launchPosition;
-    }
-
     public void setPosition(Position position) {
         this.position = position;
     }
@@ -146,7 +137,7 @@ public class Robot {
     }
 
     public void resetShield() {
-        this.currentShield = World.getMaxShield();
+        this.currentShield = maxShield;
     }
 
     public void resetAmmo() {
@@ -173,5 +164,18 @@ public class Robot {
                 "\nshields : " +currentShield+
                 "\nshots : " +currentAmmo+
                 "\nstatus : n/a";
+    }
+
+    public void setVisibilityDistance(int visibilityDistance) {
+        this.visibilityDistance = visibilityDistance;
+    }
+
+    public int getMaxShield() {
+        return maxShield;
+    }
+
+    public void setMaxShield(int maxShield) {
+        this.maxShield = maxShield;
+        this.currentShield = maxShield;
     }
 }

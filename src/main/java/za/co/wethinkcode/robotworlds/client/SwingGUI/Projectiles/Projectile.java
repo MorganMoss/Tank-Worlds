@@ -1,7 +1,7 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles;
 
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.WorldObject;
 
 public abstract class Projectile implements WorldObject {

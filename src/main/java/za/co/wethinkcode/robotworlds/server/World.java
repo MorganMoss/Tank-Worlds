@@ -1,73 +1,139 @@
 package za.co.wethinkcode.robotworlds.server;
 
-import static java.lang.Math.*;
+import za.co.wethinkcode.robotworlds.server.map.BasicMap;
+import za.co.wethinkcode.robotworlds.server.map.GUIMap;
+import za.co.wethinkcode.robotworlds.server.map.Map;
+import za.co.wethinkcode.robotworlds.server.map.MazeMap;
+import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
+import za.co.wethinkcode.robotworlds.shared.Position;
+import za.co.wethinkcode.robotworlds.shared.Robot;
+import za.co.wethinkcode.robotworlds.shared.exceptions.PathBlockedException;
+import za.co.wethinkcode.robotworlds.shared.exceptions.RobotNotFoundException;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
-import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
-import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
-import za.co.wethinkcode.robotworlds.server.map.Map;
-import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
+import static java.lang.Math.*;
 
 public class World {
-    private static int visibilityDistance;
-    private static int repairTime;
-    private static int reloadTime;
-    private static int maxShield;
+    /**
+     * The largest distance a robot can see in this world
+     */
+    private static final int visibilityDistance =  Integer.parseInt(getConfigProperty("visibility"));
+    /**
+     * The repair time for each robot in this world
+     */
+    private static final int repairTime = Integer.parseInt(getConfigProperty("reloadTime"));
+    /**
+     * The reloading time for each robot in this world
+     */
+    private static final int reloadTime = Integer.parseInt(getConfigProperty("maxShield"));
+    /**
+     * The highest the maximum shield can be for each robot in this world
+     */
+    private static final int maxShield = Integer.parseInt(getConfigProperty("repairTime"));
+    /**
+     * The map loaded by config to be used for it's obstacles
+     */
+    private static Map loadedMap = getMap();
+    /**
+     *  The World Map. It contains shorthand references ot obstacles, open spaces and robots as a grid.
+     *      <li> Obstacle : "X"</li>
+     *      <li> Open : " "</li>
+     *      <li> Robot : "RobotName" </li>
+     */
+    private static final HashMap<Integer, HashMap<Integer, String>> worldMap = constructWorldMap();
+    /**
+     * The robots currently active in this world
+     */
+    private static final HashMap<String, Robot> robots = new HashMap<>();
 
-    private final HashMap<String, Robot> robots;
-    private final HashMap<Integer, HashMap<Integer, String>> worldMap; //"X"," ",<RobotName>
-    private final Map loadedMap;
+    public static void resetMap(){
+        loadedMap = getMap();
+        worldMap.clear();
+        worldMap.putAll(constructWorldMap());
+    }
 
     /**
-     * Constructor for world
-     * @param map : the map that has gives a list of obstacles for this world to use.
+     * Gets a generic property from the server config file
+     * @param property the property key
+     * @return the property value
      */
-    public World(Map map) {
-
+    public static String getConfigProperty(String property){
         try {
             FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
             Properties properties = new Properties();
             properties.load(fileInputStream);
-            visibilityDistance = Integer.parseInt(properties.getProperty("visibility"));
-            repairTime = Integer.parseInt(properties.getProperty("repairTime"));
-            reloadTime = Integer.parseInt(properties.getProperty("reloadTime"));
-            maxShield = Integer.parseInt(properties.getProperty("maxShield"));
+            String value = properties.getProperty(property);
+            if (value != null){
+                return value;
+            }
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
         } catch (IOException e) {
-            System.out.println("Error");;
+            System.out.println("Error");
+        }
+        System.out.println("Property " + property + " is not defined in the config");
+        System.exit(1);
+        return "";
+    }
+
+    /**
+     * This should take the config file and get a map
+     * @return a map that will be used to define the world's size and it's obstacles
+     */
+    private static Map getMap() {
+        String[] mapSize;
+        String map = getConfigProperty("map");
+        mapSize = getConfigProperty("mapSize").split(",");
+        Map.setSize(new Position(Integer.parseInt(mapSize[0]), Integer.parseInt(mapSize[1])));
+
+        switch (map){
+            case "MazeMap":
+                return new MazeMap();
+            case "GUIMap":
+                return new GUIMap();
+            case "BasicMap":
+                return new BasicMap();
         }
 
-        this.loadedMap = map;
-        List<Obstacle> obstacleList = map.getObstacles();
+        System.out.println("Error: Bad map property");
+        System.exit(1);
+        return null;
+    }
 
-        this.worldMap = new HashMap<>();
-        for (int x = round(-map.getMapSize().getX()/2.0f); x <= round(map.getMapSize().getX()/2.0f); x++) { //ROWS
+    /**
+     * Constructs the grid of the World Map from the loaded map
+     */
+    public static HashMap<Integer, HashMap<Integer, String>> constructWorldMap(){
+        List<Obstacle> obstacleList = loadedMap.getObstacles();
+
+        HashMap<Integer, HashMap<Integer, String>> constructedMap = new HashMap<>();
+
+        for (int x = -loadedMap.getMapSize().getX()/2; x <= round(loadedMap.getMapSize().getX()/2.0f); x++) { //ROWS
             HashMap<Integer, String> row = new HashMap<>();
 
-            for (int y = round(-map.getMapSize().getY()/2.0f); y <= round(map.getMapSize().getY()/2.0f); y++) { //COLUMNS
+            for (int y = round(-loadedMap.getMapSize().getY()/2.0f); y <= round(loadedMap.getMapSize().getY()/2.0f); y++) { //COLUMNS
                 for (Obstacle obstacle : obstacleList){
                     if (obstacle.isPositionBlocked(new Position(x,y))){
-                        row.putIfAbsent(y, "X"); //closed space
+                        row.put(y, "X"); //closed space
                         break;
                     }
                     row.putIfAbsent(y, " "); //open space
                 }
             }
-            this.worldMap.putIfAbsent(x, row);
+            constructedMap.putIfAbsent(x, row);
         }
-        this.robots = new HashMap<>();
+        return constructedMap;
     }
 
     /**
      * Get a robot object from its name
      * @param name : the robot's name
      * */
-    public Robot getRobot(String name) throws RobotNotFoundException {
+    public static Robot getRobot(String name) throws RobotNotFoundException {
         Robot robot = robots.get(name);
         if (robot == null){
             throw new RobotNotFoundException();
@@ -75,46 +141,85 @@ public class World {
         return robot;
     }
 
-
-    public HashMap<String, Robot> getRobots() {
-        return this.robots;
+    /**
+     * Gets the list of active robots
+     * @return the list of active robots
+     */
+    public static HashMap<String, Robot> getRobots() {
+        return robots;
     }
 
-    public HashMap<Integer, HashMap<Integer, String>> getWorldMap() {
-        return this.worldMap;
+    /**
+     * Get the world map in its current state
+     * @return the world map in its current state
+     */
+    public static HashMap<Integer, HashMap<Integer, String>> getWorldMap() {
+        return worldMap;
     }
 
-    public Position getMapSize() {
+    /**
+     * Gets the width and height of the map loaded
+     * @return a position holding those values as x and y respectively
+     */
+    public static Position getMapSize() {
         return loadedMap.getMapSize();
     }
 
-    public static int getVisibilityDistance() {
-        return visibilityDistance;
-    }
 
-    public static int getMaxShield() {
-        return maxShield;
+    /**
+     * Gets a valid starting position for a robot
+     * @return a position of an open space
+     */
+    public static Position getLaunchPosition() {
+        Position launchPosition;
+        Random random = new Random();
+        do {
+            int limit = -50;
+            int x = random.nextInt(getMapSize().getX()+1+limit) - (getMapSize().getX()+limit/2)/2;
+            int y = random.nextInt(getMapSize().getY()+1+limit) - (getMapSize().getY()+limit/2)/2;
+            launchPosition = new Position(x,y);
+        } while(!worldMap.get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
+        return launchPosition;
     }
 
     /**
      * Launch a robot at a random position in the world
      * @param robot : the robot to be added
      * */
-    public void add(Robot robot) {
+    public static void add(Robot robot) {
+        //limits imposed by server config
+        if (robot.getVisibilityDistance() > visibilityDistance){
+            robot.setVisibilityDistance(visibilityDistance);
+        }
+        if (robot.getMaxShield() > maxShield){
+            robot.setVisibilityDistance(visibilityDistance);
+        }
+
+        robot.setPosition(getLaunchPosition());
         robots.put(robot.getRobotName(), robot);
+
         int x = robot.getPosition().getX();
         int y = robot.getPosition().getY();
         worldMap.get(x).put(y, robot.getRobotName());
     }
 
-    public void remove(String robotName) {
-        this.remove(getRobot(robotName));
+    /**
+     * Handles removal of a robot from the world using their name
+     * @param robotName : of robot to be removed
+     */
+    public static void remove(String robotName) {
+        remove(getRobot(robotName));
     }
 
-    public void remove(Robot robot) {
+    /**
+     * Handles removal of a robot from the world
+     * @param robot : to be removed
+     */
+    public static void remove(Robot robot) {
         worldMap.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
         robots.remove(robot.getRobotName());
     }
+
 
     /**
      * Looks at the path and sees if it's all an open path
@@ -124,7 +229,7 @@ public class World {
      *          "hit obstacle {x} {y}" : if an obstacle is hit
      *          "hit enemy {enemyName}" : if an enemy is hit
      */
-    public String pathBlocked(Robot robot, Position newPosition) {
+    public static String pathBlocked(Robot robot, Position newPosition) {
         final int low;
         final int high;
         String response = "";
@@ -189,7 +294,7 @@ public class World {
      * @param steps : the distance the robot moves
      * @throws PathBlockedException : thrown if the movement is not possible
      */
-    public void updatePosition(String robotName, int steps) throws PathBlockedException{
+    public static void updatePosition(String robotName, int steps) throws PathBlockedException{
         Robot robot = getRobot(robotName);
         Position newPosition =  new Position(
                 (int) (robot.getPosition().getX() + round(steps * sin(toRadians(robot.getDirection().getAngle())))),
@@ -207,28 +312,30 @@ public class World {
      * @param robot : the robot whose position will be set
      * @param newPosition : new Position of robot
      * */
-    public void setRobotPosition(Robot robot, Position newPosition) {
+    public static void setRobotPosition(Robot robot, Position newPosition) {
         worldMap.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
         worldMap.get(newPosition.getX()).put(newPosition.getY(), robot.getRobotName());
         robot.setPosition(newPosition);
     }
 
-    public void updateDirection(String robotName, int degrees) {
+    /**
+     * Rotates robot by the degrees given
+     * @param robotName robot ot be rotated
+     * @param degrees the number of degrees (in 90 degree intervals)
+     */
+    public static void updateDirection(String robotName, int degrees) {
         Robot robot = getRobot(robotName);
         robot.setDirection((int) (robot.getDirection().getAngle()) + degrees);
     }
 
-    //TODO
-    public void fire(Robot robot) {}
 
-    // TODO : add an argument for viewDistance.
     /**
      * Makes a hashmap of hashmaps going from 0 to 2*viewDistance
      * contains characters representing obstacles, open spaces and robots
      * @param relativeCenter : The position to look from
      * @return : a grid of data representing the relative view from this position
      */
-    public HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter, int distance) {
+    public static HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter, int distance) {
         int current_x = 0;
         HashMap<Integer, HashMap<Integer, String>> result = new HashMap<>();
 
@@ -248,26 +355,21 @@ public class World {
         return result;
     }
 
-    // TODO : Have this give the base method the viewDistance of the robot
-    //  (Do the to do for the base method first)
     /**
      * Makes a hashmap of hashmaps going from 0 to 2*viewDistance
      * contains characters representing obstacles, open spaces and robots
      * @param robot : The robot that is used as a reference to look from
      * @return : a grid of data representing the relative view from this position
      */
-    public HashMap<Integer, HashMap<Integer, String>> look(Robot robot) {
+    public static HashMap<Integer, HashMap<Integer, String>> look(Robot robot) {
        return look(robot.getPosition(), robot.getVisibilityDistance());
     }
-
-    //TODO
-    public void pause(Robot robot, int duration) {}
 
     /**
      * Pause the robot while doing repairs
      * @param robot : the robot to repair
      * */
-    public void repair(Robot robot) {
+    public static void repair(Robot robot) {
         robot.setPaused(true);
         Timer t = new Timer();
         t.schedule(new TimerTask() {
@@ -283,7 +385,7 @@ public class World {
      * Pause the robot while reloading
      * @param robot : the robot to reload
      * */
-    public void reload(Robot robot) {
+    public static void reload(Robot robot) {
         robot.setPaused(true);
         Timer t = new Timer();
         t.schedule(new TimerTask() {
@@ -300,7 +402,7 @@ public class World {
      * Returns all robots in the world except the given robot
      * @param robot : the robot that wants info on its enemies
      * */
-    public HashMap<String, Robot> getEnemies(Robot robot) {
+    public static HashMap<String, Robot> getEnemies(Robot robot) {
         HashMap<String, Robot> enemies = new HashMap<>();
         for (Robot robotObj : robots.values()) {
             if (robotObj != robot) try {
@@ -315,7 +417,7 @@ public class World {
      * @param robot : the robot that fired the shot
      * @param enemy : the robot being shot at
      * */
-    private boolean isEnemyHit(Robot robot, Robot enemy) {
+    private static boolean isEnemyHit(Robot robot, Robot enemy) {
         List<Position> bulletList = getBulletList(robot);
         for (Position bulletPosition : bulletList) {
             if (bulletPosition.equals(enemy.getPosition())) {
@@ -325,14 +427,13 @@ public class World {
         return false;
     }
 
-
     /**
      * Compiles a list consisting of all the positions the bullet will
      * travel to if world objects are ignored
      * @param robot : the robot that fired the shot
      * @return list of bullet positions
      * */
-    public List<Position> getBulletList(Robot robot) {
+    public static List<Position> getBulletList(Robot robot) {
 
         int distance = robot.getFiringDistance();
         Position bulletPosition = new Position(0,0);

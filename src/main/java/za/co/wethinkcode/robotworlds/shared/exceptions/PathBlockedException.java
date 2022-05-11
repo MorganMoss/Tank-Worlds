@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.exceptions;
+package za.co.wethinkcode.robotworlds.shared.exceptions;
 
 /**
  * Raised when a robot tries to move to a place it cannot

@@ -1,16 +1,19 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
 import za.co.wethinkcode.robotworlds.client.GUI;
-
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
-
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.*;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Brick;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Obstacle;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Projectile;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
-import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
-import za.co.wethinkcode.robotworlds.protocol.*;
-import za.co.wethinkcode.robotworlds.server.Position;
-import za.co.wethinkcode.robotworlds.server.Robot;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Enemy;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Player;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Tank;
+import za.co.wethinkcode.robotworlds.shared.Position;
+import za.co.wethinkcode.robotworlds.shared.Robot;
+import za.co.wethinkcode.robotworlds.shared.exceptions.NoNewInput;
+import za.co.wethinkcode.robotworlds.shared.protocols.Request;
+import za.co.wethinkcode.robotworlds.shared.protocols.Response;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,9 +21,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.*;
-import java.awt.Color;
 import java.util.List;
+import java.util.*;
 
 public class TankWorld extends JComponent implements GUI {
     private static final int WIDTH = 588, HEIGHT = 616;

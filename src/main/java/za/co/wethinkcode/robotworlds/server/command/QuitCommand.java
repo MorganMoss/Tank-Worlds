@@ -1,15 +1,15 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
 import za.co.wethinkcode.robotworlds.server.World;
+public class QuitCommand extends Command{
 
-public class RightCommand extends Command{
-    public RightCommand(String robotName) {
+    public QuitCommand(String robotName) {
         super(robotName);
     }
 
     @Override
     public String execute() {
-        World.updateDirection(robotName, 90);
-        return "Success";
+        World.remove(robotName);
+        return "Quit Successful";
     }
 }

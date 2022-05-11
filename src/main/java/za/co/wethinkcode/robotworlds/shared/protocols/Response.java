@@ -1,8 +1,7 @@
-package za.co.wethinkcode.robotworlds.protocol;
+package za.co.wethinkcode.robotworlds.shared.protocols;
 
 import com.google.gson.Gson;
-
-import za.co.wethinkcode.robotworlds.server.Robot;
+import za.co.wethinkcode.robotworlds.shared.Robot;
 
 import java.util.HashMap;
 

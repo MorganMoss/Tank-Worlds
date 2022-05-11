@@ -1,10 +1,7 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
+import javax.swing.*;
 import java.awt.*;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.Timer;
 
 public class Countdown {
     private final JLabel label = new JLabel("...");

@@ -3,7 +3,7 @@ package ClientTest;
 import org.junit.jupiter.api.Test;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Brick;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Pit;
-import za.co.wethinkcode.robotworlds.server.Position;
+import za.co.wethinkcode.robotworlds.shared.Position;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
