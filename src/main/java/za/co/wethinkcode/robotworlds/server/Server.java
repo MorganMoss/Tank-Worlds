@@ -178,7 +178,13 @@ public class Server{
                     Command command = Command.create(request);
                     commandResponse = command.execute();
                 } else {
-                    if (!World.getRobot(robotName).isPaused()) {
+                    Robot robot = World.getRobot(robotName);
+
+                    if (!robot.isPaused() || request.getCommand().equals("quit")) {
+                        if (robot.hasDied()) {
+                            robot.setPaused(true);
+                        }
+                        robot.setLastCommand(request.getCommand());
                         Command command = Command.create(request);
                         commandResponse = command.execute();
                     }

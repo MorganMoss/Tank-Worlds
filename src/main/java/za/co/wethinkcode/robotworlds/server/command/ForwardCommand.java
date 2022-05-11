@@ -13,6 +13,7 @@ public class ForwardCommand extends Command{
     public String execute() {
         try {
             World.updatePosition(robotName, Integer.parseInt(argument));
+            World.getRobot(robotName).setStatus("normal");
             return "Success";
         } catch (PathBlockedException ignored) {
             return "Path Blocked!";

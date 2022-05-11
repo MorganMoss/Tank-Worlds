@@ -19,6 +19,7 @@ public class Robot {
     private int kills=0;
     private int deaths=0;
     private boolean paused;
+    private String status;
 
 
     public Robot(String robotName, String robotType) {
@@ -26,6 +27,7 @@ public class Robot {
         this.direction = Direction.NORTH;
         this.paused = false;
         this.lastCommand = "launch";
+        this.status="normal";
 
         switch (robotType.toLowerCase()){
             case "sniper":
@@ -124,6 +126,10 @@ public class Robot {
         this.position = position;
     }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public void decreaseShield() {
         this.currentShield--;
     }
@@ -156,6 +162,10 @@ public class Robot {
         return false;
     }
 
+    public boolean hasDied() {
+        return currentShield==0;
+    }
+
     @Override
     public String toString() {
         return "name : " +robotName+
@@ -163,7 +173,7 @@ public class Robot {
                 "\ndirection : " +direction.toString()+
                 "\nshields : " +currentShield+
                 "\nshots : " +currentAmmo+
-                "\nstatus : n/a";
+                "\nstatus : "+status;
     }
 
     public void setVisibilityDistance(int visibilityDistance) {
