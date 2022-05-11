@@ -9,6 +9,7 @@ public class RightCommand extends Command{
 
     @Override
     public String execute(World world) {
+        world.getRobot(robotName).setStatus("normal");
         world.updateDirection(robotName, 90);
         return "Success";
     }

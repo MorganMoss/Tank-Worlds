@@ -15,6 +15,7 @@ public class FireCommand extends Command{
         @Override
         public String execute(World world) {
             Robot robot = world.getRobot(robotName);
+            world.getRobot(robotName).setStatus("normal");
             if (robot.getCurrentAmmo() > 0) {
                 robot.decreaseAmmo();
                 List<Position> bulletList = world.getBulletList(robot);

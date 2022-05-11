@@ -268,6 +268,7 @@ public class World {
      * @param robot : the robot to repair
      * */
     public void repair(Robot robot) {
+        robot.setStatus("repair");
         robot.setPaused(true);
         Timer t = new Timer();
         t.schedule(new TimerTask() {
@@ -284,6 +285,7 @@ public class World {
      * @param robot : the robot to reload
      * */
     public void reload(Robot robot) {
+        robot.setStatus("reload");
         robot.setPaused(true);
         Timer t = new Timer();
         t.schedule(new TimerTask() {
@@ -293,6 +295,7 @@ public class World {
                 robot.setPaused(false);
             }
         }, reloadTime*1000L);
+
     }
 
 
