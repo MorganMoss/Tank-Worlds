@@ -165,6 +165,10 @@ public class Robot {
         return false;
     }
 
+    public boolean hasDied() {
+        return currentShield==0;
+    }
+
     @Override
     public String toString() {
         return "name : " +robotName+

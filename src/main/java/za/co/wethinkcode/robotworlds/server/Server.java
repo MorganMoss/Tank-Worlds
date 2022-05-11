@@ -179,12 +179,22 @@ public class Server implements Runnable {
                     Command command = Command.create(request);
                     commandResponse = command.execute(world);
                 } else {
-                    if (!world.getRobot(robotName).isPaused()) {
+                    Robot robot = world.getRobot(robotName);
+
+                    if (!robot.isPaused()) {
+                        if (request.getCommand().equals("quit")) {
+                            world.remove(robot);
+                        }
+                        if (robot.hasDied()) {
+                            robot.setPaused(true);
+                            world.remove(robot);
+                        }
+                        robot.setLastCommand(request.getCommand());
                         Command command = Command.create(request);
                         commandResponse = command.execute(world);
                     }
                 }
-                world.getRobot(robotName).setLastCommand(request.getCommand());
+
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }
