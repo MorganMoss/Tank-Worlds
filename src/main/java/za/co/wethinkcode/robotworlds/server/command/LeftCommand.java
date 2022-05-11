@@ -10,6 +10,7 @@ public class LeftCommand extends Command{
     @Override
     public String execute(World world) {
         world.updateDirection(robotName,270);
+        world.getRobot(robotName).setStatus("normal");
         return "Success";
     }
 }
