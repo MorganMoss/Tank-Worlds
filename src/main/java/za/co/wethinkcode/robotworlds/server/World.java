@@ -68,7 +68,7 @@ public class World {
      * @param name : the robot's name
      * */
     public Robot getRobot(String name) throws RobotNotFoundException {
-        Robot robot = robots.get(name.toLowerCase());
+        Robot robot = robots.get(name);
         if (robot == null){
             throw new RobotNotFoundException();
         }
@@ -304,7 +304,7 @@ public class World {
         HashMap<String, Robot> enemies = new HashMap<>();
         for (Robot robotObj : robots.values()) {
             if (robotObj != robot) try {
-                enemies.put(robotObj.getRobotName().toLowerCase(),robotObj);
+                enemies.put(robotObj.getRobotName(),robotObj);
             } catch (RobotNotFoundException ignored) {}
         }
         return enemies;

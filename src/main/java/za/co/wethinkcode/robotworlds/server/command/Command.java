@@ -12,7 +12,7 @@ public abstract class Command {
     public abstract String execute(World world);
 
     public Command(String robotName){
-        this.robotName = robotName.trim().toLowerCase();
+        this.robotName = robotName.trim();
         this.argument = "";
     }
 

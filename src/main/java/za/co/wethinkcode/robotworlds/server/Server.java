@@ -23,7 +23,7 @@ public class Server implements Runnable {
     /**
      * The speed at which the server sends out responses (in milliseconds)
      */
-    private final int tickInterval = 50;
+    private static final int tickInterval = 50;
     /**
      * The world the server interacts with when handling requests and responses
      */
@@ -164,7 +164,7 @@ public class Server implements Runnable {
                 }
             }
         ) {
-            robotName = robotName.trim().toLowerCase();
+            robotName = robotName.trim();
 
             Request request = currentRequests.getOrDefault(robotName, new Request(robotName, "idle"));
 
@@ -217,7 +217,7 @@ public class Server implements Runnable {
 
         this.responseLog.add(response);
 
-        currentResponses.put(robot.getRobotName().toLowerCase(), response);
+        currentResponses.put(robot.getRobotName(), response);
 
         if (!Objects.equals(response.getCommandResponse(), "idle")) {
             System.out.println("Out -> " +response.getRobot().getRobotName() + " : " + response.getCommandResponse());
@@ -231,7 +231,7 @@ public class Server implements Runnable {
      * @return a formatted response object
      */
     public Response getResponse(String robotName) throws NoChangeException {
-        Response response = currentResponses.get(robotName.toLowerCase());
+        Response response = currentResponses.get(robotName);
         if (response == null) {
             throw new NoChangeException();
         }

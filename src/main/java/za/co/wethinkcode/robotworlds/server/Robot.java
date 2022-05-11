@@ -3,7 +3,7 @@ package za.co.wethinkcode.robotworlds.server;
 import java.util.Random;
 
 public class Robot {
-
+    public static final String[] ROBOT_TYPES = new String[]{"Sniper", "Machine", "Bomber", "Tank"};
     private final String robotName;
     private final String robotType;
     private final int maxAmmo;

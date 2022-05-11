@@ -135,7 +135,7 @@ public class ServerThread extends Thread {
 
                     if (request.getCommand().equals("launch")) {
                         responder.setRobotName(request.getRobotName());
-                        robotName = request.getRobotName().toLowerCase();
+                        robotName = request.getRobotName();
                         responder.start();
                     }
 
