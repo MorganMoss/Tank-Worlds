@@ -187,7 +187,7 @@ public class Server implements Runnable {
                         }
                         if (robot.hasDied()) {
                             robot.setPaused(true);
-                            world.remove(robot);
+//                            world.remove(robot);
                         }
                         robot.setLastCommand(request.getCommand());
                         Command command = Command.create(request);
