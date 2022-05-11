@@ -27,4 +27,9 @@ public abstract class Obstacle {
 
     public abstract boolean isPositionBlocked(Position position);
 
+    @Override
+    public String toString() {
+        return String.format("- At position %s (to %d,%d)", topLeft.toString(), topLeft.getX() + size.getX(), topLeft.getY() - size.getY());
+    }
+
 }

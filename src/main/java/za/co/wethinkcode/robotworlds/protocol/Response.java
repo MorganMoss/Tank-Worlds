@@ -2,7 +2,7 @@ package za.co.wethinkcode.robotworlds.protocol;
 
 import com.google.gson.Gson;
 
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.server.Robot;
 
 import java.util.HashMap;
 
@@ -19,7 +19,7 @@ public class Response {
      * A view given by the world.look method.
      * It is a grid that represents what this robot can see
      */
-//    private final HashMap<Integer, HashMap<Integer, String>> map;
+    private final HashMap<Integer, HashMap<Integer, String>> map;
     /**
      * A list of nearby robots with their current states.
      */
@@ -35,15 +35,15 @@ public class Response {
     public Response(Robot robot, String commandResponse, HashMap<Integer, HashMap<Integer, String>> map, HashMap<String, Robot> enemyRobots) {
         this.robot = robot;
         this.commandResponse = commandResponse;
-//        this.map = map;
+        this.map = map;
         this.enemyRobots = enemyRobots;
     }
 
 
 
-//    public HashMap<Integer, HashMap<Integer, String>> getMap() {
-//        return this.map;
-//    }
+    public HashMap<Integer, HashMap<Integer, String>> getMap() {
+        return this.map;
+    }
 
     public Robot getRobot() {
         return robot;
@@ -64,7 +64,6 @@ public class Response {
      */
     public String serialize(){
         Gson gson = new Gson();
-//                GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(this);
     }
 
@@ -76,7 +75,6 @@ public class Response {
      */
     public static Response deSerialize(String json){
         Gson gson = new Gson();
-//                GsonBuilder().setPrettyPrinting().create();
         return gson.fromJson(json,Response.class);
     }
 }

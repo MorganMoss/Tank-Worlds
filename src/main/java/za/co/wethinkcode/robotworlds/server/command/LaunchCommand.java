@@ -1,23 +1,17 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
-import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
+import za.co.wethinkcode.robotworlds.server.Robot;
 import za.co.wethinkcode.robotworlds.server.World;
-import za.co.wethinkcode.robotworlds.server.robot.BasicRobot;
-
-import java.util.Locale;
 
 public class LaunchCommand extends Command{
 
-    public LaunchCommand(String robotName) {
-        super(robotName);
+    public LaunchCommand(String robotName,String argument) {
+        super(robotName,argument);
     }
-
 
     @Override
     public String execute(World world) {
-        world.add(new BasicRobot(robotName.toLowerCase()));
+        world.add(new Robot(world, robotName ,argument));
         return "Success";
     }
-
-
 }

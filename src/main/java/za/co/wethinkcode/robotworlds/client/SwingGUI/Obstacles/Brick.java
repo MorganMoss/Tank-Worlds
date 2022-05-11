@@ -1,5 +1,6 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
 import za.co.wethinkcode.robotworlds.server.Position;
 import java.awt.*;
@@ -35,11 +36,13 @@ public class Brick extends Obstacle{
     }
 
     static Image brick = HelperMethods.getImage("brick.png");
-    static Image resizedBrick = brick.getScaledInstance(25,25, Image.SCALE_DEFAULT);
+    static Image resizedBrick = brick.getScaledInstance(TankWorld.getX_scale()+1,TankWorld.getY_scale()+1, Image.SCALE_DEFAULT);
     public void draw(Graphics g) {
         g.drawImage(resizedBrick, x, y, null);
-        g.setColor(Color.red);
-        g.drawRect(x, y, super.getSize(), super.getSize());
+        if (TankWorld.getShowBoundaries()) {
+            g.setColor(Color.red);
+            g.drawRect(x, y, super.getSize(), super.getSize());
+        }
 
     }
 

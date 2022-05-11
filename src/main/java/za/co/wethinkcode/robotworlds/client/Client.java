@@ -4,75 +4,40 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
-import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.SwingGUI;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
 import za.co.wethinkcode.robotworlds.protocol.Request;
 import za.co.wethinkcode.robotworlds.protocol.Response;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
-
-
-import javax.swing.*;
-import java.util.HashMap;
-import java.util.Scanner;
 
 /**
  * This is the back-end for the user, it handles communication between the GUI and the server.
  * This class should not be modified further, outside of the TODO's given.
  */
 public class Client {
-    //TODO : Have port be determined by a config file
+    //TODO : Have port and address be determined by a config file
     /**
      * The port the server uses
      */
     private static int port = 5000;
-    private static String clientName;
-    static Scanner scanner = new Scanner(System.in);
-    private static String enemyName="enemy";
-    private static Response guiResponse;
+    //10.200.109.17 //localhost //maggie 10.200.110.163
+    /**
+     * The address of the server that the client is connecting to
+     */
+    private static String address = "localhost";
 
-    public static String getMyClientName(){return clientName;}
-
-    public static Response getResponse() {
-        return guiResponse;
-    }
-
-    public String getEnemyName(){return enemyName;};
+    //TODO : Have a config file for client that sets which GUI you use
+    /**
+     * The GUI being used by the client
+     */
+    private static class CurrentGUI extends TankWorld {}
 
     /**
      * Starts the gui and the threads that handle input/output
      */
     private static void start(){
-        //TODO : Have a config file for client that sets which GUI you use
-        /*
-          all that should change in here is this line.
-          i.e. GUI gui = new SwingGUI(); or new TankWorlds();
-         */
-//        GUI gui = new SwingGUI();
-//        ((SwingGUI) gui).startGUI();
-//        GUI gui = new TextGUI();
-        System.out.println("Enter Tank name: \n");
-        clientName = scanner.nextLine();
+        GUI gui = new CurrentGUI();
 
-        HelperMethods.setTheme();
-        JFrame frame = new JFrame("T A N K W O R L D S");
-        frame.setIconImage(HelperMethods.getImage("icon.png"));
-//        JLabel background = new JLabel(new ImageIcon(HelperMethods.getImage("/icon.png")));
-        frame.setSize(TankWorld.getScreenWidth(), TankWorld.getScreenHeight());
-        frame.setLocation(400, 100);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setResizable(false);
-        TankWorld gui = new TankWorld();
-        frame.add(gui);
-        gui.setFocusable(true);
-        frame.setVisible(true);
-        gui.start();
-
-        try (
-                //10.200.109.17 //localhost //maggie 10.200.110.163
-            Socket socket = new Socket("localhost", port);
-        ) {
+        try (Socket socket = new Socket(address, port)) {
             Out output = new Out(socket, gui);
             output.start();
 
@@ -111,20 +76,18 @@ public class Client {
         @Override
         public void run() {
             try(
-                    BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             ) {
                 do {
                     try {
-                        String serializedResponse = incoming.readLine(); //should be changed to a response object
-                        guiResponse = Response.deSerialize(serializedResponse);
-//                        System.out.println(guiResponse.getEnemyRobots().values());
-                        System.out.println("("+(guiResponse.getRobot().getPosition().getX()+300)+","+(-guiResponse.getRobot().getPosition().getY()+300)+")");
+                        String serializedResponse = incoming.readLine();
 
-                        if (!serializedResponse.matches("")){
-    //                        gui.showOutput(Response.deSerialize(serializedResponse));
-                            System.out.println(serializedResponse);
-                            System.out.println(gui.getClientName());
+                        Response response = Response.deSerialize(serializedResponse);
+
+                        if (response != null) {
+                            gui.showOutput(response);
                         }
+
                     } catch (IOException ignored) {}
 
                 } while (true);
@@ -141,13 +104,11 @@ public class Client {
     private static class In extends Thread {
         private final GUI gui;
         private final Socket socket;
-//        private final String name;
 
         public In(Socket socket, GUI gui) {
             this.gui = gui;
             this.socket = socket;
-//            gui.showOutput(new Response("", "Enter a Name", new HashMap<>()));
-//            this.name = gui.getInput();
+
         }
 
         @Override
@@ -160,17 +121,15 @@ public class Client {
             }
 
             try(
-                    PrintStream outgoing = new PrintStream(socket.getOutputStream());
+                PrintStream outgoing = new PrintStream(socket.getOutputStream());
             ) {
                 do {
                     try {
-                        String input = gui.getInput().serialize();
-                        System.out.println("output:\n"+input);
+                        Request request = gui.getInput();
 
-                        Request request = new Request(gui.getClientName(), input);
-                        String serializedRequest = request.serialize();
+//                        System.out.println("Out -> " + request.getRobotName() + " : " + request.getCommand() + " ; " + request.getArguments());
 
-                        outgoing.println(input);
+                        outgoing.println(request.serialize()); //send request to server
                         outgoing.flush();
 
                         if (request.getCommand().matches("quit")) {

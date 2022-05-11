@@ -2,6 +2,7 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks;
 
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 
 import java.awt.*;
 import java.util.Random;
@@ -20,6 +21,9 @@ public class Enemy extends Tank {
     int size=40;
     private int x=rand.nextInt(500);
     private int y=rand.nextInt(500);
+    private int absoluteX;
+    private int absoluteY;
+
 
 
     //getters
@@ -68,17 +72,24 @@ public class Enemy extends Tank {
     public void turnLeft(){this.direction = this.direction.getLeft();}
     public void turnRight(){this.direction = this.direction.getRight();}
 
+
     //draw tank on swing graphics
     public void draw(Graphics g){
+
         g.drawString(name, this.x, this.y-20);
+        if (TankWorld.getShowBoundaries()){
+            g.setColor(Color.RED);
+            g.drawRect(super.getX(), super.getY(), super.getSize(), super.getSize());
+        }
         g.setColor(Color.RED);
         g.fillRect(this.x, this.y-10, health*7, 10);
+
         boolean enemyDead = health==0;
 
         if(enemyDead){g.drawImage(HelperMethods.getImage(this.getDeadImage()), this.x, this.y, null);
         }else{
             g.drawImage(this.getDirection().getImage(this.getSpriteName()),
-                     this.x, this.y, null);}
+                    this.x, this.y, null);}
 
         //respawn enemy
         if(health==-1){

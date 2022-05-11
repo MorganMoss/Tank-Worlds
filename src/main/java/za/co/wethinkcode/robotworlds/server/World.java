@@ -1,35 +1,55 @@
 package za.co.wethinkcode.robotworlds.server;
 
 import static java.lang.Math.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.server.map.Map;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
 
 public class World {
+    private static int visibilityDistance;
+    private static int repairTime;
+    private static int reloadTime;
+    private static int maxShield;
+
     private final HashMap<String, Robot> robots;
-    private final HashMap<Integer, HashMap<Integer, String>> map; //"X"," ",<RobotName>
-    private final Position mapSize;
+    private final HashMap<Integer, HashMap<Integer, String>> worldMap; //"X"," ",<RobotName>
+    private final Map loadedMap;
 
     /**
      * Constructor for world
      * @param map : the map that has gives a list of obstacles for this world to use.
      */
     public World(Map map) {
-        mapSize = map.getMapSize();
 
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            visibilityDistance = Integer.parseInt(properties.getProperty("visibility"));
+            repairTime = Integer.parseInt(properties.getProperty("repairTime"));
+            reloadTime = Integer.parseInt(properties.getProperty("reloadTime"));
+            maxShield = Integer.parseInt(properties.getProperty("maxShield"));
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");;
+        }
+
+        this.loadedMap = map;
         List<Obstacle> obstacleList = map.getObstacles();
 
-        this.map = new HashMap<>();
-        for (int x = round(-mapSize.getX()/2.0f); x <= round(mapSize.getX()/2.0f); x++) { //ROWS
+        this.worldMap = new HashMap<>();
+        for (int x = round(-map.getMapSize().getX()/2.0f); x <= round(map.getMapSize().getX()/2.0f); x++) { //ROWS
             HashMap<Integer, String> row = new HashMap<>();
 
-            for (int y = round(-mapSize.getY()/2.0f); y <= round(mapSize.getY()/2.0f); y++) { //COLUMNS
+            for (int y = round(-map.getMapSize().getY()/2.0f); y <= round(map.getMapSize().getY()/2.0f); y++) { //COLUMNS
                 for (Obstacle obstacle : obstacleList){
                     if (obstacle.isPositionBlocked(new Position(x,y))){
                         row.putIfAbsent(y, "X"); //closed space
@@ -38,38 +58,53 @@ public class World {
                     row.putIfAbsent(y, " "); //open space
                 }
             }
-            this.map.putIfAbsent(x, row);
+            this.worldMap.putIfAbsent(x, row);
         }
         this.robots = new HashMap<>();
     }
 
+    /**
+     * Get a robot object from its name
+     * @param name : the robot's name
+     * */
     public Robot getRobot(String name) throws RobotNotFoundException {
-        Robot robot = robots.get(name.toLowerCase());
+        Robot robot = robots.get(name);
         if (robot == null){
             throw new RobotNotFoundException();
         }
         return robot;
     }
 
+
     public HashMap<String, Robot> getRobots() {
         return this.robots;
     }
 
+    public HashMap<Integer, HashMap<Integer, String>> getWorldMap() {
+        return this.worldMap;
+    }
+
+    public Position getMapSize() {
+        return loadedMap.getMapSize();
+    }
+
+    public static int getVisibilityDistance() {
+        return visibilityDistance;
+    }
+
+    public static int getMaxShield() {
+        return maxShield;
+    }
+
+    /**
+     * Launch a robot at a random position in the world
+     * @param robot : the robot to be added
+     * */
     public void add(Robot robot) {
-        Position launchPosition;
-        Random random = new Random();
-        do {
-            // TODO: don't let robot spawn close to bottom or right edge
-            int x = random.nextInt(mapSize.getX()-50+1) - mapSize.getX()/2;
-            int y = random.nextInt(mapSize.getY()-50+1) - mapSize.getY()/2;
-            launchPosition = new Position(x,y);
-        } while(!map.get(launchPosition.getX()).get(launchPosition.getY()).equals(" "));
-        robot.setPosition(launchPosition);
-        robot.setDirection(0);
         robots.put(robot.getRobotName(), robot);
         int x = robot.getPosition().getX();
         int y = robot.getPosition().getY();
-        map.get(x).put(y, robot.getRobotName());
+        worldMap.get(x).put(y, robot.getRobotName());
     }
 
     public void remove(String robotName) {
@@ -77,19 +112,23 @@ public class World {
     }
 
     public void remove(Robot robot) {
-        map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
+        worldMap.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
         robots.remove(robot.getRobotName());
     }
 
     /**
      * Looks at the path and sees if it's all an open path
-     * @param position : the old position
+     * @param robot : the robot that wants to move
      * @param newPosition : the new position
-     * @return true if there's something in the way, false if movement is unimpeded
+     * @return  "miss" : if no obstacles in the way
+     *          "hit obstacle {x} {y}" : if an obstacle is hit
+     *          "hit enemy {enemyName}" : if an enemy is hit
      */
-    public PathBlockedResponse pathBlocked(Position position, Position newPosition) {
+    public String pathBlocked(Robot robot, Position newPosition) {
         final int low;
         final int high;
+        String response = "";
+        Position position = robot.getPosition();
 
         if (position.getX() == newPosition.getX()){
             final int x = newPosition.getX();
@@ -103,11 +142,15 @@ public class World {
             }
 
             for (int y = low; y <= high; y++){
-                if (!map.get(x).get(y).equals(" ")){
-                    if (map.get(x).get(y).equals("X")) {
-                        return PathBlockedResponse.OBSTACLE_HIT;
+                if (!worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals(" ")){
+                    if (worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals("X")) {
+                        return String.format("hit obstacle %d %d",x,y);
                     } else {
-                        return PathBlockedResponse.ENEMY_HIT;
+                        for (Robot enemy : getEnemies(robot).values()) {
+                            if (isEnemyHit(robot, enemy)) {
+                                return String.format("hit enemy %s", enemy.getRobotName());
+                            }
+                        }
                     }
                 }
             }
@@ -123,17 +166,21 @@ public class World {
             }
 
             for (int x = low; x <= high; x++){
-                if (!map.get(x).get(y).equals(" ")){
-                    if (map.get(x).get(y).equals("X")) {
-                        return PathBlockedResponse.OBSTACLE_HIT;
+                if (!worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals(" ")){
+                    if (worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals("X")) {
+                        return String.format("hit obstacle %d %d", x, y);
                     } else {
-                        return PathBlockedResponse.ENEMY_HIT;
+                        for (Robot enemy : getEnemies(robot).values()) {
+                            if (isEnemyHit(robot, enemy)) {
+                                return String.format("hit enemy %s", enemy.getRobotName());
+                            }
+                        }
+                        return response;
                     }
                 }
             }
         }
-
-        return PathBlockedResponse.MISS;
+        return "miss";
     }
 
     /**
@@ -148,13 +195,22 @@ public class World {
                 (int) (robot.getPosition().getX() + round(steps * sin(toRadians(robot.getDirection().getAngle())))),
                 (int) (robot.getPosition().getY() + round(steps * cos(toRadians(robot.getDirection().getAngle()))))
         );
-        if (pathBlocked(robot.getPosition(), newPosition) == PathBlockedResponse.MISS) {
-            map.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
-            map.get(newPosition.getX()).put(newPosition.getY(), robotName);
-            robot.setPosition(newPosition);
+        if (pathBlocked(robot, newPosition).equals("miss")) {
+            setRobotPosition(robot, newPosition);
         } else {
             throw new PathBlockedException();
         }
+    }
+
+    /**
+     * Sets a robot's position without first checking whether the position or path is blocked.
+     * @param robot : the robot whose position will be set
+     * @param newPosition : new Position of robot
+     * */
+    public void setRobotPosition(Robot robot, Position newPosition) {
+        worldMap.get(robot.getPosition().getX()).put(robot.getPosition().getY(), " ");
+        worldMap.get(newPosition.getX()).put(newPosition.getY(), robot.getRobotName());
+        robot.setPosition(newPosition);
     }
 
     public void updateDirection(String robotName, int degrees) {
@@ -172,9 +228,7 @@ public class World {
      * @param relativeCenter : The position to look from
      * @return : a grid of data representing the relative view from this position
      */
-    public HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter) {
-        int distance = 600;//hardcoded for now 10
-
+    public HashMap<Integer, HashMap<Integer, String>> look(Position relativeCenter, int distance) {
         int current_x = 0;
         HashMap<Integer, HashMap<Integer, String>> result = new HashMap<>();
 
@@ -183,7 +237,7 @@ public class World {
             int current_y = 0;
 
             for (int y = relativeCenter.getY() - distance; y <= relativeCenter.getY() + distance; y++) {
-                row.putIfAbsent(current_y, map.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X"));
+                row.putIfAbsent(current_y, worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X"));
                 current_y ++;
             }
 
@@ -203,22 +257,49 @@ public class World {
      * @return : a grid of data representing the relative view from this position
      */
     public HashMap<Integer, HashMap<Integer, String>> look(Robot robot) {
-       return look(robot.getPosition());
+       return look(robot.getPosition(), robot.getVisibilityDistance());
     }
 
     //TODO
     public void pause(Robot robot, int duration) {}
 
-    //TODO
+    /**
+     * Pause the robot while doing repairs
+     * @param robot : the robot to repair
+     * */
     public void repair(Robot robot) {
-        robot.resetShield();
+        robot.setPaused(true);
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                robot.resetShield();
+                robot.setPaused(false);
+            }
+        }, repairTime*1000L);
     }
 
-    //TODO
+    /**
+     * Pause the robot while reloading
+     * @param robot : the robot to reload
+     * */
     public void reload(Robot robot) {
-        robot.resetAmmo();
+        robot.setPaused(true);
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                robot.resetAmmo();
+                robot.setPaused(false);
+            }
+        }, reloadTime*1000L);
     }
 
+
+    /**
+     * Returns all robots in the world except the given robot
+     * @param robot : the robot that wants info on its enemies
+     * */
     public HashMap<String, Robot> getEnemies(Robot robot) {
         HashMap<String, Robot> enemies = new HashMap<>();
         for (Robot robotObj : robots.values()) {
@@ -229,16 +310,52 @@ public class World {
         return enemies;
     }
 
-//    public HashMap<String, Robot> getEnemies(){
-//        HashMap<String, Robot> enemies = new HashMap<>();
-//        for ( HashMap<Integer, String> row : map.values()){
-//            for (String object : row.values()) {
-//                if (!object.equals(" ") && !object.equals("X")) try {
-//                    Robot enemy = getRobot(object);
-//                    enemies.put(object, enemy);
-//                } catch (RobotNotFoundException ignored) {}
-//            }
-//        }
-//        return enemies;
-//    }
+    /**
+     * Checks whether an enemy was hit by the robot
+     * @param robot : the robot that fired the shot
+     * @param enemy : the robot being shot at
+     * */
+    private boolean isEnemyHit(Robot robot, Robot enemy) {
+        List<Position> bulletList = getBulletList(robot);
+        for (Position bulletPosition : bulletList) {
+            if (bulletPosition.equals(enemy.getPosition())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Compiles a list consisting of all the positions the bullet will
+     * travel to if world objects are ignored
+     * @param robot : the robot that fired the shot
+     * @return list of bullet positions
+     * */
+    public List<Position> getBulletList(Robot robot) {
+
+        int distance = robot.getFiringDistance();
+        Position bulletPosition = new Position(0,0);
+        List<Position> bulletList = new ArrayList<>();
+
+        for (int i = 1; i <= distance; i++) {
+            int angle = (int) robot.getDirection().getAngle();
+            switch (angle) {
+                case 0:
+                    bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() + i);
+                    break;
+                case 90:
+                    bulletPosition = new Position(robot.getPosition().getX() + i, robot.getPosition().getY());
+                    break;
+                case 180:
+                    bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() - i);
+                    break;
+                case 270:
+                    bulletPosition = new Position(robot.getPosition().getX() - i, robot.getPosition().getY());
+                    break;
+            }
+            bulletList.add(bulletPosition);
+        }
+        return bulletList;
+    }
 }
