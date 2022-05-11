@@ -13,9 +13,7 @@ public abstract class Obstacle {
         this.topLeft = topLeft;
     }
 
-    public String getShape() {
-        return shape;
-    }
+    public String getShape() {return shape;}
 
     public Position getSize() {
         return size;

@@ -2,6 +2,8 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles;
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Player;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Tank;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.WorldObject;
 
 public abstract class Projectile implements WorldObject {
@@ -13,7 +15,7 @@ public abstract class Projectile implements WorldObject {
     int tankY;
     int size;
     Direction direction;
-
+    private Player tank;
 
 
     //setters
@@ -58,4 +60,7 @@ public abstract class Projectile implements WorldObject {
 
     public abstract void project(Direction direction);
 
+    public Player getTank(){
+        return this.tank;
+    }
 }

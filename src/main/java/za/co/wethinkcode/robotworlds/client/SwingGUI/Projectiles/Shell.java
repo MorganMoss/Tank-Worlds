@@ -2,6 +2,7 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles;
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Player;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Tank;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.WorldObject;
 import java.awt.*;
@@ -15,7 +16,7 @@ public class Shell extends Projectile{
     int y;
     Direction direction;
     private int range;
-    Tank tank;
+    Player tank;
     int size = 10;
 
     public String getSprite() {
@@ -46,8 +47,8 @@ public class Shell extends Projectile{
     public int getRange() {
         return range;
     }
-
-    public Tank getTank() {
+    @Override
+    public Player getTank() {
         return tank;
     }
 
@@ -61,7 +62,7 @@ public class Shell extends Projectile{
 
 
     //ADD MISSILE TO WORLD
-    public void discharge(Tank tank) {
+    public void discharge(Player tank) {
         this.x = tank.getX();
         this.tankX = tank.getX();
         this.y = tank.getY();

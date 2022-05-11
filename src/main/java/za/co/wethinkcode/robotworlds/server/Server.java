@@ -164,6 +164,7 @@ public class Server implements Runnable {
 
             try {
                 this.requestLog.add(request);
+                System.out.println(request.getCommand());
 
                 if (!request.getCommand().equals("idle")) {
                     System.out.println(request.serialize()); // PRINT REQUEST
@@ -178,6 +179,7 @@ public class Server implements Runnable {
                         commandResponse = command.execute(world);
                     }
                 }
+                world.getRobot(robotName).setLastcommand(request.getCommand());
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }

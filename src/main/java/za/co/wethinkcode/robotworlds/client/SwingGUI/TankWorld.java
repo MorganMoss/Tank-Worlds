@@ -1,7 +1,6 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
 import za.co.wethinkcode.robotworlds.client.GUI;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.BasicMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.*;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Projectile;
@@ -22,7 +21,7 @@ import java.util.List;
 public class TankWorld extends JComponent implements GUI {
     private static final int WIDTH = 588, HEIGHT = 616;
     private static final int REPAINT_INTERVAL = 50;
-    private static final ArrayList<Enemy> enemyList = new ArrayList<>();
+    private static final ArrayList<Player> enemyList = new ArrayList<Player>();
     private static final ArrayList<Position> enemyPositions = new ArrayList<>();
     private static final List<Obstacle> obstacleList = new ArrayList<>();
     private static final ArrayList<Projectile> projectileList = new ArrayList<>();
@@ -137,7 +136,7 @@ public class TankWorld extends JComponent implements GUI {
                         }
                         break;
 
-                    case KeyEvent.VK_M:
+                    case KeyEvent.VK_H:
 //                        client.HelperMethods.playAudio(Tools.nextBoolean() ? "supershoot.wav" : "supershoot.aiff");
                         if (launched) {
                             request = new Request(clientName, "repair");
@@ -213,40 +212,52 @@ public class TankWorld extends JComponent implements GUI {
         }
     }
 
-    // PaintComponent is our real showOutput
+    //PaintComponent is our real showOutput
     @Override
     public void showOutput(Response response) {
+        System.out.println(response.getCommandResponse());
         if (!launched && response.getCommandResponse().equalsIgnoreCase("success")){
             player = new Player(robotType, clientName);
             launched = true;
+        }else if (!launched && response.getCommandResponse().equalsIgnoreCase("duplicate")){
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Try again! Tank name taken!\nEnter Tank name : ");
+            clientName = scanner.nextLine();
+            Scanner scanner2 = new Scanner(System.in);
+            System.out.print("Enter the type of tank : ");
+            robotType = scanner2.nextLine();
         }
-
         runServerCorrections(response);
     }
 
     /*Swing component that paints onto the window*/
     @Override
     protected void paintComponent(Graphics g) {
+
         //Draw desert Sand
         System.setProperty("myColor", "0XCE8540");
         g.setColor(new Color(205,133, 63));
         g.fillRect(0, 0, WIDTH, HEIGHT);
         g.setColor(Color.GRAY);
 
+        //Draw obstacles
         for (Obstacle obstacle:obstacleList){
             obstacle.draw(g);
         }
 
-        for (Enemy enemy : enemyList){
+        //Draw enemies
+        for (Player enemy : enemyList){
             enemy.draw(g);
         }
-        // draw HUD *TO DO: Hide and only show on state command
+
+        // Draw HUD
         if(showState){
             player.showState(g);
             MiniMap.draw(g,player);
         }
 
         //spawn projectiles check collisions
+        //draw explosions at projectile exit points
         if(projectileList.size()!=0){
             int i=0;
             boolean hit = false;
@@ -254,16 +265,27 @@ public class TankWorld extends JComponent implements GUI {
                 i++;
                 projectile.project(projectile.getDirection());
                 projectile.draw(g);
-                for (Enemy enemy:enemyList){
+
+                for (Player enemy:enemyList){
                     if(projectile.isHitting(enemy)){
+                        if (enemy!=projectile.getTank()){
                         explosionX = enemy.getX();
                         explosionY = enemy.getY();
                         showFireAnimation = true;
                         enemy.takeHit();
                         player.addKill();
-                        hit=true;
+                        hit=true;}
                     }
+                }
 
+                if (projectile.isHitting(player)){
+                    if(projectile.getTank()!=player){
+                        explosionX = player.getX();
+                        explosionY = player.getY();
+                        showFireAnimation = true;
+                        player.takeHit();
+                        projectile.getTank().addKill();
+                        hit=true;}
                 }
 
                 for (Obstacle obstacle : obstacleList){
@@ -325,7 +347,7 @@ public class TankWorld extends JComponent implements GUI {
     }
 
     public static boolean collision(Tank player){
-        for (Enemy enemy:enemyList){
+        for (Player enemy:enemyList){
             if (intersects(player,enemy)){
                 return true;
                 }
@@ -339,11 +361,8 @@ public class TankWorld extends JComponent implements GUI {
     }
 
 
-
-
-
     //TODO: find a way to animate explosion
-    public boolean fireAnimation(Graphics g, Tank tank,ArrayList<Enemy> enemyList, int explodeCount){
+    public boolean fireAnimation(Graphics g, Tank tank, ArrayList<Player> enemyList, int explodeCount){
 
         boolean bullet = false;
 
@@ -353,21 +372,22 @@ public class TankWorld extends JComponent implements GUI {
         return bullet;
     }
 
-
-    //TODO: BUILD INTERFACE () TO CONVERT SERVER OBJECTS
+    /**
+     * Updates state of world objects and minimap according to response from server
+     * */
     public void runServerCorrections(Response response) {
-        HashMap<String, Robot> enemies = response.getEnemyRobots();
 
-        for(Robot enemy : enemies.values()){
-            enemyPositions.add(enemy.getPosition());
-        }
+        HashMap<String, Robot> enemies = response.getEnemyRobots();
 
         player.setName(response.getRobot().getRobotName());
 
         //Minimap positions
         player.setAbsoluteX(response.getRobot().getPosition().getX()+50);
-        System.out.println((response.getRobot().getPosition().getX()+50)+","+((-(response.getRobot().getPosition().getY())+50)));
         player.setAbsoluteY(-(response.getRobot().getPosition().getY())+50);
+        for(Robot enemy : enemies.values()){
+            enemyPositions.add(enemy.getPosition());
+        }
+        System.out.println((response.getRobot().getPosition().getX()+50)+","+((-(response.getRobot().getPosition().getY())+50)));
 
 
         HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
@@ -409,7 +429,7 @@ public class TankWorld extends JComponent implements GUI {
                             player.setTankHealth(response.getRobot().getCurrentShield());
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
-                            player.setRange(response.getRobot().getRange()*x_scale);
+//                            player.setRange(response.getRobot().getRange()*x_scale);
                             player.setKills(response.getRobot().getKills());
                             player.setDeaths(response.getRobot().getDeaths());
 
@@ -432,7 +452,7 @@ public class TankWorld extends JComponent implements GUI {
 
                         Robot robot = response.getEnemyRobots().get(valueAtPosition);
 
-                        Enemy enemy = new Enemy();
+                        Player enemy = new Player(robot.getRobotType(),robot.getRobotName());
 
                         enemy.setX((x+x_offset) * x_scale);
                         enemy.setY(getScreenHeight() - (y+y_offset) * y_scale);
@@ -440,7 +460,7 @@ public class TankWorld extends JComponent implements GUI {
                         enemy.setSprite(robot.getRobotType());
                         enemy.setAmmo(robot.getCurrentAmmo());
                         enemy.setTankHealth(robot.getCurrentShield());
-                        enemy.setRange(robot.getRange());
+//                        enemy.setRange(robot.getFiringDistance()*x_scale);
                         enemy.setKills(robot.getKills());
 
                         switch (robot.getDirection()) {
@@ -457,9 +477,10 @@ public class TankWorld extends JComponent implements GUI {
                                 enemy.setTankDirection(Direction.Left);
                                 break;
                         }
-
-                        if (robot.isFiring()) {
-                            enemy.fire();
+                        System.out.println(robot.getLastCommand());
+                        if (Objects.equals(robot.getLastCommand(), "fire")) {
+                            if(!(enemy.getAmmo()<=0)){
+                            enemy.fire();}
                         }
 
                         enemyList.add(enemy);

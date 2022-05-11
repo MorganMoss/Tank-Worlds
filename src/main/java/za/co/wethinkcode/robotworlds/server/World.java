@@ -254,6 +254,21 @@ public class World {
         }, robot.getReloadTime()*1000);
     }
 
+    /**
+     * Pause the robot while doing repairs
+     * @param robot : the robot to repair
+     * */
+    public void stuck(Robot robot) {
+        robot.setPaused(true);
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                robot.setPaused(false);
+            }
+        }, robot.getReloadTime()*1000);
+    }
+
 
     /**
      * Returns all robots in the world except the given robot
@@ -277,7 +292,7 @@ public class World {
     private boolean isEnemyHit(Robot robot, Robot enemy) {
         List<Position> bulletList = getBulletList(robot);
         for (Position bulletPosition : bulletList) {
-            if (bulletPosition == enemy.getPosition()) {
+            if (bulletPosition.equals(enemy.getPosition())) {
                 return true;
             }
         }

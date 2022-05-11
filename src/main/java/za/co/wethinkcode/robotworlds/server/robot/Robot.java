@@ -26,6 +26,7 @@ public class Robot {
     private int kills=0;
     private int deaths=0;
     private boolean paused;
+    private String lastCommand;
 
     public Robot(World world, String robotName, String robotType) {
 
@@ -36,7 +37,7 @@ public class Robot {
                 this.robotType = "sniper";
                 this.maxShield = 3;
                 this.maxAmmo = 5;
-                this.fireDistance = 125;
+                this.fireDistance = 15;
                 this.reloadTime = 3;
                 this.size=40;
                 //These are initialized, but are mutable
@@ -53,7 +54,7 @@ public class Robot {
                 this.robotType = "machine";
                 this.maxShield = 1;
                 this.maxAmmo = 20;
-                this.fireDistance = 50;
+                this.fireDistance = 8;
                 this.reloadTime = 3;
                 this.size=40;
                 //These are initialized, but are mutable
@@ -68,7 +69,7 @@ public class Robot {
                 //These are immutable
                 this.robotName = robotName;
                 this.robotType = "bomber";
-                this.maxShield = 10;
+                this.maxShield = 5;
                 this.maxAmmo = 10;
                 this.fireDistance = 75;
                 this.reloadTime = 3;
@@ -87,7 +88,7 @@ public class Robot {
                 this.robotType = "tank";
                 this.maxShield = 3;
                 this.maxAmmo = 15;
-                this.fireDistance = 50;
+                this.fireDistance = 10;
                 this.reloadTime = 3;
                 this.size=40;
                 //These are initialized, but are mutable
@@ -136,6 +137,10 @@ public class Robot {
 
     public int getReloadTime() {
         return reloadTime;
+    }
+
+    public String getLastCommand(){
+        return this.lastCommand;
     }
 
     public boolean getPaused() {
@@ -219,5 +224,9 @@ public class Robot {
                 "\nshields : " +currentShield+
                 "\nshots : " +currentAmmo+
                 "\nstatus : n/a";
+    }
+
+    public void setLastcommand(String command) {
+        this.lastCommand = command;
     }
 }

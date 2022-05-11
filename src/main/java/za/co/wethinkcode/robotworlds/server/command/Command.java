@@ -26,6 +26,7 @@ public abstract class Command {
         String robotName = request.getRobotName();
 
         switch (request.getCommand()) {
+
             case "launch":
                 return new LaunchCommand(robotName, args.get(0));
             case "idle":
@@ -46,6 +47,8 @@ public abstract class Command {
                 return new ReloadCommand(robotName);
             case "look":
                 return new LookCommand(robotName);
+            case "stuck":
+                return new StuckCommand(robotName);
             default:
                 throw new IllegalArgumentException("Unsupported command: " + request);
         }
