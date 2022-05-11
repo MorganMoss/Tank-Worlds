@@ -226,7 +226,11 @@ public class Robot {
                 "\nstatus : n/a";
     }
 
-    public void setLastcommand(String command) {
+    public void setLastCommand(String command) {
         this.lastCommand = command;
+    }
+
+    public int getMaxAmmo() {
+        return maxAmmo;
     }
 }

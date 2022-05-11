@@ -41,7 +41,8 @@ public class TankWorld extends JComponent implements GUI {
     private Player player;
     private String clientName;
     private String robotType;
-    //FIFO stack for requests
+
+    //LIFO stack for requests
     private static Request request;
     private JFrame frame;
 
@@ -428,6 +429,7 @@ public class TankWorld extends JComponent implements GUI {
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
                             player.setAmmo(response.getRobot().getCurrentAmmo());
+                            player.setMaxAmmo(response.getRobot().getMaxAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
 //                            player.setRange(response.getRobot().getRange()*x_scale);
                             player.setKills(response.getRobot().getKills());
