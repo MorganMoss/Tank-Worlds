@@ -295,6 +295,15 @@ public class TankWorld extends JComponent implements GUI {
             launchButton.setVisible(true);
             g.drawString("Choose a Tank:",WIDTH/2-34, HEIGHT/2-10-5);
             g.drawString("Enter a Name:",WIDTH/2-34, HEIGHT/2-10-75);
+
+            g.drawString("Controls:",WIDTH/2-40, HEIGHT/2-10+50+100);
+            g.drawString("Arrow Keys to move",WIDTH/2-30, HEIGHT/2-10+60+100);
+            g.drawString("R - Reload",WIDTH/2-30, HEIGHT/2-10+70+100);
+            g.drawString("H - Repair",WIDTH/2-30, HEIGHT/2-10+80+100);
+            g.drawString("S - State",WIDTH/2-30, HEIGHT/2-10+90+100);
+            g.drawString("Space - Fire",WIDTH/2-30, HEIGHT/2-10+100+100);
+            g.drawString("B - See hit-boxes",WIDTH/2-30, HEIGHT/2-10+110+100);
+            g.drawString("Exc - Quit",WIDTH/2-30, HEIGHT/2-10+120+100);
             return;
         }
 
