@@ -456,26 +456,38 @@ public class World {
     public static List<Position> getBulletList(Robot robot) {
 
         int distance = robot.getFiringDistance();
-        Position bulletPosition = new Position(0,0);
+        Position bulletPosition1 = new Position(0,0);
+        Position bulletPosition2 = new Position(0,0);
+        Position bulletPosition3 = new Position(0,0);
         List<Position> bulletList = new ArrayList<>();
 
         for (int i = 1; i <= distance; i++) {
             int angle = (int) robot.getDirection().getAngle();
             switch (angle) {
                 case 0:
-                    bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() + i);
+                    bulletPosition1 = new Position(robot.getPosition().getX(), robot.getPosition().getY() + i);
+                    bulletPosition2 = new Position(robot.getPosition().getX()-1, robot.getPosition().getY() + i);
+                    bulletPosition3 = new Position(robot.getPosition().getX()+1, robot.getPosition().getY() + i);
                     break;
                 case 90:
-                    bulletPosition = new Position(robot.getPosition().getX() + i, robot.getPosition().getY());
+                    bulletPosition1 = new Position(robot.getPosition().getX() + i, robot.getPosition().getY());
+                    bulletPosition2 = new Position(robot.getPosition().getX() + i, robot.getPosition().getY()+1);
+                    bulletPosition3 = new Position(robot.getPosition().getX() + i, robot.getPosition().getY()-1);
                     break;
                 case 180:
-                    bulletPosition = new Position(robot.getPosition().getX(), robot.getPosition().getY() - i);
+                    bulletPosition1 = new Position(robot.getPosition().getX(), robot.getPosition().getY() - i);
+                    bulletPosition2 = new Position(robot.getPosition().getX()+1, robot.getPosition().getY() - i);
+                    bulletPosition3 = new Position(robot.getPosition().getX()-1, robot.getPosition().getY() - i);
                     break;
                 case 270:
-                    bulletPosition = new Position(robot.getPosition().getX() - i, robot.getPosition().getY());
+                    bulletPosition1 = new Position(robot.getPosition().getX() - i, robot.getPosition().getY());
+                    bulletPosition2 = new Position(robot.getPosition().getX() - i, robot.getPosition().getY()+1);
+                    bulletPosition3 = new Position(robot.getPosition().getX() - i, robot.getPosition().getY()-1);
                     break;
             }
-            bulletList.add(bulletPosition);
+            bulletList.add(bulletPosition1);
+            bulletList.add(bulletPosition2);
+            bulletList.add(bulletPosition3);
         }
         return bulletList;
     }
