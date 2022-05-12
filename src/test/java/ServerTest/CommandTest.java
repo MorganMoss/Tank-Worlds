@@ -9,7 +9,9 @@ import za.co.wethinkcode.robotworlds.shared.Robot;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,14 +20,18 @@ public class CommandTest {
 
     //setup is to modify the static world
     private static String oldMap;
-    @BeforeEach
-    public void changeConfig(){
+    @BeforeAll
+    static void changeConfig(){
         try {
             FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
             Properties properties = new Properties();
             properties.load(fileInputStream);
             oldMap = properties.getProperty("map");
             properties.setProperty("map", "EmptyMap");
+            fileInputStream.close();
+            FileOutputStream fileOutputStream = new FileOutputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            properties.store(fileOutputStream, "Test config override");
+            fileOutputStream.close();
 
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
@@ -33,6 +39,7 @@ public class CommandTest {
             System.out.println("Error");
         }
         World.resetMap();
+        showWorld();
     }
 
     @AfterAll
@@ -46,6 +53,22 @@ public class CommandTest {
             System.out.println("File not found");
         } catch (IOException e) {
             System.out.println("Error");
+        }
+    }
+
+    static void showWorld(){
+        HashMap<Integer, HashMap<Integer, String>> map = World.look(new Position(0,0),
+                (World.getMapSize().getX() > World.getMapSize().getY()) ?
+                        (World.getMapSize().getX()/2+2): World.getMapSize().getY()/2+2);
+        for (int y = map.get(0).size()-1; y >= 0;  y--){
+            for (int x =0; x < map.size(); x++){
+                try{
+                    System.out.print("" + map.get(x).get(y).charAt(0) /*+ map.get(x).get(y).charAt(0)*/);
+                } catch (NullPointerException odd) {
+                    System.out.println(x + "," + y);
+                }
+            }
+            System.out.print('\n');
         }
     }
 

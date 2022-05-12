@@ -121,8 +121,9 @@ public class World {
                         row.put(y, "X"); //closed space
                         break;
                     }
-                    row.putIfAbsent(y, " "); //open space
                 }
+
+                row.putIfAbsent(y, " "); //open space
             }
             constructedMap.putIfAbsent(x, row);
         }
