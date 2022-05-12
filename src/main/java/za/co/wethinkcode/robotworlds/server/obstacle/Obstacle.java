@@ -1,6 +1,6 @@
 package za.co.wethinkcode.robotworlds.server.obstacle;
 
-import za.co.wethinkcode.robotworlds.server.Position;
+import za.co.wethinkcode.robotworlds.shared.Position;
 
 public abstract class Obstacle {
     private final String shape;

@@ -1,8 +1,10 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles;
+
 import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
-import za.co.wethinkcode.robotworlds.server.Position;
+import za.co.wethinkcode.robotworlds.shared.Position;
+
 import java.awt.*;
 
 public class Brick extends Obstacle{

@@ -1,7 +1,7 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
-import za.co.wethinkcode.robotworlds.exceptions.PathBlockedException;
 import za.co.wethinkcode.robotworlds.server.World;
+import za.co.wethinkcode.robotworlds.shared.exceptions.PathBlockedException;
 
 public class ForwardCommand extends Command{
 
@@ -10,9 +10,10 @@ public class ForwardCommand extends Command{
     }
 
     @Override
-    public String execute(World world) {
+    public String execute() {
         try {
-            world.updatePosition(robotName, Integer.parseInt(argument));
+            World.updatePosition(robotName, Integer.parseInt(argument));
+            World.getRobot(robotName).setStatus("normal");
             return "Success";
         } catch (PathBlockedException ignored) {
             return "Path Blocked!";

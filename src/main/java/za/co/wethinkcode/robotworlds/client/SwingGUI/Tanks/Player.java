@@ -1,12 +1,10 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks;
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Shell;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 
 import java.awt.*;
-import java.util.Locale;
 
 public class Player extends Tank {
 

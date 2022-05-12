@@ -43,10 +43,10 @@ public class TanksTest {
     public  void testEnemy(){
         Player enemy = new Player("Enemy1","Enemy1");
         assertEquals("Enemy1",enemy.getTankName());
-        assertEquals(5,enemy.getTankHealth());
-        assertEquals(5,enemy.getAmmo());
+        assertEquals(2,enemy.getTankHealth());
+        assertEquals(10,enemy.getAmmo());
         assertEquals("Up",enemy.getDirection().toString());
-        assertEquals(0,enemy.getRange());
+        assertEquals(75,enemy.getRange());
         assertEquals(40,enemy.getSize());
 
     }

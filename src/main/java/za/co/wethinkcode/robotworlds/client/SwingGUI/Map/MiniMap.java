@@ -2,8 +2,8 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI.Map;
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Tank;
-import za.co.wethinkcode.robotworlds.server.Position;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
+import za.co.wethinkcode.robotworlds.shared.Position;
 
 import java.awt.*;
 import java.util.ArrayList;

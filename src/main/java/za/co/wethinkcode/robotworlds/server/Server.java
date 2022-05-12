@@ -1,135 +1,138 @@
 package za.co.wethinkcode.robotworlds.server;
 
-import za.co.wethinkcode.robotworlds.exceptions.NoChangeException;
-import za.co.wethinkcode.robotworlds.protocol.Request;
-import za.co.wethinkcode.robotworlds.protocol.Response;
 import za.co.wethinkcode.robotworlds.server.command.Command;
-import za.co.wethinkcode.robotworlds.server.map.BasicMap;
-import za.co.wethinkcode.robotworlds.server.map.Map;
-import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.shared.Position;
+import za.co.wethinkcode.robotworlds.shared.Robot;
+import za.co.wethinkcode.robotworlds.shared.exceptions.NoChangeException;
+import za.co.wethinkcode.robotworlds.shared.protocols.Request;
+import za.co.wethinkcode.robotworlds.shared.protocols.Response;
 
-import java.net.*;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import static java.lang.Math.round;
-
-/**
- * The server that will be run. Clients will connect to it. 
- * It has 2-way communication and support for many clients
- */
-public class Server implements Runnable {
+public class Server{
+    /**
+     * The server port number
+     */
+    private static final int port = Integer.parseInt(getConfigProperty("port"));
     /**
      * The speed at which the server sends out responses (in milliseconds)
      */
-    private final int tickInterval = 50;
-    /**
-     * The world the server interacts with when handling requests and responses
-     */
-    private final World world;
+    private static final int tickRate = Integer.parseInt(getConfigProperty("tickRate"));
     /**
      * The socket clients will connect to
      */
-    private final ServerSocket socket;
+    private static final ServerSocket socket = getServerSocket();
     /**
      * The list of requests that will be run in the next server tick
      */
-    private final HashMap<String, Request> currentRequests;
+    private static final HashMap<String, Request> currentRequests = new HashMap<>();
     /**
      * The list of responses that will be sent in the next server tick
      */
-    private final HashMap<String, Response> currentResponses;
+    private static final HashMap<String, Response> currentResponses = new HashMap<>();
 
     /**
      * Stores history of requests made to the server
      */
-    private List<Request> requestLog;
+    private static final List<Request> requestLog = new ArrayList<>();
     /**
      * Stores history of responses made to the server
      */
-    private List<Response> responseLog;
-
-
-    /**
-     * Makes an instance of a server. It uses the port given for the server socket
-     * @param port : the port clients will use to connect to the server
-     * @throws IOException : throws when server socket fails
-     */
-    private Server(int port) throws IOException{
-        this.requestLog = new ArrayList<>();
-        this.responseLog = new ArrayList<>();
-        this.socket = new ServerSocket(port);
-        Map map = getMap();
-        this.world = new World(map);
-        this.currentRequests = new HashMap<>();
-        this.currentResponses = new HashMap<>();
-
-    }
+    private static final List<Response> responseLog= new ArrayList<>();
 
     /**
-     * This should take the config file and get the repair time
-     * @return the number of seconds it takes to repair a robot's armour
+     * Gets a generic property from the server config file
+     * @param property the property key
+     * @return the property value
      */
-    private int getRepairTime() {
-        return 3;
-    }
-
-    /**
-     * This should take the config file and get a map
-     * @return a map that will be used to define the world's size and it's obstacles
-     */
-    private Map getMap() {
-        //TODO : Get the map to be used from the config file;
-        // Size for a map should be determined by the map, not the server.
-        return new BasicMap(new Position(100,100));
-    }
-
-    /**
-     * Starts up the server
-     * @throws IOException : raised when server object fails
-     */
-    public static void start() throws IOException {
-        final int port = 5000;
-        Server server = new Server(port);
-
-        Thread executeThread = new Thread(server);
-        executeThread.start();
-
-        Thread inputThread = new InputThread(server);
-        inputThread.start();
-
-        System.out.println("Server running & waiting for client connections.");
-        while(true) {
-            try {
-                Socket socket = server.socket.accept();
-                String socketName = socket.getLocalAddress().toString();
-                System.out.println(socketName);
-
-                ServerThread serverThread = new ServerThread(server, socket);
-                serverThread.start();
-                System.out.println("A client has been connected. Their name is : " + socket.getInetAddress().getHostName());
-            } catch(IOException ex) {
-                ex.printStackTrace();
+    public static String getConfigProperty(String property){
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            String value = properties.getProperty(property);
+            if (value != null){
+                return value;
             }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+        System.out.println("Property " + property + " is not defined in the config");
+        System.exit(1);
+        return "";
+    }
+
+    /**
+     * Safely creates server socket
+     * @return the instantiated server socket object
+     */
+    private static ServerSocket getServerSocket(){
+        try {
+            return new ServerSocket(port);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     /**
-     * Executes all requests every tick
+     * Shows the address and port for the clients to connect to
      */
-    @Override
-    public void run() {
-        do {
-            this.executeRequests();
-            try {
-                Thread.sleep(tickInterval);
-            } catch (InterruptedException ignored) {
-            }
-        } while (true);
+    private static void showIP(){
+        InetAddress ip;
+        String hostname;
+
+        try {
+            ip = InetAddress.getLocalHost();
+            hostname = ip.getHostAddress();
+            System.out.println("Server IP : " + hostname + ":" + port);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Tries to get a client that's trying to connect to the server.
+     */
+    private static void getClient(){
+        try {
+            Socket socket = Server.socket.accept();
+
+            ClientSocket.startClientThreads(socket);
+
+            System.out.println("A client ("
+                    + socket.getInetAddress().getHostName()
+                    + ") has been connected. Waiting for launch...");
+
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Starts up the server
+     */
+    public static void start(){
+        showIP();
+
+        Thread executeThread = new RequestExecuteThread();
+        executeThread.start();
+
+        Thread inputThread = new InputThread();
+        inputThread.start();
+
+        System.out.println("Server running & waiting for client connections.");
+        while(true) {
+            getClient();
+        }
     }
 
     /**
@@ -137,7 +140,7 @@ public class Server implements Runnable {
      * @param robotName : the client giving the request
      * @param request : the request the client is giving
      */
-    public void addRequest(String robotName, Request request){
+    public static void addRequest(String robotName, Request request){
         currentRequests.putIfAbsent(robotName, request);
     }
 
@@ -145,7 +148,9 @@ public class Server implements Runnable {
      * Should execute all requests and create a new response for each client
      * It should clear the list as it goes
      */
-    private void executeRequests() {
+    private static void executeRequests() {
+        long start = System.currentTimeMillis();
+
         if (currentRequests.keySet().size() == 0) {
             return;
         }
@@ -153,42 +158,56 @@ public class Server implements Runnable {
         String commandResponse = "";
         for (String robotName : new HashSet<String>(){
                 {
-                    addAll(world.getRobots().keySet());
+                    addAll(World.getRobots().keySet());
                     addAll(currentRequests.keySet());
                 }
             }
         ) {
-            robotName = robotName.trim().toLowerCase();
-
             Request request = currentRequests.getOrDefault(robotName, new Request(robotName, "idle"));
 
             try {
-                this.requestLog.add(request);
-                System.out.println(request.getCommand());
+                requestLog.add(request);
 
                 if (!request.getCommand().equals("idle")) {
-                    System.out.println(request.serialize()); // PRINT REQUEST
+                    System.out.println(request.getRobotName()
+                            + " -> " + request.getCommand()
+                            + (request.getArguments() != null ? " - " + request.getArguments() : ""));
                 }
 
-                if (request.getCommand().equals("launch")) {
+                if (request.getCommand().equalsIgnoreCase("launch")) {
                     Command command = Command.create(request);
-                    commandResponse = command.execute(world);
+                    commandResponse = command.execute();
                 } else {
-                    if (!world.getRobot(robotName).isPaused()) {
+                    Robot robot = World.getRobot(robotName);
+
+                    if (!robot.isPaused() || request.getCommand().equals("quit")) {
+                        if (robot.hasDied()) {
+                            robot.setPaused(true);
+                        }
+                        robot.setLastCommand(request.getCommand());
                         Command command = Command.create(request);
-                        commandResponse = command.execute(world);
+                        commandResponse = command.execute();
                     }
                 }
-                world.getRobot(robotName).setLastCommand(request.getCommand());
+
+                if (request.getCommand().equals("quit")){
+                    System.out.println(request.getRobotName() + " has quit");
+                    currentRequests.remove(robotName);
+                    return;
+                }
+
+                World.getRobot(robotName).setLastCommand(request.getCommand());
             } catch (IllegalArgumentException e) {
                 commandResponse = "failed! bad input";
             }
 
-            //TODO : Add all requests to a buffer before adding them to current requests (to prevent multiple responses per request)
-
-            //TODO : use the look command on each robot to get the grid of values it
             generateResponse(request, commandResponse);
             currentRequests.remove(robotName);
+
+            long end = System.currentTimeMillis();
+            if (end-start > tickRate){
+                System.out.println("Tick delay in milli seconds: "+ (end-start-tickRate));
+            }
         }
     }
 
@@ -196,12 +215,11 @@ public class Server implements Runnable {
      * Takes a request and generates a response object
      * @param request : a request object received from the client
      * @param commandResponse : the response to the client's request
-     * @return response
      */
-    public void generateResponse(Request request, String commandResponse) {
-        Robot robot = world.getRobot(request.getRobotName());
-        HashMap<Integer, HashMap<Integer, String>> map = world.look(robot);
-        HashMap<String, Robot> enemies = world.getEnemies(robot);
+    public static void generateResponse(Request request, String commandResponse) {
+        Robot robot = World.getRobot(request.getRobotName());
+        HashMap<Integer, HashMap<Integer, String>> map = World.look(robot);
+        HashMap<String, Robot> enemies = World.getEnemies(robot);
 
         Response response = new Response(
                 robot,
@@ -210,12 +228,12 @@ public class Server implements Runnable {
                 enemies
         );
 
-        this.responseLog.add(response);
+        responseLog.add(response);
 
-        currentResponses.put(robot.getRobotName().toLowerCase(), response);
+        currentResponses.put(robot.getRobotName(), response);
 
         if (!Objects.equals(response.getCommandResponse(), "idle")) {
-            System.out.println("Out -> " +response.getRobot().getRobotName() + " : " + response.getCommandResponse());
+            System.out.println(response.getRobot().getRobotName() + " -> " + response.getCommandResponse());
         }
     }
 
@@ -225,8 +243,8 @@ public class Server implements Runnable {
      * @param robotName : the client looking for a response
      * @return a formatted response object
      */
-    public Response getResponse(String robotName) throws NoChangeException {
-        Response response = currentResponses.get(robotName.toLowerCase());
+    public static Response getResponse(String robotName) throws NoChangeException {
+        Response response = currentResponses.get(robotName);
         if (response == null) {
             throw new NoChangeException();
         }
@@ -237,21 +255,29 @@ public class Server implements Runnable {
     /**
      * Display a representation of the world's state showing robots, obstacles, and anything else in the world.
      */
-    public void dump(){
-        List<Obstacle> obstacleList = getMap().getObstacles();
-        HashMap<String, Robot> robots = world.getRobots();
-        if (obstacleList.size()>0) {
+    public static void dump(){
+        if (requestLog.size()>0) {
             System.out.println("----------------------\n" +
-                    "OBSTACLES:\n" +
+                    "REQUESTS:\n" +
                     "----------------------");
-            for (Obstacle obstacle:obstacleList) {
-                System.out.println(obstacle.toString());
+            for (Request request : requestLog) {
+                System.out.println(request.getRobotName()
+                        + " -> " + request.getCommand()
+                        + (request.getArguments() != null ? " - " + request.getArguments() : ""));
             }
-            System.out.println("----------------------");
         }
-        if (robots.values().size()>0) {
+        if (responseLog.size()>0) {
+            System.out.println("----------------------\n" +
+                    "RESPONSES:\n" +
+                    "----------------------");
+            for (Response response : responseLog) {
+                System.out.println(response.getRobot().getRobotName() + " -> " + response.getCommandResponse());
+            }
+        }
+
+        if (World.getRobots().values().size()>0) {
             System.out.println("ROBOTS:");
-            for (Robot robot : robots.values()) {
+            for (Robot robot : World.getRobots().values()) {
                 System.out.println("----------------------\n" +
                         robot.toString());
             }
@@ -260,7 +286,9 @@ public class Server implements Runnable {
         System.out.println("----------------------\n" +
                 "WORLD MAP:\n" +
                 "----------------------");
-        HashMap<Integer, HashMap<Integer, String>> map = world.look(new Position(0,0), world.getMapSize().getX()/2+2);
+        HashMap<Integer, HashMap<Integer, String>> map = World.look(new Position(0,0),
+                (World.getMapSize().getX() > World.getMapSize().getY()) ?
+                        (World.getMapSize().getX()/2+2): World.getMapSize().getY()/2+2);
         for (int y = map.get(0).size()-1; y >= 0;  y--){
             for (int x =0; x < map.size(); x++){
                 try{
@@ -276,8 +304,8 @@ public class Server implements Runnable {
     /**
      * Display a summary of all robots and their states
      */
-    public void robots(){
-        HashMap<String, Robot> robots = world.getRobots();
+    public static void robots(){
+        HashMap<String, Robot> robots = World.getRobots();
         if (robots.values().size()>0) {
             System.out.println("----------------------\n" +
                     "ROBOTS:");
@@ -295,12 +323,12 @@ public class Server implements Runnable {
      * Should send a response to all clients telling them that the server is shutting down,
      * then close everything that needs closing on the server side
      */
-    public void quit() {
-        for (Robot robot : world.getRobots().values()) {
-            Response response = new Response(robot, "quit", world.look(robot), world.getEnemies(robot));
+    public static void quit() {
+        for (Robot robot : World.getRobots().values()) {
+            Response response = new Response(robot, "quit", null, null);
             currentResponses.put(robot.getRobotName(), response);
             try {
-                Thread.sleep(tickInterval*2);
+                Thread.sleep(tickRate);
             } catch (InterruptedException ignored) {
             }
         }
@@ -310,33 +338,31 @@ public class Server implements Runnable {
     /**
      * The server is run from here.
      * @param args : none are applicable
-     * @throws IOException : raised when server object fails
      */
-    public static void main(String[] args) throws IOException {
-        InetAddress ip;
-        String hostname;
-
-        try {
-            ip = InetAddress.getLocalHost();
-            hostname = ip.getHostName();
-            System.out.println("Your current IP address : " + ip);
-            System.out.println("Your current Hostname : " + hostname);
-
-        } catch (UnknownHostException e) {
-
-            e.printStackTrace();
-        }
+    public static void main(String[] args){
         start();
     }
 
-    public static class InputThread extends Thread{
-
-        private final Server server;
-
-        public InputThread(Server server) {
-            this.server = server;
+    /**
+     * Executes all requests every tick
+     */
+    private static class RequestExecuteThread extends Thread {
+        @Override
+        public void run() {
+            do {
+                executeRequests();
+                try {
+                    Thread.sleep(tickRate);
+                } catch (InterruptedException ignored) {
+                }
+            } while (true);
         }
+    }
 
+    /**
+     * A separate thread to be run to handle server commands
+     */
+    public static class InputThread extends Thread{
         @Override
         public void run() {
             Scanner scanner = new Scanner(System.in);
@@ -344,13 +370,13 @@ public class Server implements Runnable {
                 String command = scanner.nextLine().toLowerCase();
                 switch (command) {
                     case "quit":
-                        server.quit();
+                        quit();
                         break;
                     case "dump":
-                        server.dump();
+                        dump();
                         break;
                     case "robots":
-                        server.robots();
+                        robots();
                         break;
                     default:
                         System.out.println("Unsupported command: " + command);

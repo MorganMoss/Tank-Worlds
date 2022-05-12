@@ -1,7 +1,5 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
-import za.co.wethinkcode.robotworlds.server.World;
-
 public class IdleCommand extends Command{
 
     public IdleCommand(String RobotName) {
@@ -9,7 +7,7 @@ public class IdleCommand extends Command{
     }
 
     @Override
-    public String execute(World world) {
+    public String execute() {
         return "idle";
     }
 }

@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.exceptions;
+package za.co.wethinkcode.robotworlds.shared.exceptions;
 
 /**
  * Raised when there is no new response from the server for a specific client

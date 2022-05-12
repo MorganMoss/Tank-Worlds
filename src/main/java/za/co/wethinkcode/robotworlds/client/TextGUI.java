@@ -1,11 +1,11 @@
 package za.co.wethinkcode.robotworlds.client;
 
-import java.util.*;
+import za.co.wethinkcode.robotworlds.shared.Robot;
+import za.co.wethinkcode.robotworlds.shared.exceptions.NoNewInput;
+import za.co.wethinkcode.robotworlds.shared.protocols.Request;
+import za.co.wethinkcode.robotworlds.shared.protocols.Response;
 
-import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
-import za.co.wethinkcode.robotworlds.protocol.Request;
-import za.co.wethinkcode.robotworlds.protocol.Response;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import java.util.*;
 
 // TODO :
 //  I have not implemented any way for the output to update
@@ -53,7 +53,7 @@ public class TextGUI implements GUI {
     /**
      * Takes a string input from terminal and turns it into a response object
      * @return a request made by the user
-     * @throws NoNewInput
+     * @throws NoNewInput when waiting for input
      */
     @Override
     public Request getInput() throws NoNewInput {

@@ -1,7 +1,7 @@
 package ServerTest;
 
 import org.junit.jupiter.api.Test;
-import za.co.wethinkcode.robotworlds.server.Direction;
+import za.co.wethinkcode.robotworlds.shared.Direction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DirectionTest {

@@ -1,7 +1,6 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
-import za.co.wethinkcode.robotworlds.protocol.Request;
-import za.co.wethinkcode.robotworlds.server.World;
+import za.co.wethinkcode.robotworlds.shared.protocols.Request;
 
 import java.util.List;
 
@@ -9,10 +8,10 @@ public abstract class Command {
     String robotName;
     String argument;
 
-    public abstract String execute(World world);
+    public abstract String execute();
 
     public Command(String robotName){
-        this.robotName = robotName.trim().toLowerCase();
+        this.robotName = robotName;
         this.argument = "";
     }
 
@@ -26,9 +25,10 @@ public abstract class Command {
         String robotName = request.getRobotName();
 
         switch (request.getCommand()) {
-
             case "launch":
                 return new LaunchCommand(robotName, args.get(0));
+            case "quit":
+                return new QuitCommand(robotName);
             case "idle":
                 return new IdleCommand(robotName);
             case "forward":
@@ -45,8 +45,6 @@ public abstract class Command {
                 return new RepairCommand(robotName);
             case "reload":
                 return new ReloadCommand(robotName);
-            case "look":
-                return new LookCommand(robotName);
             case "stuck":
                 return new StuckCommand(robotName);
             default:

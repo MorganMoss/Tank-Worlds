@@ -2,16 +2,22 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI;
 
 import za.co.wethinkcode.robotworlds.client.GUI;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.*;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Brick;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Obstacle;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Projectile;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.*;
-import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
-import za.co.wethinkcode.robotworlds.protocol.*;
-import za.co.wethinkcode.robotworlds.server.Position;
-import za.co.wethinkcode.robotworlds.server.robot.Robot;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Player;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Tank;
+import za.co.wethinkcode.robotworlds.shared.Position;
+import za.co.wethinkcode.robotworlds.shared.Robot;
+import za.co.wethinkcode.robotworlds.shared.exceptions.NoNewInput;
+import za.co.wethinkcode.robotworlds.shared.protocols.Request;
+import za.co.wethinkcode.robotworlds.shared.protocols.Response;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.*;
@@ -50,6 +56,11 @@ public class TankWorld extends JComponent implements GUI {
     private static int y_scale;
 
 
+    private JFormattedTextField nameBox;
+    private JComboBox<String> tankBox;
+    private JButton launchButton;
+
+
     public static int getScreenWidth(){return WIDTH;}
     public static int getScreenHeight(){return HEIGHT;}
 
@@ -71,6 +82,27 @@ public class TankWorld extends JComponent implements GUI {
     public static void addProjectile(Projectile projectile){projectileList.add(projectile);}
 
     public TankWorld()  {
+
+        nameBox = new JFormattedTextField();
+        tankBox  = new JComboBox<>(Robot.ROBOT_TYPES);
+        launchButton = new JButton("LAUNCH");
+        launchButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+//                tf.setText("Welcome to Javatpoint.");
+                launch();
+            }
+        });
+
+        this.add(tankBox);
+        this.add(nameBox);
+        this.add(launchButton);
+
+        nameBox.setBounds(WIDTH/2-100, HEIGHT/2-10-70, 200,30);
+        tankBox.setBounds(WIDTH/2-100, HEIGHT/2-10, 200,30);
+        launchButton.setBounds(WIDTH/2-50, HEIGHT/2+65, 100,30);
+
+        nameBox.requestFocus();
+
         frame = setupGUI();
         frame.add(this);
         frame.setVisible(true);
@@ -153,24 +185,6 @@ public class TankWorld extends JComponent implements GUI {
                             showState=true;
                         }
                         break;
-
-                    case KeyEvent.VK_L:
-                        if (!launched){
-                            //TODO: Please put this in a pop up rather than the terminal.
-                                Scanner scanner = new Scanner(System.in);
-                                System.out.print("Enter Tank name : ");
-                                clientName = scanner.nextLine();
-                                Scanner scanner2 = new Scanner(System.in);
-                                System.out.print("Enter the type of tank : ");
-                                robotType = scanner2.nextLine();
-
-//                                robotType = "sniper";
-
-                                request = new Request(clientName,"launch", Collections.singletonList(robotType));
-                                lastRequest.add(request);
-                        }
-                        break;
-
                     case KeyEvent.VK_ESCAPE:
                         if (launched) {
                             request = new Request(clientName,"quit");
@@ -188,6 +202,25 @@ public class TankWorld extends JComponent implements GUI {
                 enemyPositions.clear();
             }
         });
+    }
+
+    private void launch() {
+        if (launched) return;
+
+        clientName = nameBox.getText();
+        robotType = (String) tankBox.getSelectedItem();
+
+        if (clientName == "") {
+            JOptionPane.showMessageDialog(frame,
+                    "Please Enter a name",
+                    "Error: No Name",
+                    JOptionPane.ERROR_MESSAGE);
+            nameBox.requestFocus();
+            return;
+        }
+
+        request = new Request(clientName,"launch", Collections.singletonList(robotType));
+        lastRequest.add(request);
     }
 
     public static JFrame setupGUI() {
@@ -216,18 +249,24 @@ public class TankWorld extends JComponent implements GUI {
     //PaintComponent is our real showOutput
     @Override
     public void showOutput(Response response) {
-        System.out.println(response.getCommandResponse());
-        if (!launched && response.getCommandResponse().equalsIgnoreCase("success")){
-            player = new Player(robotType, clientName);
-            launched = true;
-        }else if (!launched && response.getCommandResponse().equalsIgnoreCase("duplicate")){
-            Scanner scanner = new Scanner(System.in);
-            System.out.print("Try again! Tank name taken!\nEnter Tank name : ");
-            clientName = scanner.nextLine();
-            Scanner scanner2 = new Scanner(System.in);
-            System.out.print("Enter the type of tank : ");
-            robotType = scanner2.nextLine();
+        if (!launched ){
+            if (response.getCommandResponse().equalsIgnoreCase("success")){
+                player = new Player(robotType, clientName);
+
+                launched = true;
+                nameBox.setVisible(false);
+                tankBox.setVisible(false);
+                launchButton.setVisible(false);
+            } else {
+                JOptionPane.showMessageDialog(frame,
+                        "Player with this name already exists. Please try again",
+                        "Error: Player Exists",
+                        JOptionPane.ERROR_MESSAGE);
+                nameBox.requestFocus();
+                nameBox.setText("");
+            }
         }
+
         runServerCorrections(response);
     }
 
@@ -329,8 +368,15 @@ public class TankWorld extends JComponent implements GUI {
             }
 
         }else {
-            g.setColor(Color.red);
-            g.drawString("PRESS >L< BUTTON TO LAUNCH",200,200);
+            g.setColor(new Color(213, 191, 191));
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+
+            g.setColor(Color.BLACK);
+            nameBox.setVisible(true);
+            tankBox.setVisible(true);
+
+            g.drawString("Choose a Tank:",WIDTH/2-34, HEIGHT/2-10-5);
+            g.drawString("Enter a Name:",WIDTH/2-34, HEIGHT/2-10-75);
         }
     }
 
@@ -388,7 +434,7 @@ public class TankWorld extends JComponent implements GUI {
         for(Robot enemy : enemies.values()){
             enemyPositions.add(enemy.getPosition());
         }
-        System.out.println((response.getRobot().getPosition().getX()+50)+","+((-(response.getRobot().getPosition().getY())+50)));
+//        System.out.println((response.getRobot().getPosition().getX()+50)+","+((-(response.getRobot().getPosition().getY())+50)));
 
 
         HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
@@ -432,6 +478,7 @@ public class TankWorld extends JComponent implements GUI {
                             player.setMaxAmmo(response.getRobot().getMaxAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
 //                            player.setRange(response.getRobot().getRange()*x_scale);
+                            player.setRange(response.getRobot().getFiringDistance()*x_scale);
                             player.setKills(response.getRobot().getKills());
                             player.setDeaths(response.getRobot().getDeaths());
 
@@ -462,7 +509,8 @@ public class TankWorld extends JComponent implements GUI {
                         enemy.setSprite(robot.getRobotType());
                         enemy.setAmmo(robot.getCurrentAmmo());
                         enemy.setTankHealth(robot.getCurrentShield());
-//                        enemy.setRange(robot.getFiringDistance()*x_scale);
+                        enemy.setRange(response.getRobot().getFiringDistance()*x_scale);
+                        enemy.setRange(robot.getFiringDistance());
                         enemy.setKills(robot.getKills());
 
                         switch (robot.getDirection()) {
@@ -479,7 +527,7 @@ public class TankWorld extends JComponent implements GUI {
                                 enemy.setTankDirection(Direction.Left);
                                 break;
                         }
-                        System.out.println(robot.getLastCommand());
+//                        System.out.println(robot.getLastCommand());
                         if (Objects.equals(robot.getLastCommand(), "fire")) {
                             if(!(enemy.getAmmo()<=0)){
                             enemy.fire();}

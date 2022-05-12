@@ -1,7 +1,7 @@
 package ServerTest;
 
 import org.junit.jupiter.api.Test;
-import za.co.wethinkcode.robotworlds.server.Position;
+import za.co.wethinkcode.robotworlds.shared.Position;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
