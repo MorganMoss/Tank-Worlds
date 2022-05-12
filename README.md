@@ -27,15 +27,15 @@ ESC = QUIT<BR>
 
 ## SETUP:
 
-RUN THE SERVER:
-    open the server.jar folder in your terminal
-    use the command "java -jar toy-robot-world-mmms.jar"
+RUN THE SERVER:<BR>
+    open the server.jar folder in your terminal<BR>
+    use the command "java -jar toy-robot-world-mmms.jar"<BR>
 
-RUN THE CLIENT:
-    just double click the .jar file!
+RUN THE CLIENT:<BR>
+    just double click the .jar file!<BR>
 
 ## USING THE SERVER:
 
-DUMP = GET INFO ON ALL SERVER COMPONENTS
-ROBOTS = GET LIST OF ALL ROBOTS
-QUIT = EXIT THE SERVER AND CLOSE ALL CLIENTS
+DUMP = GET INFO ON ALL SERVER COMPONENTS<BR>
+ROBOTS = GET LIST OF ALL ROBOTS<BR>
+QUIT = EXIT THE SERVER AND CLOSE ALL CLIENTS<BR>
