@@ -49,6 +49,11 @@ public class CommandTest {
             Properties properties = new Properties();
             properties.load(fileInputStream);
             properties.setProperty("map", oldMap);
+            fileInputStream.close();
+            FileOutputStream fileOutputStream = new FileOutputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            properties.store(fileOutputStream, "Test config override");
+            fileOutputStream.close();
+
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
         } catch (IOException e) {
