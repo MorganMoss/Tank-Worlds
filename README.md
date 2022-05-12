@@ -25,3 +25,17 @@ ESC = QUIT<BR>
 ![alt text](https://gitlab.wethinkco.de/mmoss021/toy-robot-world-mmms/-/blob/main/assets/images/cover.png)
 ![Screenshot](cover.png)
 
+## SETUP:
+
+RUN THE SERVER:
+    open the server.jar folder in your terminal
+    use the command "java -jar toy-robot-world-mmms.jar"
+
+RUN THE CLIENT:
+    just double click the .jar file!
+
+## USING THE SERVER:
+
+DUMP = GET INFO ON ALL SERVER COMPONENTS
+ROBOTS = GET LIST OF ALL ROBOTS
+QUIT = EXIT THE SERVER AND CLOSE ALL CLIENTS
