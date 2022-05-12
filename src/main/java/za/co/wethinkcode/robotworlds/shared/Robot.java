@@ -35,15 +35,15 @@ public class Robot {
             case "sniper":
                 this.robotType = "sniper";
                 this.size = 20;
-                this.fireDistance = 15;
+                this.fireDistance = 9;
                 this.maxAmmo = 3;
                 this.maxShield = 1;
-                this.visibilityDistance = 20;
+                this.visibilityDistance = 10;
                 break;
             case "machine":
                 this.robotType = "machine";
                 this.size = 10;
-                this.fireDistance = 10;
+                this.fireDistance = 2;
                 this.maxAmmo = 20;
                 this.maxShield = 2;
                 this.visibilityDistance = 10;
@@ -59,7 +59,7 @@ public class Robot {
             default:
                 this.robotType = "tank";
                 this.size = 10;
-                this.fireDistance = 10;
+                this.fireDistance = 3;
                 this.maxAmmo = 5;
                 this.maxShield = 3;
                 this.visibilityDistance = 10;

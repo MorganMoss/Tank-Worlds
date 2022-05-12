@@ -55,7 +55,7 @@ public class Server{
      */
     public static String getConfigProperty(String property){
         try {
-            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            FileInputStream fileInputStream = new FileInputStream("config.properties");
             Properties properties = new Properties();
             properties.load(fileInputStream);
             String value = properties.getProperty(property);

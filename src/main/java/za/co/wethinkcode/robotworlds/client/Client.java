@@ -40,7 +40,7 @@ public class Client {
      */
     public static String getConfigProperty(String property){
         try {
-            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/client/config.properties");
+            FileInputStream fileInputStream = new FileInputStream("config.properties");
             Properties properties = new Properties();
             properties.load(fileInputStream);
             return properties.getProperty(property);

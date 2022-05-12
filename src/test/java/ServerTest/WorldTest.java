@@ -20,13 +20,13 @@ public class WorldTest {
     @BeforeAll
     static void changeConfig(){
         try {
-            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            FileInputStream fileInputStream = new FileInputStream("config.properties");
             Properties properties = new Properties();
             properties.load(fileInputStream);
             oldMap = properties.getProperty("map");
             properties.setProperty("map", "BasicMap");
             fileInputStream.close();
-            FileOutputStream fileOutputStream = new FileOutputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            FileOutputStream fileOutputStream = new FileOutputStream("config.properties");
             properties.store(fileOutputStream, "Test config override");
             fileOutputStream.close();
 
@@ -42,12 +42,12 @@ public class WorldTest {
     @AfterAll
     static void revertConfig(){
         try {
-            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            FileInputStream fileInputStream = new FileInputStream("config.properties");
             Properties properties = new Properties();
             properties.load(fileInputStream);
             properties.setProperty("map", oldMap);
             fileInputStream.close();
-            FileOutputStream fileOutputStream = new FileOutputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            FileOutputStream fileOutputStream = new FileOutputStream("config.properties");
             properties.store(fileOutputStream, "Test config override");
             fileOutputStream.close();
 
