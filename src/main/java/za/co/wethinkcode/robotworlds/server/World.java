@@ -231,23 +231,23 @@ public class World {
      *          "hit enemy {enemyName}" : if an enemy is hit
      */
     public static String pathBlocked(Robot robot, Position newPosition) {
-        final int low;
-        final int high;
+//        final int low;
+//        final int high;
         String response = "";
         Position position = robot.getPosition();
+
+        final int interval;
 
         if (position.getX() == newPosition.getX()){
             final int x = newPosition.getX();
 
             if (position.getY() > newPosition.getY()) {
-                low = newPosition.getY();
-                high = position.getY()-1;
+                interval = -1;
             } else {
-                low = position.getY()+1;
-                high = newPosition.getY();
+                interval = 1;
             }
 
-            for (int y = low; y <= high; y++){
+            for (int y = position.getY() + interval; y != newPosition.getY() + interval; y += interval){
                 if (!worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals(" ")){
                     if (worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals("X")) {
                         return String.format("hit obstacle %d %d",x,y);
@@ -264,14 +264,12 @@ public class World {
             final int y = newPosition.getY();
 
             if (position.getX() > newPosition.getX()) {
-                low = newPosition.getX();
-                high = position.getX() - 1;
+                interval = -1;
             } else {
-                low = position.getX() + 1;
-                high = newPosition.getX();
+                interval = 1;
             }
 
-            for (int x = low; x <= high; x++){
+            for (int x = position.getX() + interval; x != newPosition.getX() + interval; x += interval){
                 if (!worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals(" ")){
                     if (worldMap.getOrDefault(x, new HashMap<>()).getOrDefault(y, "X").equals("X")) {
                         return String.format("hit obstacle %d %d", x, y);
