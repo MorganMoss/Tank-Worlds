@@ -260,6 +260,7 @@ public class TankWorld extends JComponent implements GUI {
                         JOptionPane.ERROR_MESSAGE);
                 nameBox.requestFocus();
                 nameBox.setText("");
+                return;
             }
         }
 

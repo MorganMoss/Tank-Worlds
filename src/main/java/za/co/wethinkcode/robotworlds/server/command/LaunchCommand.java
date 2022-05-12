@@ -2,6 +2,7 @@ package za.co.wethinkcode.robotworlds.server.command;
 
 import za.co.wethinkcode.robotworlds.server.World;
 import za.co.wethinkcode.robotworlds.shared.Robot;
+import za.co.wethinkcode.robotworlds.shared.exceptions.RobotNotFoundException;
 
 public class LaunchCommand extends Command{
 
@@ -11,7 +12,12 @@ public class LaunchCommand extends Command{
 
     @Override
     public String execute() {
-        World.add(new Robot(robotName ,argument));
-        return "Success";
+        try {
+            World.getRobot(robotName);
+        } catch (RobotNotFoundException good){
+            World.add(new Robot(robotName ,argument));
+            return "Success";
+        }
+        return "Robot with that name already exists.";
     }
 }
