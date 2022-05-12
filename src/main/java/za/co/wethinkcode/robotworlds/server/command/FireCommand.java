@@ -15,11 +15,16 @@ public class FireCommand extends Command{
         @Override
         public String execute() {
             Robot robot = World.getRobot(robotName);
+
             World.getRobot(robotName).setStatus("normal");
+
             if (robot.getCurrentAmmo() > 0) {
                 robot.decreaseAmmo();
+
                 List<Position> bulletList = World.getBulletList(robot);
+
                 Position finalBullet = bulletList.get(bulletList.size() - 1);
+
                 String result = World.pathBlocked(robot, finalBullet);
                 String[] resultList = result.split(" ");
                 if (resultList.length > 1){
