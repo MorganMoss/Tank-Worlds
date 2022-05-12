@@ -8,8 +8,9 @@ public class LeftCommand extends Command{
     }
 
     @Override
-    public String execute(World world) {
-        world.updateDirection(robotName,270);
+    public String execute() {
+        World.updateDirection(robotName,270);
+        World.getRobot(robotName).setStatus("normal");
         return "Success";
     }
 }

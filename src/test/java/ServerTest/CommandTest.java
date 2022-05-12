@@ -1,90 +1,128 @@
 package ServerTest;
 
-import org.junit.jupiter.api.Test;
-import za.co.wethinkcode.robotworlds.server.Position;
+import org.junit.jupiter.api.*;
 import za.co.wethinkcode.robotworlds.server.World;
 import za.co.wethinkcode.robotworlds.server.command.*;
-import za.co.wethinkcode.robotworlds.server.map.BasicMap;
-import za.co.wethinkcode.robotworlds.server.Robot;
+import za.co.wethinkcode.robotworlds.shared.Position;
+import za.co.wethinkcode.robotworlds.shared.Robot;
 
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CommandTest {
+
+    //setup is to modify the static world
+    private static String oldMap;
+    @BeforeEach
+    public void changeConfig(){
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            oldMap = properties.getProperty("map");
+            properties.setProperty("map", "EmptyMap");
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+        World.resetMap();
+    }
+
+    @AfterAll
+    static void revertConfig(){
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            properties.setProperty("map", oldMap);
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+    }
+
     @Test
     public void testRepairCommand(){
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "hal","sniper");
-        world.add(robot);
+        Robot robot = new Robot("hal","sniper");
+        World.add(robot);
         RepairCommand repairCommand = new RepairCommand(robot.getRobotName());
-        assertEquals("Repair in progress",repairCommand.execute(world));
+        assertEquals("Repair in progress",repairCommand.execute());
+        World.remove(robot.getRobotName());
     }
     @Test
     public void testLaunch(){
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "halk","sniper");
-        world.add(robot);
+        Robot robot = new Robot("halk","sniper");
         LaunchCommand launch = new LaunchCommand(robot.getRobotName(),"testRobot");
-        assertEquals("Success",launch.execute(world));
+        assertEquals("Success",launch.execute());
+        World.remove(robot.getRobotName());
     }
     @Test
     public void testIdle(){
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "halk","sniper");
-        world.add(robot);
+        Robot robot = new Robot("halk","sniper");
+        World.add(robot);
         IdleCommand idleCommand = new IdleCommand(robot.getRobotName());
-        assertEquals("idle",idleCommand.execute(world));
+        assertEquals("idle",idleCommand.execute());
+        World.remove(robot.getRobotName());
     }
     @Test
     public void testReloadCommand(){
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "halk","sniper");
-        world.add(robot);
+        Robot robot = new Robot("halk","sniper");
+        World.add(robot);
         ReloadCommand reloadCommand = new ReloadCommand(robot.getRobotName());
-        assertEquals("Reload in progress",reloadCommand.execute(world));
+        assertEquals("Reload in progress",reloadCommand.execute());
+        World.remove(robot.getRobotName());
     }
     @Test
     public void testFireCommandSuccess(){
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "peter","sniper");
-        world.add(robot);
+        Robot robot = new Robot("peter","sniper");
+        World.add(robot);
+        World.setRobotPosition(robot, new Position(0,0));
         FireCommand fireCommand = new FireCommand(robot.getRobotName());
-        assertEquals("Success",fireCommand.execute(world));
+        assertEquals("Success",fireCommand.execute());
+        World.remove(robot.getRobotName());
     }
-
-
 
     @Test
     public void testLeftCommand(){
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "roger","sniper");
+        Robot robot = new Robot("roger","sniper");
         LeftCommand leftCommand = new LeftCommand(robot.getRobotName());
-        world.add(robot);
-        assertEquals("Success",leftCommand.execute(world));
+        World.add(robot);
+        assertEquals("Success",leftCommand.execute());
+        World.remove(robot.getRobotName());
     }
     @Test
     public void testRightCommand(){
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "larry","sniper");
+        Robot robot = new Robot("larry","sniper");
         RightCommand rightCommand = new RightCommand(robot.getRobotName());
-        world.add(robot);
-        assertEquals("Success",rightCommand.execute(world));
+        World.add(robot);
+        assertEquals("Success",rightCommand.execute());
+        World.remove(robot.getRobotName());
     }
     @Test
     public void testBackCommand(){
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "moss","sniper");
-        world.add(robot);
+        Robot robot = new Robot("moss","sniper");
+        World.add(robot);
+        World.setRobotPosition(robot, new Position(0,0));
         Command backCommand = new BackCommand(robot.getRobotName(),"5");
-        assertEquals("Success",backCommand.execute(world));
+        assertEquals("Success",backCommand.execute());
+        World.remove(robot.getRobotName());
     }
     @Test
     public void testForwardCommand(){
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "moss","sniper");
+        Robot robot = new Robot("moss","sniper");
         ForwardCommand forwardCommand = new ForwardCommand(robot.getRobotName(),"5");
-        world.add(robot);
-        assertEquals("Success",forwardCommand.execute(world));
+        World.add(robot);
+        World.setRobotPosition(robot, new Position(0,0));
+        assertEquals("Success",forwardCommand.execute());
+        World.remove(robot.getRobotName());
     }
 
 

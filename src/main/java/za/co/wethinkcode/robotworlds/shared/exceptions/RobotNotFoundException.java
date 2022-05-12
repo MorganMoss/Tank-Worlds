@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.exceptions;
+package za.co.wethinkcode.robotworlds.shared.exceptions;
 
 /**
  * Raised when the world cannot find the robot in its collection of robots

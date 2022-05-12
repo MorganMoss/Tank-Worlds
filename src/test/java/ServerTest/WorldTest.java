@@ -1,142 +1,185 @@
 package ServerTest;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import za.co.wethinkcode.robotworlds.server.Position;
+import za.co.wethinkcode.robotworlds.shared.Position;
 import za.co.wethinkcode.robotworlds.server.World;
-import za.co.wethinkcode.robotworlds.server.map.BasicMap;
-import za.co.wethinkcode.robotworlds.server.Robot;
+import za.co.wethinkcode.robotworlds.shared.Robot;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WorldTest {
+    //setup is to modify the static world
+    private String oldMap;
+    @BeforeEach
+    public void changeConfig(){
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            oldMap = properties.getProperty("map");
+            properties.setProperty("map", "BasicMap");
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+        World.resetMap();
+    }
+
+    @AfterEach
+    public void revertConfig(){
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/server/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            properties.setProperty("map", oldMap);
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+    }
+
     @Test
     public void addRobot() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot1 = new Robot(world, "homer","sniper");
-        Robot robot2 = new Robot(world, "marge","sniper");
-        world.add(robot1);
-        world.add(robot2);
-        assertEquals(robot1, world.getRobot("homer"));
-        assertEquals(robot2, world.getRobot("marge"));
+        Robot robot1 = new Robot("homer","sniper");
+        Robot robot2 = new Robot("marge","sniper");
+        World.add(robot1);
+        World.add(robot2);
+        assertEquals(robot1, World.getRobot("homer"));
+        assertEquals(robot2, World.getRobot("marge"));
+        World.remove(robot1);
+        World.remove(robot2);
     }
 
     @Test
     public void getRobots() {
-        World world = new World(new BasicMap(new Position(100, 100)));
-        Robot robot = new Robot(world, "homer","machine");
-        world.add(robot);
-        assertEquals(robot, world.getRobots().values().toArray()[0]);
+        Robot robot = new Robot("homer","machine");
+        World.add(robot);
+        assertEquals(robot, World.getRobots().values().toArray()[0]);
+        World.remove(robot);
     }
 
     @Test
     public void removeRobot() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot1 = new Robot(world, "homer","tank");
-        Robot robot2 = new Robot(world, "marge","sniper");
-        world.add(robot1);
-        world.add(robot2);
-        world.remove(robot1);
-        assertEquals(robot2, world.getRobots().values().toArray()[0]);
-        world.remove("marge");
-        assertEquals(0, world.getRobots().values().size());
+        Robot robot1 = new Robot("homer","tank");
+        Robot robot2 = new Robot("marge","sniper");
+        World.add(robot1);
+        World.add(robot2);
+        World.remove(robot1);
+        assertEquals(robot2, World.getRobots().values().toArray()[0]);
+        World.remove("marge");
+        assertEquals(0, World.getRobots().values().size());
     }
 
     @Test
     public void pathBlockedMiss() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "homer","sniper");
-        world.add(robot);
+        Robot robot = new Robot("homer","sniper");
+        World.add(robot);
         robot.setPosition(new Position(0,0));
-        assertEquals("miss", world.pathBlocked(robot, new Position(0,5)));
+        assertEquals("miss", World.pathBlocked(robot, new Position(0,5)));
+        World.remove(robot);
     }
 
     @Test
     public void pathBlockedHitObjectTop() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "homer","machine");
-        world.add(robot);
+        Robot robot = new Robot("homer","machine");
+        World.add(robot);
         robot.setDirection(180);
         robot.setPosition(new Position(0,0));
-        assertEquals("hit obstacle 0 -1", world.pathBlocked(robot, new Position(0,-1)));
+        assertEquals("hit obstacle 0 -1", World.pathBlocked(robot, new Position(0,-1)));
+        World.remove(robot);
     }
 
     @Test
     public void pathBlockedHitObjectLeft() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "homer","sniper");
-        world.add(robot);
+        Robot robot = new Robot("homer","sniper");
+        World.add(robot);
         robot.setDirection(90);
         robot.setPosition(new Position(-1,-1));
-        assertEquals("hit obstacle 0 -1", world.pathBlocked(robot, new Position(0,-1)));
+        assertEquals("hit obstacle 0 -1", World.pathBlocked(robot, new Position(0,-1)));
+        World.remove(robot);
     }
 
     @Test
     public void pathBlockedHitObjectBottom() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "homer","tank");
-        world.add(robot);
+        Robot robot = new Robot("homer","tank");
+        World.add(robot);
         robot.setPosition(new Position(0,-4));
-        assertEquals("hit obstacle 0 -3", world.pathBlocked(robot, new Position(0,-3)));
+        assertEquals("hit obstacle 0 -3", World.pathBlocked(robot, new Position(0,-3)));
+        World.remove(robot);
     }
 
     @Test
     public void pathBlockedHitObjectRight() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "homer","tank");
-        world.add(robot);
+        Robot robot = new Robot( "homer","tank");
+        World.add(robot);
         robot.setDirection(270);
         robot.setPosition(new Position(4,-3));
-        assertEquals("hit obstacle 3 -3", world.pathBlocked(robot, new Position(3,-3)));
+        assertEquals("hit obstacle 3 -3", World.pathBlocked(robot, new Position(3,-3)));
+        World.remove(robot);
     }
 
     @Test
     public void pathBlockedHitEnemyTop() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "homer","sniper");
-        Robot enemy = new Robot(world, "flanders","machine");
-        world.add(robot);
-        world.add(enemy);
+        Robot robot = new Robot( "homer","sniper");
+        Robot enemy = new Robot("flanders","machine");
+        World.add(robot);
+        World.add(enemy);
         robot.setDirection(180);
-        world.setRobotPosition(robot, new Position(0,1));
-        world.setRobotPosition(enemy, new Position(0,0));
-        assertEquals("hit enemy flanders", world.pathBlocked(robot, new Position(0,0)));
+        World.setRobotPosition(robot, new Position(0,1));
+        World.setRobotPosition(enemy, new Position(0,0));
+        assertEquals("hit enemy flanders", World.pathBlocked(robot, new Position(0,0)));
+        World.remove(robot);
+        World.remove(enemy);
     }
 
     @Test
     public void pathBlockedHitEnemyBottom() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "homer","machine");
-        Robot enemy = new Robot(world, "flanders","sniper");
-        world.add(robot);
-        world.add(enemy);
-        world.setRobotPosition(robot, new Position(0,0));
-        world.setRobotPosition(enemy, new Position(0,1));
-        assertEquals("hit enemy flanders", world.pathBlocked(robot, new Position(0,1)));
+        Robot robot = new Robot("homer","machine");
+        Robot enemy = new Robot("flanders","sniper");
+        World.add(robot);
+        World.add(enemy);
+        World.setRobotPosition(robot, new Position(0,0));
+        World.setRobotPosition(enemy, new Position(0,1));
+        assertEquals("hit enemy flanders", World.pathBlocked(robot, new Position(0,1)));
+        World.remove(robot);
+        World.remove(enemy);
     }
 
     @Test
     public void pathBlockedHitEnemyLeft() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "homer","bomber");
-        Robot enemy = new Robot(world, "flanders","sniper");
-        world.add(robot);
-        world.add(enemy);
+        Robot robot = new Robot("homer","bomber");
+        Robot enemy = new Robot("flanders","sniper");
+        World.add(robot);
+        World.add(enemy);
         robot.setDirection(90);
-        world.setRobotPosition(robot, new Position(-1,0));
-        world.setRobotPosition(enemy, new Position(0,0));
-        assertEquals("hit enemy flanders", world.pathBlocked(robot, new Position(0,0)));
+        World.setRobotPosition(robot, new Position(-1,0));
+        World.setRobotPosition(enemy, new Position(0,0));
+        assertEquals("hit enemy flanders", World.pathBlocked(robot, new Position(0,0)));
+        World.remove(robot);
+        World.remove(enemy);
     }
 
     @Test
     public void pathBlockedHitEnemyRight() {
-        World world = new World(new BasicMap(new Position(100,100)));
-        Robot robot = new Robot(world, "homer","machine");
-        Robot enemy = new Robot(world, "flanders","tank");
-        world.add(robot);
-        world.add(enemy);
+        Robot robot = new Robot("homer","machine");
+        Robot enemy = new Robot("flanders","tank");
+        World.add(robot);
+        World.add(enemy);
         robot.setDirection(270);
-        world.setRobotPosition(robot, new Position(1,0));
-        world.setRobotPosition(enemy, new Position(0,0));
-        assertEquals("hit enemy flanders", world.pathBlocked(robot, new Position(0,0)));
+        World.setRobotPosition(robot, new Position(1,0));
+        World.setRobotPosition(enemy, new Position(0,0));
+        assertEquals("hit enemy flanders", World.pathBlocked(robot, new Position(0,0)));
+        World.remove(robot);
+        World.remove(enemy);
     }
 }

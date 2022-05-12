@@ -1,35 +1,57 @@
 package za.co.wethinkcode.robotworlds.client;
 
+import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
+import za.co.wethinkcode.robotworlds.shared.exceptions.NoNewInput;
+import za.co.wethinkcode.robotworlds.shared.protocols.Request;
+import za.co.wethinkcode.robotworlds.shared.protocols.Response;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-
-import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
-import za.co.wethinkcode.robotworlds.exceptions.NoNewInput;
-import za.co.wethinkcode.robotworlds.protocol.Request;
-import za.co.wethinkcode.robotworlds.protocol.Response;
+import java.util.Properties;
 
 /**
  * This is the back-end for the user, it handles communication between the GUI and the server.
- * This class should not be modified further, outside of the TODO's given.
  */
 public class Client {
-    //TODO : Have port and address be determined by a config file
     /**
      * The port the server uses
      */
-    private static int port = 5000;
-    //10.200.109.17 //localhost //maggie 10.200.110.163
+    private static final int port = Integer.parseInt(getConfigProperty("port"));
+
     /**
      * The address of the server that the client is connecting to
      */
-    private static String address = "localhost";
+    private static final String address = getConfigProperty("address");
 
-    //TODO : Have a config file for client that sets which GUI you use
     /**
      * The GUI being used by the client
      */
     private static class CurrentGUI extends TankWorld {}
+
+    //these can be removed after debugging lag
+    private static Long start;
+    private static int tickRate = 50;
+
+    /**
+     * Gets a generic property from the client config file
+     * @param property the property key
+     * @return the property value
+     */
+    public static String getConfigProperty(String property){
+        try {
+            FileInputStream fileInputStream = new FileInputStream("src/main/java/za/co/wethinkcode/robotworlds/client/config.properties");
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            return properties.getProperty(property);
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+        System.exit(1);
+        return "";
+    }
 
     /**
      * Starts the gui and the threads that handle input/output
@@ -38,10 +60,10 @@ public class Client {
         GUI gui = new CurrentGUI();
 
         try (Socket socket = new Socket(address, port)) {
-            Out output = new Out(socket, gui);
+            ResponseThread output = new ResponseThread(socket, gui);
             output.start();
 
-            In input = new In(socket, gui);
+            RequestThread input = new RequestThread(socket, gui);
             input.start();
 
             while (input.isAlive() && output.isAlive()) {}
@@ -50,6 +72,7 @@ public class Client {
 
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -58,17 +81,17 @@ public class Client {
      * @param args : does nothing
      */
     public static void main(String[] args) {
-       Client.start();
+        Client.start();
     }
 
     /**
      * Receives responses from server and makes GUI output them
      */
-    private static class Out extends Thread {
+    private static class ResponseThread extends Thread {
         private final GUI gui;
         private final Socket socket;
 
-        public Out(Socket socket, GUI gui){
+        public ResponseThread(Socket socket, GUI gui){
             this.socket = socket;
             this.gui = gui;
         }
@@ -76,13 +99,17 @@ public class Client {
         @Override
         public void run() {
             try(
-                BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()))
             ) {
                 do {
                     try {
                         String serializedResponse = incoming.readLine();
 
                         Response response = Response.deSerialize(serializedResponse);
+
+                        if (System.currentTimeMillis() - start > tickRate){
+                            System.out.println("Response delayed by " + (System.currentTimeMillis() - start - tickRate));
+                        }
 
                         if (response != null) {
                             gui.showOutput(response);
@@ -94,6 +121,7 @@ public class Client {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                System.exit(1);
             }
         }
     }
@@ -101,11 +129,11 @@ public class Client {
     /**
      * Gives requests to server, the input for which is given by the GUI
      */
-    private static class In extends Thread {
+    private static class RequestThread extends Thread {
         private final GUI gui;
         private final Socket socket;
 
-        public In(Socket socket, GUI gui) {
+        public RequestThread(Socket socket, GUI gui) {
             this.gui = gui;
             this.socket = socket;
 
@@ -121,13 +149,12 @@ public class Client {
             }
 
             try(
-                PrintStream outgoing = new PrintStream(socket.getOutputStream());
+                PrintStream outgoing = new PrintStream(socket.getOutputStream())
             ) {
                 do {
+                    Client.start = System.currentTimeMillis();
                     try {
                         Request request = gui.getInput();
-
-//                        System.out.println("Out -> " + request.getRobotName() + " : " + request.getCommand() + " ; " + request.getArguments());
 
                         outgoing.println(request.serialize()); //send request to server
                         outgoing.flush();

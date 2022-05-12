@@ -1,17 +1,19 @@
 package za.co.wethinkcode.robotworlds.server.map;
 
+import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
+import za.co.wethinkcode.robotworlds.server.obstacle.SquareObstacle;
+import za.co.wethinkcode.robotworlds.shared.Position;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
-import za.co.wethinkcode.robotworlds.server.Position;
-import za.co.wethinkcode.robotworlds.server.obstacle.SquareObstacle;
-
-public class GUIMap implements Map{
-    private final Position size;
+public class GUIMap extends Map{
+    public GUIMap(){
+        super(new Position(600,600));
+    }
 
     public GUIMap(Position size) {
-        this.size = size;
+        super(size);
     }
 
     public List<Obstacle> getObstacles() {
@@ -33,8 +35,4 @@ public class GUIMap implements Map{
 
         return obstacleList;
     }
-    public Position getMapSize() {
-        return this.size;
-    }
-
 }

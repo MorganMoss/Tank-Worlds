@@ -1,4 +1,4 @@
-package za.co.wethinkcode.robotworlds.server;
+package za.co.wethinkcode.robotworlds.shared;
 
 //TODO : make javadocs!!
 public class Position {

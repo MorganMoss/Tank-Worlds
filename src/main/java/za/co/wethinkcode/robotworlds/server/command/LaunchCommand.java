@@ -1,7 +1,7 @@
 package za.co.wethinkcode.robotworlds.server.command;
 
-import za.co.wethinkcode.robotworlds.server.Robot;
 import za.co.wethinkcode.robotworlds.server.World;
+import za.co.wethinkcode.robotworlds.shared.Robot;
 
 public class LaunchCommand extends Command{
 
@@ -10,8 +10,8 @@ public class LaunchCommand extends Command{
     }
 
     @Override
-    public String execute(World world) {
-        world.add(new Robot(world, robotName ,argument));
+    public String execute() {
+        World.add(new Robot(robotName ,argument));
         return "Success";
     }
 }

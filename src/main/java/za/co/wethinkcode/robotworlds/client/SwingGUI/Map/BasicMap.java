@@ -3,7 +3,7 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI.Map;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Brick;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Obstacle;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Obstacles.Pit;
-import za.co.wethinkcode.robotworlds.server.Position;
+import za.co.wethinkcode.robotworlds.shared.Position;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,9 +2,9 @@ package za.co.wethinkcode.robotworlds.server.obstacle;
 
 import za.co.wethinkcode.robotworlds.shared.Position;
 
-public class SquareObstacle extends Obstacle{
+public class PitObstacle extends Obstacle{
 
-    public SquareObstacle(int size, Position topLeft) {
+    public PitObstacle(int size, Position topLeft) {
         super("square", new Position(size,size), topLeft);
     }
 

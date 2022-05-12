@@ -2,7 +2,6 @@ package ClientTest;
 
 import org.junit.jupiter.api.Test;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Direction;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Enemy;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Player;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,12 +41,12 @@ public class TanksTest {
     }
     @Test
     public  void testEnemy(){
-        Enemy enemy = new Enemy();
+        Player enemy = new Player("Enemy1","Enemy1");
         assertEquals("Enemy1",enemy.getTankName());
-        assertEquals(5,enemy.getTankHealth());
-        assertEquals(5,enemy.getAmmo());
+        assertEquals(2,enemy.getTankHealth());
+        assertEquals(10,enemy.getAmmo());
         assertEquals("Up",enemy.getDirection().toString());
-        assertEquals(0,enemy.getRange());
+        assertEquals(75,enemy.getRange());
         assertEquals(40,enemy.getSize());
 
     }

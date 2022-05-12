@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import za.co.wethinkcode.robotworlds.protocol.Request;
+import za.co.wethinkcode.robotworlds.shared.protocols.Request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

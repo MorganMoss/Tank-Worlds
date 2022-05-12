@@ -1,6 +1,7 @@
-package za.co.wethinkcode.robotworlds.protocol;
+package za.co.wethinkcode.robotworlds.shared.protocols;
 
 import com.google.gson.Gson;
+
 import java.util.List;
 
 public class Request {
