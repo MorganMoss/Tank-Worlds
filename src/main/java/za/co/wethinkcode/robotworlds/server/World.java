@@ -286,6 +286,7 @@ public class World {
                 }
             }
         }
+
         return "miss";
     }
 

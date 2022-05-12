@@ -183,6 +183,8 @@ public class Server{
                     if (!robot.isPaused() || request.getCommand().equalsIgnoreCase("quit")) {
                         if (robot.hasDied()) {
                             robot.setPaused(true);
+                            generateResponse(request, "You have died");
+                            currentRequests.remove(robotName);
                         }
                         robot.setLastCommand(request.getCommand());
                         Command command = Command.create(request);
@@ -220,6 +222,12 @@ public class Server{
         Robot robot = World.getRobot(request.getRobotName());
         HashMap<Integer, HashMap<Integer, String>> map = World.look(robot);
         HashMap<String, Robot> enemies = World.getEnemies(robot);
+
+
+        if (robot.hasDied()) {
+            robot.setPaused(true);
+            commandResponse = "You have died";
+        }
 
         Response response = new Response(
                 robot,
@@ -292,7 +300,7 @@ public class Server{
         for (int y = map.get(0).size()-1; y >= 0;  y--){
             for (int x =0; x < map.size(); x++){
                 try{
-                    System.out.print("" + map.get(x).get(y).charAt(0) /*+ map.get(x).get(y).charAt(0)*/);
+                    System.out.print("" + map.get(x).get(y).charAt(0));
                 } catch (NullPointerException odd) {
                     System.out.println(x + "," + y);
                 }
