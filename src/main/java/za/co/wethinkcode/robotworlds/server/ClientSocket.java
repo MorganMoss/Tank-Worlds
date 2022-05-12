@@ -2,6 +2,7 @@ package za.co.wethinkcode.robotworlds.server;
 
 import za.co.wethinkcode.robotworlds.shared.Robot;
 import za.co.wethinkcode.robotworlds.shared.exceptions.NoChangeException;
+import za.co.wethinkcode.robotworlds.shared.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.shared.protocols.Request;
 import za.co.wethinkcode.robotworlds.shared.protocols.Response;
 
@@ -48,7 +49,9 @@ public class ClientSocket{
             while (true) {
                 try {
                     Response response = Server.getResponse(robotName);
+
                     out.println(response.serialize());
+
                     if (response.getCommandResponse().equalsIgnoreCase("quit successful")){
                         break;
                     }
@@ -57,6 +60,7 @@ public class ClientSocket{
                             && !response.getCommandResponse().equalsIgnoreCase("Success")
                     ){
                         hasLaunched = false;
+                        robotName = "";
                         break;
                     } else {
                         hasLaunched = true;
@@ -77,6 +81,10 @@ public class ClientSocket{
         public boolean isLaunched() {
             return hasLaunched;
         }
+
+        public void sendResponse(Response response) {
+            out.println(response.serialize());
+        }
     }
 
     /**
@@ -89,6 +97,9 @@ public class ClientSocket{
         public RequestThread(Socket socket) throws IOException {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             responseThread = new ResponseThread(new PrintStream(socket.getOutputStream()));
+            if (!responseThread.isAlive()){
+                responseThread.start();
+            }
         }
 
         /**
@@ -103,25 +114,23 @@ public class ClientSocket{
                 while ((messageFromClient = in.readLine()) != null) {
                     Request request = Request.deSerialize(messageFromClient);
 
-
-                    if (request.getCommand().equals("launch")) {
-                        if (!responseThread.isLaunched()) {
-                            if (!responseThread.isAlive()){
-                                responseThread.start();
+                    if (!responseThread.isLaunched()) {
+                        if (request.getCommand().equals("launch")) {
+                            try {
+                                World.getRobot(request.getRobotName());
+                                responseThread.sendResponse(new Response(null, "Robot with that name already exists.",null,null));
+                                continue;
+                            } catch (RobotNotFoundException goAsNormal) {
                             }
+                            System.out.println(robotName + " has joined!");
                             responseThread.setRobotName(request.getRobotName());
                             robotName = request.getRobotName();
-                            System.out.println(robotName + " has joined!");
-                        } else continue;
-                    } else if (!responseThread.isLaunched()
-                            && !request.getCommand().equalsIgnoreCase("quit")) {
-                        continue;
+                        } else if (!request.getCommand().equalsIgnoreCase("quit")){
+                            continue;
+                        } else {
+                            break;
+                        }
                     }
-
-                    if (request.getCommand().equalsIgnoreCase("quit")){
-                        break;
-                    }
-
 
                     Server.addRequest(robotName, request);
                 }

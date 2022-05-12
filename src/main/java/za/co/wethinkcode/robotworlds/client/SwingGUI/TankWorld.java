@@ -264,6 +264,10 @@ public class TankWorld extends JComponent implements GUI {
             }
         }
 
+        if (response.getCommandResponse().equalsIgnoreCase("Robot with that name already exists.")){
+            return;
+        }
+
         if (response.getCommandResponse().equalsIgnoreCase("You are dead")){
             JOptionPane.showMessageDialog(frame,
                     "You have been killed.",
