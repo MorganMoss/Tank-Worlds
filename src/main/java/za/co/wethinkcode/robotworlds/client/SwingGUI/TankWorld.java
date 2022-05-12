@@ -263,15 +263,37 @@ public class TankWorld extends JComponent implements GUI {
             }
         }
 
+        if (response.getCommandResponse().equalsIgnoreCase("You are dead")){
+            JOptionPane.showMessageDialog(frame,
+                    "You have been killed.",
+                    "G A M E  O V E R",
+                    JOptionPane.PLAIN_MESSAGE);
+            launched = false;
+            nameBox.setVisible(true);
+            tankBox.setVisible(true);
+            launchButton.setVisible(true);
+            return;
+        }
+
         runServerCorrections(response);
     }
 
     /*Swing component that paints onto the window*/
     @Override
     protected void paintComponent(Graphics g) {
+        if (!launched) {
+            g.setColor(new Color(213, 191, 191));
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+            g.setColor(Color.BLACK);
+            nameBox.setVisible(true);
+            tankBox.setVisible(true);
+            launchButton.setVisible(true);
+            g.drawString("Choose a Tank:",WIDTH/2-34, HEIGHT/2-10-5);
+            g.drawString("Enter a Name:",WIDTH/2-34, HEIGHT/2-10-75);
+            return;
+        }
 
         //Draw desert Sand
-        System.setProperty("myColor", "0XCE8540");
         g.setColor(new Color(205,133, 63));
         g.fillRect(0, 0, WIDTH, HEIGHT);
         g.setColor(Color.GRAY);
@@ -346,33 +368,20 @@ public class TankWorld extends JComponent implements GUI {
         }
 
         // spawn player tank TODO: implement designs for other tanks
-        if (launched){
-            player.draw(g);
-            if(showBoundaries){
-            g.setColor(Color.BLACK);
-            g.drawString("("+player.getX() +","+ player.getY()+")", player.getX(), player.getY()-35);
-            }
-            g.setColor(Color.RED);
-            //Explode fire command animation
-            if (showFireAnimation){
-                fireAnimation(g,player,enemyList,explodeCount);
-            }
-            explodeCount++;
-            if (explodeCount==10){
-            showFireAnimation =false;
-            explodeCount=1;
-            }
-
-        }else {
-            g.setColor(new Color(213, 191, 191));
-            g.fillRect(0, 0, WIDTH, HEIGHT);
-
-            g.setColor(Color.BLACK);
-            nameBox.setVisible(true);
-            tankBox.setVisible(true);
-
-            g.drawString("Choose a Tank:",WIDTH/2-34, HEIGHT/2-10-5);
-            g.drawString("Enter a Name:",WIDTH/2-34, HEIGHT/2-10-75);
+        player.draw(g);
+        if(showBoundaries){
+        g.setColor(Color.BLACK);
+        g.drawString("("+player.getX() +","+ player.getY()+")", player.getX(), player.getY()-35);
+        }
+        g.setColor(Color.RED);
+        //Explode fire command animation
+        if (showFireAnimation){
+            fireAnimation(g,player,enemyList,explodeCount);
+        }
+        explodeCount++;
+        if (explodeCount==10){
+        showFireAnimation =false;
+        explodeCount=1;
         }
     }
 
@@ -420,6 +429,8 @@ public class TankWorld extends JComponent implements GUI {
      * */
     public void runServerCorrections(Response response) {
 
+
+
         HashMap<String, Robot> enemies = response.getEnemyRobots();
 
         player.setName(response.getRobot().getRobotName());
@@ -430,8 +441,6 @@ public class TankWorld extends JComponent implements GUI {
         for(Robot enemy : enemies.values()){
             enemyPositions.add(enemy.getPosition());
         }
-//        System.out.println((response.getRobot().getPosition().getX()+50)+","+((-(response.getRobot().getPosition().getY())+50)));
-
 
         HashMap<Integer, HashMap<Integer, String>> map = response.getMap();
         //Goes through all the positions you can see

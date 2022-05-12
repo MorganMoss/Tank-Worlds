@@ -49,6 +49,10 @@ public class ClientSocket{
                 try {
                     Response response = Server.getResponse(robotName);
                     out.println(response.serialize());
+                    if (response.getCommandResponse().equalsIgnoreCase("quit successful")){
+                        break;
+                    }
+
                     if (response.getRobot().getLastCommand().equalsIgnoreCase("Launch")
                             && !response.getCommandResponse().equalsIgnoreCase("Success")
                     ){
@@ -56,6 +60,10 @@ public class ClientSocket{
                         break;
                     } else {
                         hasLaunched = true;
+                    }
+
+                    if (response.getCommandResponse().equalsIgnoreCase("You are dead")){
+                        hasLaunched = false;
                     }
                 } catch (NoChangeException ignored) {
                 }
@@ -95,20 +103,35 @@ public class ClientSocket{
                 while ((messageFromClient = in.readLine()) != null) {
                     Request request = Request.deSerialize(messageFromClient);
 
+
                     if (request.getCommand().equals("launch")) {
                         if (!responseThread.isLaunched()) {
-                            responseThread.start();
+                            if (!responseThread.isAlive()){
+                                responseThread.start();
+                            }
                             responseThread.setRobotName(request.getRobotName());
                             robotName = request.getRobotName();
                             System.out.println(robotName + " has joined!");
                         } else continue;
+                    } else if (!responseThread.isLaunched()
+                            && !request.getCommand().equalsIgnoreCase("quit")) {
+                        continue;
                     }
+
+                    if (request.getCommand().equalsIgnoreCase("quit")){
+                        break;
+                    }
+
 
                     Server.addRequest(robotName, request);
                 }
             } catch (IOException ex) {
-                System.out.println(robotName + " is shutting down");
-                Server.addRequest(robotName, new Request(robotName, "quit"));
+                if (responseThread.isLaunched()){
+                    System.out.println(robotName + " is shutting down");
+                    Server.addRequest(robotName, new Request(robotName, "quit"));
+                } else {
+                    System.out.println("Client shut down before launching");
+                }
             }
 
             try {

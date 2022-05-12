@@ -149,6 +149,7 @@ public class Robot {
 
     public void decreaseShield() {
         this.currentShield--;
+        System.out.println(currentShield);
     }
 
     public void setLastCommand(String lastCommand) {

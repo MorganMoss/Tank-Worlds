@@ -4,6 +4,7 @@ import za.co.wethinkcode.robotworlds.server.command.Command;
 import za.co.wethinkcode.robotworlds.shared.Position;
 import za.co.wethinkcode.robotworlds.shared.Robot;
 import za.co.wethinkcode.robotworlds.shared.exceptions.NoChangeException;
+import za.co.wethinkcode.robotworlds.shared.exceptions.RobotNotFoundException;
 import za.co.wethinkcode.robotworlds.shared.protocols.Request;
 import za.co.wethinkcode.robotworlds.shared.protocols.Response;
 
@@ -163,10 +164,12 @@ public class Server{
                 }
             }
         ) {
+
             Request request = currentRequests.getOrDefault(robotName, new Request(robotName, "idle"));
 
             try {
                 requestLog.add(request);
+
 
                 if (!request.getCommand().equals("idle")) {
                     System.out.println(request.getRobotName()
@@ -177,25 +180,31 @@ public class Server{
                 if (request.getCommand().equalsIgnoreCase("launch")) {
                     Command command = Command.create(request);
                     commandResponse = command.execute();
-                } else {
+                } else try {
                     Robot robot = World.getRobot(robotName);
 
+                    if (robot.hasDied()) {
+                        robot.setPaused(true);
+                        generateResponse(request, "You are dead");
+                        currentRequests.remove(robotName);
+                        World.remove(robotName);
+                        continue;
+                    }
+
                     if (!robot.isPaused() || request.getCommand().equalsIgnoreCase("quit")) {
-                        if (robot.hasDied()) {
-                            robot.setPaused(true);
-                            generateResponse(request, "You have died");
-                            currentRequests.remove(robotName);
-                        }
                         robot.setLastCommand(request.getCommand());
                         Command command = Command.create(request);
                         commandResponse = command.execute();
                     }
+                } catch (RobotNotFoundException robotDead){
+                    continue;
                 }
+
 
                 if (request.getCommand().equalsIgnoreCase("quit")){
                     System.out.println(request.getRobotName() + " has quit");
                     currentRequests.remove(robotName);
-                    return;
+                    continue;
                 }
 
                 World.getRobot(robotName).setLastCommand(request.getCommand());
@@ -225,8 +234,8 @@ public class Server{
 
 
         if (robot.hasDied()) {
-            robot.setPaused(true);
-            commandResponse = "You have died";
+            World.remove(robot);
+            commandResponse = "You are dead";
         }
 
         Response response = new Response(
