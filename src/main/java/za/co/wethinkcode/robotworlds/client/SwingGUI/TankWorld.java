@@ -305,12 +305,12 @@ public class TankWorld extends JComponent implements GUI {
                 for (Player enemy:enemyList){
                     if(projectile.isHitting(enemy)){
                         if (enemy!=projectile.getTank()){
-                        explosionX = enemy.getX();
-                        explosionY = enemy.getY();
-                        showFireAnimation = true;
-                        enemy.takeHit();
-                        player.addKill();
-                        hit=true;}
+                            explosionX = enemy.getX();
+                            explosionY = enemy.getY();
+                            showFireAnimation = true;
+                            enemy.takeHit();
+                            player.addKill();
+                            hit=true;}
                     }
                 }
 
@@ -473,8 +473,7 @@ public class TankWorld extends JComponent implements GUI {
                             player.setAmmo(response.getRobot().getCurrentAmmo());
                             player.setMaxAmmo(response.getRobot().getMaxAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
-//                            player.setRange(response.getRobot().getRange()*x_scale);
-                            player.setRange(response.getRobot().getFiringDistance()*x_scale);
+//                            player.setRange(response.getRobot().getFiringDistance()*x_scale);
                             player.setKills(response.getRobot().getKills());
                             player.setDeaths(response.getRobot().getDeaths());
 
@@ -505,8 +504,7 @@ public class TankWorld extends JComponent implements GUI {
                         enemy.setSprite(robot.getRobotType());
                         enemy.setAmmo(robot.getCurrentAmmo());
                         enemy.setTankHealth(robot.getCurrentShield());
-                        enemy.setRange(response.getRobot().getFiringDistance()*x_scale);
-                        enemy.setRange(robot.getFiringDistance());
+//                        enemy.setRange(response.getRobot().getFiringDistance()*x_scale);
                         enemy.setKills(robot.getKills());
 
                         switch (robot.getDirection()) {
@@ -526,7 +524,7 @@ public class TankWorld extends JComponent implements GUI {
 //                        System.out.println(robot.getLastCommand());
                         if (Objects.equals(robot.getLastCommand(), "fire")) {
                             if(!(enemy.getAmmo()<=0)){
-                            enemy.fire();}
+                                enemy.fire();}
                         }
 
                         enemyList.add(enemy);
