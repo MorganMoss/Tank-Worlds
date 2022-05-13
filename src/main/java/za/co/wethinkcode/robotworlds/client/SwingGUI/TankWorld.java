@@ -75,6 +75,12 @@ public class TankWorld extends JComponent implements GUI {
         frame.add(this);
         frame.setVisible(true);
         setFocusable(true);
+        SoundPlayer audio = new SoundPlayer("assets/audios/start.wav");
+        try {
+            audio.play();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
         start();
 
         // KEY LISTENER FOR USER INPUT
@@ -120,8 +126,6 @@ public class TankWorld extends JComponent implements GUI {
                             request = new Request(robotName, "fire");
                             lastRequest.add(request);
 
-//                        client.HelperMethods.playAudio("shoot.wav");
-
                             if (player.getAmmo() != 0) {
                                 player.fire();
                             }
@@ -134,6 +138,12 @@ public class TankWorld extends JComponent implements GUI {
                             lastRequest.add(request);
 
                             player.reload();
+                            SoundPlayer audio = new SoundPlayer("assets/audios/reload.wav");
+                            try {
+                                audio.play();
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                         break;
 
@@ -144,6 +154,12 @@ public class TankWorld extends JComponent implements GUI {
                             lastRequest.add(request);
 
                             player.repair();
+                            SoundPlayer audio = new SoundPlayer("assets/audios/health.wav");
+                            try {
+                                audio.play();
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                         break;
 
@@ -231,10 +247,12 @@ public class TankWorld extends JComponent implements GUI {
             throw new NoNewInput();
         }
     }
+
     //PaintComponent is our real showOutput
     @Override
     public void showOutput(Response response) {
         if (!launched ){
+
             if (response.getCommandResponse().equalsIgnoreCase("success")){
                 frame.setSize((TankWorld.getScreenWidth()/x_scale)*x_scale, (TankWorld.getScreenHeight()/y_scale)*y_scale);
 
@@ -289,6 +307,13 @@ public class TankWorld extends JComponent implements GUI {
         }
 
         if (response.getCommandResponse().equalsIgnoreCase("You are dead")){
+            SoundPlayer audio = new SoundPlayer("assets/audios/death.wav");
+            try {
+                audio.play();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+
             JOptionPane.showMessageDialog(frame,
                     "You have been killed.",
                     "G A M E  O V E R",
@@ -304,7 +329,6 @@ public class TankWorld extends JComponent implements GUI {
         runServerCorrections(response);
     }
     /*Swing component that paints onto the window*/
-
     @Override
     protected void paintComponent(Graphics g) {
         if (!launched) {
@@ -383,6 +407,12 @@ public class TankWorld extends JComponent implements GUI {
             }
 
             if (hit) {
+                SoundPlayer audio = new SoundPlayer("assets/audios/explode.wav");
+                try {
+                    audio.play();
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
                 explosionX = projectile.getX();
                 explosionY = projectile.getY();
                 showFireAnimation = true;

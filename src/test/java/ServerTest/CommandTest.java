@@ -114,7 +114,7 @@ public class CommandTest {
         World.add(robot);
         World.setRobotPosition(robot, new Position(0,0));
         FireCommand fireCommand = new FireCommand(robot.getRobotName());
-        assertEquals("Success",fireCommand.execute());
+        assertEquals("miss",fireCommand.execute());
         World.remove(robot.getRobotName());
     }
 

@@ -4,7 +4,7 @@ A SHOOT EM UP GAME BY:
 
 MFUNDO CELE<BR>
 MORGAN MOSS<BR>
-MAGGIE DEWET<BR>
+MAGDALEEN DE WET<BR>
 SISIPHO FIKIZOLO<BR>
 
 ## CONTROLS:
@@ -22,17 +22,16 @@ S = SHOW STATE AND MINIMAP<BR>
 B = SHOW COLLISION AND RANGE LINES<BR>
 ESC = QUIT<BR>
 
-![alt text](https://gitlab.wethinkco.de/mmoss021/toy-robot-world-mmms/-/blob/main/assets/images/cover.png)
 ![Screenshot](cover.png)
 
 ## SETUP:
 
 RUN THE SERVER:<BR>
-    open the server.jar folder in your terminal<BR>
-    use the command "java -jar toy-robot-world-mmms.jar"<BR>
+open the server.jar folder in your terminal<BR>
+use the command "java -jar toy-robot-world-mmms.jar"<BR>
 
 RUN THE CLIENT:<BR>
-    just double click the .jar file!<BR>
+just double click the .jar file!<BR>
 
 ## USING THE SERVER:
 

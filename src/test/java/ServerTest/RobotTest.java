@@ -17,7 +17,7 @@ public class RobotTest {
         assertEquals(3,testRobot.getCurrentShield());
         assertEquals(0,testRobot.getDeaths());
         assertEquals(0,testRobot.getKills());
-        assertEquals(10,testRobot.getFiringDistance());
+        assertEquals(3,testRobot.getFiringDistance());
         assertEquals(10,testRobot.getVisibilityDistance());
     }
 
@@ -29,8 +29,8 @@ public class RobotTest {
         assertEquals(1,testRobot.getCurrentShield());
         assertEquals(0,testRobot.getDeaths());
         assertEquals(0,testRobot.getKills());
-        assertEquals(15,testRobot.getFiringDistance());
-        assertEquals(20,testRobot.getVisibilityDistance());
+        assertEquals(9,testRobot.getFiringDistance());
+        assertEquals(10,testRobot.getVisibilityDistance());
     }
     @Test
     public void testMachine(){
@@ -40,7 +40,7 @@ public class RobotTest {
         assertEquals(2,testRobot.getCurrentShield());
         assertEquals(0,testRobot.getDeaths());
         assertEquals(0,testRobot.getKills());
-        assertEquals(10,testRobot.getFiringDistance());
+        assertEquals(2,testRobot.getFiringDistance());
         assertEquals(10,testRobot.getVisibilityDistance());
     }
     @Test
