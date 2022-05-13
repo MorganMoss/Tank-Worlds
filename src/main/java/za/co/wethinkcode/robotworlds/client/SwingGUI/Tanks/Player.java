@@ -139,6 +139,5 @@ public class Player extends Tank {
         g.drawString("Missiles: " + super.getAmmo(), 10, 150);
         g.drawString("Health: " + super.getTankHealth(), 10, 170);
         g.drawString("Kills: " + super.getKills(), 10, 210);
-        g.drawString("Deaths: " + super.getDeaths(), 10, 230);
     }
 }

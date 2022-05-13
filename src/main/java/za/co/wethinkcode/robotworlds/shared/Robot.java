@@ -114,10 +114,6 @@ public class Robot {
         return lastCommand;
     }
 
-    public void setVisibilityDistance(int visibilityDistance) {
-        this.visibilityDistance = visibilityDistance;
-    }
-
     public void setPaused(Boolean bool) {
         this.paused = bool;
     }
@@ -179,10 +175,6 @@ public class Robot {
 
     public int getKills() {
         return this.kills;
-    }
-
-    public boolean isFiring() {
-        return false;
     }
 
     public boolean hasDied() {

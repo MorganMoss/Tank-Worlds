@@ -108,7 +108,6 @@ public class Shell extends Projectile{
 
     //CHECK IF A MISSILE HAS HIT A WORLD OBJECT
     public boolean reachedRange(Direction direction){
-//        this.x-(range-1), this.y-(range-1), range*2, range*2
         Rectangle playerRect = new Rectangle(this.x,this.y,this.size,this.size);
         Rectangle tankRect = new Rectangle(tankX-(range-1),tankY-(range-1),
                 range*2, range*2);

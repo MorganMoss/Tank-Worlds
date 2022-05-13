@@ -382,10 +382,10 @@ public class TankWorld extends JComponent implements GUI {
 
             for (Player enemy:enemyList){
                 if(projectile.isHitting(enemy) && enemy!=projectile.getTank()){
-                        hit=true;
-                        enemy.takeHit();
-                        player.addKill();
-                        break;
+                    hit=true;
+                    enemy.takeHit();
+                    player.addKill();
+                    break;
                 }
             }
 
@@ -503,8 +503,6 @@ public class TankWorld extends JComponent implements GUI {
                             player.setMaxAmmo(response.getRobot().getMaxAmmo());
                             player.setTankHealth(response.getRobot().getCurrentShield());
                             player.setRange(response.getRobot().getFiringDistance()*x_scale);
-                            player.setKills(response.getRobot().getKills());
-                            player.setDeaths(response.getRobot().getDeaths());
 
                             switch(response.getRobot().getDirection()) {
                                 case NORTH:
@@ -536,6 +534,8 @@ public class TankWorld extends JComponent implements GUI {
                                     enemy.setAmmo(robot.getCurrentAmmo());
                                     enemy.setTankHealth(robot.getCurrentShield());
                                     enemy.setKills(robot.getKills());
+                                    enemy.setRange(response.getRobot().getFiringDistance() * x_scale);
+
                                     enemyNames.remove(valueAtPosition);
 
                                     switch (robot.getDirection()) {
