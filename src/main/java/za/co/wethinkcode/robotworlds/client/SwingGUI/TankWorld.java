@@ -286,6 +286,13 @@ public class TankWorld extends JComponent implements GUI {
         }
 
         if (response.getCommandResponse().equalsIgnoreCase("You are dead")){
+            SoundPlayer audio = new SoundPlayer("assets/audios/death.wav");
+            try {
+                audio.play();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+
             JOptionPane.showMessageDialog(frame,
                     "You have been killed.",
                     "G A M E  O V E R",
