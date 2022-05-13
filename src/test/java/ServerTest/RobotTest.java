@@ -13,45 +13,45 @@ public class RobotTest {
     public void testDefaultRobot(){
         Robot testRobot = new Robot("Hal","tank");
         assertEquals("Hal",testRobot.getRobotName());
-        assertEquals(5,testRobot.getCurrentAmmo());
-        assertEquals(3,testRobot.getCurrentShield());
+        assertEquals(testRobot.getMaxAmmo(),testRobot.getCurrentAmmo());
+        assertEquals(testRobot.getMaxShield(),testRobot.getCurrentShield());
         assertEquals(0,testRobot.getDeaths());
         assertEquals(0,testRobot.getKills());
-        assertEquals(3,testRobot.getFiringDistance());
-        assertEquals(10,testRobot.getVisibilityDistance());
+        assertEquals(10,testRobot.getFiringDistance());
+        assertEquals(12,testRobot.getVisibilityDistance());
     }
 
     @Test
     public void testSniper(){
         Robot testRobot = new Robot("Hal","sniper");
         assertEquals("Hal",testRobot.getRobotName());
-        assertEquals(3,testRobot.getCurrentAmmo());
-        assertEquals(1,testRobot.getCurrentShield());
+        assertEquals(testRobot.getMaxAmmo(),testRobot.getCurrentAmmo());
+        assertEquals(testRobot.getMaxShield(),testRobot.getCurrentShield());
         assertEquals(0,testRobot.getDeaths());
         assertEquals(0,testRobot.getKills());
-        assertEquals(9,testRobot.getFiringDistance());
-        assertEquals(10,testRobot.getVisibilityDistance());
+        assertEquals(18,testRobot.getFiringDistance());
+        assertEquals(20,testRobot.getVisibilityDistance());
     }
     @Test
     public void testMachine(){
         Robot testRobot = new Robot( "Hal","machine");
         assertEquals("Hal",testRobot.getRobotName());
-        assertEquals(20,testRobot.getCurrentAmmo());
-        assertEquals(2,testRobot.getCurrentShield());
+        assertEquals(testRobot.getMaxAmmo(),testRobot.getCurrentAmmo());
+        assertEquals(testRobot.getMaxShield(),testRobot.getCurrentShield());
         assertEquals(0,testRobot.getDeaths());
         assertEquals(0,testRobot.getKills());
-        assertEquals(2,testRobot.getFiringDistance());
-        assertEquals(10,testRobot.getVisibilityDistance());
+        assertEquals(4,testRobot.getFiringDistance());
+        assertEquals(6,testRobot.getVisibilityDistance());
     }
     @Test
     public void testBomber(){
         Robot testRobot = new Robot( "Hal","bomber");
         assertEquals("Hal",testRobot.getRobotName());
-        assertEquals(10,testRobot.getCurrentAmmo());
-        assertEquals(3,testRobot.getCurrentShield());
+        assertEquals(testRobot.getMaxAmmo(),testRobot.getCurrentAmmo());
+        assertEquals(testRobot.getMaxShield(),testRobot.getCurrentShield());
         assertEquals(0,testRobot.getDeaths());
         assertEquals(0,testRobot.getKills());
-        assertEquals(5,testRobot.getFiringDistance());
+        assertEquals(8,testRobot.getFiringDistance());
         assertEquals(10,testRobot.getVisibilityDistance());
     }
 }

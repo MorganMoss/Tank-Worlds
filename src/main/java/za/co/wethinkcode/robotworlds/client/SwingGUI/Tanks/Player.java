@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class Player extends Tank {
     private int oldSize = 0;
 
-    private ArrayList<Image> tankImages = new ArrayList<>();
+    private final ArrayList<Image> tankImages = new ArrayList<>();
     private Image deadImage;
 
     public Player(String tankType,String name){
@@ -23,19 +23,15 @@ public class Player extends Tank {
         switch (tankType.toLowerCase()){
             case "sniper":
                 super.setSprite("sniper");
-                super.setMaxAmmo(5);
                 break;
             case "machine":
                 super.setSprite("machine");
-                super.setRange(50);
                 break;
             case "bomber":
                 super.setSprite("bomber");
-                super.setMaxAmmo(5);
                 break;
             default:
                 super.setSprite("tank");
-                super.setMaxAmmo(10);
         }
     }
 

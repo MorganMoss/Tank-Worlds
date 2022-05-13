@@ -34,8 +34,8 @@ public class Robot {
         switch (robotType.toLowerCase()){
             case "sniper":
                 this.robotType = "sniper";
-                this.size = 20;
-                this.fireDistance = 9;
+                this.size = 10;
+                this.fireDistance = 18;
                 this.maxAmmo = 3;
                 this.maxShield = 1;
                 this.visibilityDistance = 20;
@@ -43,26 +43,26 @@ public class Robot {
             case "machine":
                 this.robotType = "machine";
                 this.size = 10;
-                this.fireDistance = 2;
+                this.fireDistance = 4;
                 this.maxAmmo = 20;
-                this.maxShield = 2;
-                this.visibilityDistance = 5;
+                this.maxShield = 3;
+                this.visibilityDistance = 6;
                 break;
             case "bomber":
                 this.robotType = "bomber";
                 this.size = 10;
-                this.fireDistance = 5;
+                this.fireDistance = 8;
                 this.maxAmmo = 10;
-                this.maxShield = 3;
+                this.maxShield = 5;
                 this.visibilityDistance = 10;
                 break;
             default:
                 this.robotType = "tank";
                 this.size = 10;
-                this.fireDistance = 3;
+                this.fireDistance = 10;
                 this.maxAmmo = 5;
                 this.maxShield = 3;
-                this.visibilityDistance = 10;
+                this.visibilityDistance = 12;
                 break;
         }
         this.currentShield = this.maxShield;

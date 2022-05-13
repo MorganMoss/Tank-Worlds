@@ -40,26 +40,17 @@ public class TanksTest {
         assertEquals(2,direction.ordinal());
     }
     @Test
-    public  void testEnemy(){
-        Player enemy = new Player("Enemy1","Enemy1");
+    public void testEnemy(){
+        Player enemy = new Player("machine","Enemy1");
         assertEquals("Enemy1",enemy.getTankName());
-        assertEquals(2,enemy.getTankHealth());
-        assertEquals(10,enemy.getAmmo());
-        assertEquals("Up",enemy.getDirection().toString());
-        assertEquals(75,enemy.getRange());
-        assertEquals(40,enemy.getSize());
+        assertEquals("machine", enemy.getSpriteName());
 
     }
     @Test
     public  void testPlayer(){
         Player player = new Player("sniper","hal");
         assertEquals("hal",player.getTankName());
-        assertEquals(3,player.getTankHealth());
-        assertEquals(5,player.getAmmo());
-
-        assertEquals("Up",player.getDirection().toString());
-        assertEquals(125,player.getRange());
-        assertEquals(40,player.getSize());
+        assertEquals("sniper", player.getSpriteName());
 
     }
 
