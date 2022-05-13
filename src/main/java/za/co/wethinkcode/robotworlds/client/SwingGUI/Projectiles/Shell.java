@@ -85,16 +85,16 @@ public class Shell extends Projectile{
     public void project(Direction direction){
         switch (direction){
             case Up:
-                this.y-=5;
+                this.y-=15;
                 break;
             case Down:
-                this.y+=5;
+                this.y+=15;
                 break;
             case Left:
-                this.x-=5;
+                this.x-=15;
                 break;
             case Right:
-                this.x+=5;
+                this.x+=15;
         }
     }
 

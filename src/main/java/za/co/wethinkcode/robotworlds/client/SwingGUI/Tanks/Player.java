@@ -3,7 +3,9 @@ package za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Shell;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.SoundPlayer;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
+import za.co.wethinkcode.robotworlds.shared.protocols.Request;
 
 import java.awt.*;
 import java.util.Locale;
@@ -63,6 +65,13 @@ public class Player extends Tank {
     }
 
     public void fire() {
+        SoundPlayer audio = new SoundPlayer("assets/audios/shoot.wav");
+
+        try {
+            audio.play();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
         Shell newBullet = new Shell();
         newBullet.discharge(this);
         super.decreaseAmmo();

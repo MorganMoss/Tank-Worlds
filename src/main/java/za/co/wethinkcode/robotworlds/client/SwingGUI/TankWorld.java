@@ -107,6 +107,12 @@ public class TankWorld extends JComponent implements GUI {
         frame.add(this);
         frame.setVisible(true);
         setFocusable(true);
+        SoundPlayer audio = new SoundPlayer("assets/audios/start.wav");
+        try {
+            audio.play();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
         start();
 
         // KEY LISTENER FOR USER INPUT
@@ -148,11 +154,10 @@ public class TankWorld extends JComponent implements GUI {
                         break;
 
                     case KeyEvent.VK_SPACE:
+
                         if (launched) {
                             request = new Request(clientName, "fire");
                             lastRequest.add(request);
-
-//                        client.HelperMethods.playAudio("shoot.wav");
 
                             if (player.getAmmo() != 0) {
                                 player.fire();
@@ -166,16 +171,27 @@ public class TankWorld extends JComponent implements GUI {
                             lastRequest.add(request);
 
                             player.reload();
+                            SoundPlayer audio = new SoundPlayer("assets/audios/reload.wav");
+                            try {
+                                audio.play();
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                         break;
 
                     case KeyEvent.VK_H:
-//                        client.HelperMethods.playAudio(Tools.nextBoolean() ? "supershoot.wav" : "supershoot.aiff");
                         if (launched) {
                             request = new Request(clientName, "repair");
                             lastRequest.add(request);
 
                             player.repair();
+                            SoundPlayer audio = new SoundPlayer("assets/audios/health.wav");
+                            try {
+                                audio.play();
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                         break;
 
@@ -246,6 +262,7 @@ public class TankWorld extends JComponent implements GUI {
     @Override
     public void showOutput(Response response) {
         if (!launched ){
+
             if (response.getCommandResponse().equalsIgnoreCase("success")){
                 player = new Player(robotType, clientName);
 
@@ -377,6 +394,14 @@ public class TankWorld extends JComponent implements GUI {
 
             //REMOVE PROJECTILE FROM WORLD
             if(hit){
+                SoundPlayer audio = new SoundPlayer("assets/audios/explode.wav");
+
+                try {
+                    audio.play();
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+
                 projectileList.remove(i-1);
             }
         }
