@@ -452,6 +452,7 @@ public class TankWorld extends JComponent implements GUI {
      * */
     public void runServerCorrections(Response response) {
         HashMap<String, Robot> enemies = response.getEnemyRobots();
+        enemyPositions.clear();
 
         //Minimap positions
         player.setAbsoluteX(response.getRobot().getPosition().getX()+50);
@@ -532,6 +533,7 @@ public class TankWorld extends JComponent implements GUI {
                                     enemy.setX((x + x_offset) * x_scale);
                                     enemy.setY(getScreenHeight() - (y + y_offset) * y_scale);
                                     enemy.setAmmo(robot.getCurrentAmmo());
+                                    enemy.setRange(robot.getFiringDistance()*x_scale);
                                     enemy.setTankHealth(robot.getCurrentShield());
                                     enemy.setKills(robot.getKills());
                                     enemy.setRange(response.getRobot().getFiringDistance() * x_scale);
