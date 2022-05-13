@@ -7,9 +7,8 @@ public class Robot {
     private final String robotType;
     private final int maxAmmo;
     private int maxShield;
-    private int visibilityDistance;
+    private final int visibilityDistance;
     private final int fireDistance;
-    private final int size;
 
     private String lastCommand;
     private Position position;
@@ -17,12 +16,9 @@ public class Robot {
     private int currentShield;
     private int currentAmmo;
     private int kills=0;
-    private int deaths=0;
 
     private boolean paused;
     private String status;
-    private boolean isFiring = false;
-
 
     public Robot(String robotName, String robotType) {
         this.robotName = robotName;
@@ -34,7 +30,6 @@ public class Robot {
         switch (robotType.toLowerCase()){
             case "sniper":
                 this.robotType = "sniper";
-                this.size = 10;
                 this.fireDistance = 18;
                 this.maxAmmo = 3;
                 this.maxShield = 1;
@@ -42,7 +37,6 @@ public class Robot {
                 break;
             case "machine":
                 this.robotType = "machine";
-                this.size = 10;
                 this.fireDistance = 4;
                 this.maxAmmo = 20;
                 this.maxShield = 3;
@@ -50,7 +44,6 @@ public class Robot {
                 break;
             case "bomber":
                 this.robotType = "bomber";
-                this.size = 10;
                 this.fireDistance = 8;
                 this.maxAmmo = 10;
                 this.maxShield = 5;
@@ -58,7 +51,6 @@ public class Robot {
                 break;
             default:
                 this.robotType = "tank";
-                this.size = 10;
                 this.fireDistance = 10;
                 this.maxAmmo = 5;
                 this.maxShield = 3;
@@ -67,10 +59,6 @@ public class Robot {
         }
         this.currentShield = this.maxShield;
         this.currentAmmo = this.maxAmmo;
-    }
-
-    public int getDeaths(){
-        return this.deaths;
     }
 
     public String getRobotName() {
@@ -189,5 +177,9 @@ public class Robot {
                 "\nshields : " +currentShield+
                 "\nshots : " +currentAmmo+
                 "\nstatus : "+status;
+    }
+
+    public void addKill() {
+        kills++;
     }
 }

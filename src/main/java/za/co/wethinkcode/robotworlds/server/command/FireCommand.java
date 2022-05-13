@@ -41,6 +41,9 @@ public class FireCommand extends Command{
                 if (result.contains("hit enemy ")){
                         Robot enemy = World.getRobot(result.replace("hit enemy ", ""));
                         enemy.decreaseShield();
+                        if (enemy.hasDied()){
+                            robot.addKill();
+                        }
                     }
                     return result;
                 }
