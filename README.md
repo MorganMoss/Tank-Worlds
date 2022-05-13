@@ -22,7 +22,6 @@ S = SHOW STATE AND MINIMAP<BR>
 B = SHOW COLLISION AND RANGE LINES<BR>
 ESC = QUIT<BR>
 
-![alt text](https://gitlab.wethinkco.de/mmoss021/toy-robot-world-mmms/-/blob/main/assets/images/cover.png)
 ![Screenshot](cover.png)
 
 ## SETUP:
