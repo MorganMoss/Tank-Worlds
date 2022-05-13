@@ -31,7 +31,7 @@ public class Client {
 
     //these can be removed after debugging lag
     private static Long start;
-    private static int tickRate = 50;
+    private static final int tickRate = 50;
 
     /**
      * Gets a generic property from the client config file

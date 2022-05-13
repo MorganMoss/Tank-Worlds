@@ -114,6 +114,10 @@ public class ClientSocket{
                 while ((messageFromClient = in.readLine()) != null) {
                     Request request = Request.deSerialize(messageFromClient);
 
+                    if (request.getCommand().equalsIgnoreCase("quit")){
+                        break;
+                    }
+
                     if (!responseThread.isLaunched()) {
                         if (request.getCommand().equals("launch")) {
                             try {
@@ -121,33 +125,30 @@ public class ClientSocket{
                                 responseThread.sendResponse(new Response(null, "Robot with that name already exists.",null,null));
                                 continue;
                             } catch (RobotNotFoundException goAsNormal) {
+                                System.out.println(robotName + " has joined!");
+                                responseThread.setRobotName(request.getRobotName());
+                                robotName = request.getRobotName();
                             }
-                            System.out.println(robotName + " has joined!");
-                            responseThread.setRobotName(request.getRobotName());
-                            robotName = request.getRobotName();
-                        } else if (!request.getCommand().equalsIgnoreCase("quit")){
-                            continue;
-                        } else {
-                            break;
                         }
                     }
 
                     Server.addRequest(robotName, request);
                 }
-            } catch (IOException ex) {
+
                 if (responseThread.isLaunched()){
                     System.out.println(robotName + " is shutting down");
                     Server.addRequest(robotName, new Request(robotName, "quit"));
                 } else {
                     System.out.println("Client shut down before launching");
                 }
-            }
 
-            try {
-                responseThread.out.close();
-                in.close();
-            } catch (IOException ignored) {
-            }
+                try {
+                    responseThread.out.close();
+                    in.close();
+                } catch (IOException ignored) {
+                }
+
+            } catch (IOException ignored) {}
         }
     }
 }

@@ -38,7 +38,7 @@ public class Robot {
                 this.fireDistance = 9;
                 this.maxAmmo = 3;
                 this.maxShield = 1;
-                this.visibilityDistance = 10;
+                this.visibilityDistance = 20;
                 break;
             case "machine":
                 this.robotType = "machine";
@@ -46,7 +46,7 @@ public class Robot {
                 this.fireDistance = 2;
                 this.maxAmmo = 20;
                 this.maxShield = 2;
-                this.visibilityDistance = 10;
+                this.visibilityDistance = 5;
                 break;
             case "bomber":
                 this.robotType = "bomber";

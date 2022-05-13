@@ -19,6 +19,8 @@ public abstract class Tank implements WorldObject {
     private int deaths=0;
     int size;
 
+    protected Direction oldDirection = direction;
+
     //getters
     public int getX(){return this.x;}
     public int getY(){return this.y;}

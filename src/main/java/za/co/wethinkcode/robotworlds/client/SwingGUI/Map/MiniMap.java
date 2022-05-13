@@ -1,6 +1,7 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI.Map;
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
+import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Player;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks.Tank;
 import za.co.wethinkcode.robotworlds.server.obstacle.Obstacle;
 import za.co.wethinkcode.robotworlds.shared.Position;
@@ -19,6 +20,7 @@ public class MiniMap {
     }
 
     public static void draw(Graphics g, Tank player){
+
         ArrayList<Position> enemyPositions = TankWorld.getEnemyPositions();
 
         g.setColor(Color.BLACK);

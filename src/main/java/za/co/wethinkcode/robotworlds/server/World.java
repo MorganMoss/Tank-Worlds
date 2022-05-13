@@ -80,7 +80,7 @@ public class World {
 
     /**
      * This should take the config file and get a map
-     * @return a map that will be used to define the world's size and it's obstacles
+     * @return a map that will be used to define the world's size, and it's obstacles
      */
     private static Map getMap() {
         String[] mapSize;
@@ -189,11 +189,8 @@ public class World {
      * */
     public static void add(Robot robot) {
         //limits imposed by server config
-        if (robot.getVisibilityDistance() > visibilityDistance){
-            robot.setVisibilityDistance(visibilityDistance);
-        }
         if (robot.getMaxShield() > maxShield){
-            robot.setVisibilityDistance(visibilityDistance);
+            robot.setMaxShield(maxShield);
         }
 
         robot.setPosition(getLaunchPosition());
@@ -231,8 +228,6 @@ public class World {
      *          "hit enemy {enemyName}" : if an enemy is hit
      */
     public static String pathBlocked(Robot robot, Position newPosition) {
-//        final int low;
-//        final int high;
         String response = "";
         Position position = robot.getPosition();
 
@@ -362,7 +357,10 @@ public class World {
      * @return : a grid of data representing the relative view from this position
      */
     public static HashMap<Integer, HashMap<Integer, String>> look(Robot robot) {
-       return look(robot.getPosition(), robot.getVisibilityDistance());
+        //limits imposed by server config
+        return look(robot.getPosition(), (
+                Math.min(robot.getVisibilityDistance(), visibilityDistance))
+        );
     }
 
     /**

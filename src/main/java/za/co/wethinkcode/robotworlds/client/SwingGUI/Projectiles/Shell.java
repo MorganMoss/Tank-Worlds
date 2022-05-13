@@ -77,7 +77,9 @@ public class Shell extends Projectile{
     //DISPLAY MISSILE ON GUI
     @Override
     public void draw(Graphics g) {
-        g.drawImage(tank.getDirection().getImage("missile"), x+14, y+14, null);
+        Image shell = tank.getDirection().getImage("missile");
+        g.drawImage(shell, x+tank.getSize()/2-6, y+tank.getSize()/2-6, null);
+        g.drawImage(shell, x+tank.getSize()/2-6, y+tank.getSize()/2-6, null);
     }
 
     //ANIMATE MISSILE ON WORLD
@@ -85,16 +87,16 @@ public class Shell extends Projectile{
     public void project(Direction direction){
         switch (direction){
             case Up:
-                this.y-=5;
+                this.y-=TankWorld.getX_scale()/2;
                 break;
             case Down:
-                this.y+=5;
+                this.y+=TankWorld.getX_scale()/2;
                 break;
             case Left:
-                this.x-=5;
+                this.x-=TankWorld.getX_scale()/2;
                 break;
             case Right:
-                this.x+=5;
+                this.x+=TankWorld.getX_scale()/2;
         }
     }
 

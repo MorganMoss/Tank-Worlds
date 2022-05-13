@@ -1,64 +1,75 @@
 package za.co.wethinkcode.robotworlds.client.SwingGUI.Tanks;
 
 import za.co.wethinkcode.robotworlds.client.SwingGUI.HelperMethods;
-import za.co.wethinkcode.robotworlds.client.SwingGUI.Map.MiniMap;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.Projectiles.Shell;
 import za.co.wethinkcode.robotworlds.client.SwingGUI.TankWorld;
 
 import java.awt.*;
-import java.util.Locale;
+import java.util.ArrayList;
 
 public class Player extends Tank {
+    private int oldSize = 0;
 
+    private ArrayList<Image> tankImages = new ArrayList<>();
+    private Image deadImage;
 
     public Player(String tankType,String name){
 
+        super.setName(name);
+        super.setX(100);
+        super.setY(200);
         switch (tankType.toLowerCase()){
             case "sniper":
                 super.setSprite("sniper");
-                super.setName(name);
-                super.setTankHealth(3);
-                super.setAmmo(5);
                 super.setMaxAmmo(5);
-                super.setRange(125);
-                super.setSize(40);
-                super.setX(100);
-                super.setY(200);
-
                 break;
             case "machine":
                 super.setSprite("machine");
-                super.setName(name);
-                super.setTankHealth(1);
-                super.setAmmo(20);
-                super.setMaxAmmo(20);
                 super.setRange(50);
-                super.setSize(40);
-                super.setX(100);
-                super.setY(200);
                 break;
             case "bomber":
                 super.setSprite("bomber");
-                super.setName(name);
-                super.setTankHealth(2);
-                super.setAmmo(5);
                 super.setMaxAmmo(5);
-                super.setRange(75);
-                super.setSize(40);
-                super.setX(100);
-                super.setY(200);
                 break;
             default:
                 super.setSprite("tank");
-                super.setName(name);
-                super.setTankHealth(2);
-                super.setAmmo(10);
                 super.setMaxAmmo(10);
-                super.setRange(75);
-                super.setSize(40);
-                super.setX(100);
-                super.setY(200);
         }
+    }
+
+    @Override
+    public void setSize(int size) {
+        if (oldSize != size){
+            oldSize = this.size;
+            super.setSize(size);
+            MediaTracker tracker = new MediaTracker(new java.awt.Container());
+
+            deadImage = HelperMethods.getImage("deademoji.png").getScaledInstance(size,size, Image.SCALE_FAST);
+            tracker.addImage(deadImage,0);
+
+            Image tankImageUp = Direction.Up.getImage(super.getSpriteName()).getScaledInstance(size,size, Image.SCALE_FAST);
+            tracker.addImage(tankImageUp,1);
+            Image tankImageDown = Direction.Down.getImage(super.getSpriteName()).getScaledInstance(size,size, Image.SCALE_FAST);
+            tracker.addImage(tankImageDown,2);
+            Image tankImageLeft = Direction.Left.getImage(super.getSpriteName()).getScaledInstance(size,size, Image.SCALE_FAST);
+            tracker.addImage(tankImageLeft,3);
+            Image tankImageRight = Direction.Right.getImage(super.getSpriteName()).getScaledInstance(size,size, Image.SCALE_FAST);
+            tracker.addImage(tankImageRight,4);
+
+            tankImages.clear();
+
+            tankImages.add(tankImageUp);
+            tankImages.add(tankImageDown);
+            tankImages.add(tankImageLeft);
+            tankImages.add(tankImageRight);
+            // wait for image to be ready
+            try {
+                tracker.waitForAll();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException("Image loading interrupted", ex);
+            }
+        }
+
 
     }
 
@@ -87,20 +98,33 @@ public class Player extends Tank {
         if (TankWorld.getShowBoundaries()) {
             //Range
             g.setColor(Color.GREEN);
-            g.drawRect(super.getX() - (super.getRange() - 1)+20, super.getY() - (super.getRange() - 1)+20, super.getRange() * 2, super.getRange() * 2);
+            g.drawRect(super.getX() - (super.getRange() - 1)+size/2, super.getY() - (super.getRange() - 1)+size/2, super.getRange() * 2, super.getRange() * 2);
             g.setColor(Color.RED);
             g.drawRect(super.getX(), super.getY(), super.getSize(), super.getSize());
         }
 
         boolean playerDead = super.getTankHealth()==0;
-        Image tankImage = super.getDirection().getImage(super.getSpriteName());
 
-        if (playerDead) {
-            g.drawImage(HelperMethods.getImage("deademoji.png"),
-                    super.getX(), super.getY(), null);
+        int index=0;
+        switch (getDirection()){
+            case Left:
+                index = 2;
+                break;
+            case Up:
+                index = 0;
+                break;
+            case Right:
+                index = 3;
+                break;
+            case Down:
+                index = 1;
+                break;
         }
-        else{
-            g.drawImage(tankImage, super.getX(), super.getY(), null);
+
+        if (!playerDead) {
+            g.drawImage(tankImages.get(index), super.getX(), super.getY(), null);
+        } else {
+            g.drawImage(deadImage, super.getX(), super.getY(), null);
         }
     }
 
@@ -109,11 +133,7 @@ public class Player extends Tank {
         g.setFont(new Font("Default", Font.BOLD, 14));
         g.drawString("Missiles: " + super.getAmmo(), 10, 150);
         g.drawString("Health: " + super.getTankHealth(), 10, 170);
-//        g.drawString("Enemies Left: " + enemiesLeft, 10, 190);
         g.drawString("Kills: " + super.getKills(), 10, 210);
         g.drawString("Deaths: " + super.getDeaths(), 10, 230);
-//        double kdRatio = kills/deaths;
-//        g.drawString("K/D: " + kdRatio, 10, 250);
-
     }
 }
